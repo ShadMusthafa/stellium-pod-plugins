@@ -422,9 +422,45 @@ sap.ui.define([
             const isPackUnpack = this.oUserAction.isPack() || this.oUserAction.isUnpack();
             const fnOnSuccess = isPackUnpack ? this.onUnitSaveSuccess : this.updatePackingUnitData;
 
+            this._createCPIServiceRequest(oPackingUnit);
+            
             return this.oServiceClient.put(sUrl, oPackingUnit)
                 .then(fnOnSuccess.bind(this))
                 .catch(this.onUnitSaveError.bind(this));
+            
+        },
+
+        _createCPIServiceRequest: function(oPackingUnit){
+            var oView = this.getView(),
+                oAuxModel = oView.getModel('auxData'),
+                oData= oAuxModel.getData(),
+                oPayloadData = [];
+            
+            oPayloadData = oData.content.map(oItem=>{
+                return {
+                    "site" : oData.plant,
+                    "orderNo" : oItem.sfc.shopOrder.shopOrder,
+                    "orderStatus" : 0,
+                    "headerMat" : oItem.sfc.material.material,
+                    "description" : oItem.sfc.material.description,
+                    "packUnit" : oData.number,
+                    "packStatus" : oPackingUnit.status,
+                    "qty" : oItem.quantity,
+                    "uom" : oItem.unitOfMeasure
+                  }
+            });
+
+            var oPayload = {
+                StartParams: oPayloadData
+            }
+            console.log('CPI service payload', oPayload);
+            
+            var sUrl = this.getPublicApiRestDataSourceUri() + "/pe/api/v1/process/processDefinitions/start?key=REG_fcfb5385-e4a6-4534-9504-55f95dfced22";
+            this.ajaxPostRequest(sUrl, oPayload, function(oResponse){
+                Log.info(oResponse);
+            }, function(){
+                Log.error(...arguments)
+            })
         },
 
         unloadPackingUnit: function (bCancelLogisticsOrder) {

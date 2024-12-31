@@ -23,20 +23,4 @@ modules:
                      \"Content-Type\",\"x-dme-plant\",\"x-dme-industry-type\",\"x-features\"]}]"
    build-parameters:
     supported-platforms: [CF]
-   requires:
-    - name: uaa_SMDEVPluginsMTA
-    - name: dest_SMDEVPluginsMTA
-resources:
- - name: uaa_SMDEVPluginsMTA
-   parameters:
-      path: ./xs-security.json
-      service-plan: application
-      service: xsuaa
-   type: org.cloudfoundry.managed-service
-
- - name: dest_SMDEVPluginsMTA
-   parameters:
-      service-plan: lite
-      service: destination
-   type: org.cloudfoundry.managed-service
 
