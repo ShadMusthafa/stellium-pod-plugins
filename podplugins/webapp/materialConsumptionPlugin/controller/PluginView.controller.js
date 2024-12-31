@@ -2290,6 +2290,12 @@ sap.ui.define([
 
         _enableConfirmButton: function () {
             var isErrorStateExist = false;
+            // Call the new batch validation function - AD-006
+            if (this.batchDetailsModel && this.batchDetailsModel.getData() && this.batchDetailsModel.getData().length > 0) {
+                if (!this._validateBatchSelection()) {
+                    return;
+                }
+            }
             var oFormContent = this.getFormControl();
             // validation for initial popup opening
             if (!oFormContent) return;
@@ -4462,6 +4468,38 @@ sap.ui.define([
             //Now we have storagelocations, call and get the remaining quantities
             aStorageLocations && aStorageLocations.length > 0 && this.handleStorageLocationDetails(aStorageLocations.join(','));
         },
-
+        // To set Validation of lower expiry Batch - AD-006
+        _validateBatchSelection: function () {
+            var batchDetails = this.batchDetailsModel.getData();
+            var oModel = this.getCurrentModel();
+            var batchNumber = oModel.getProperty("/batchNumber");
+            var inputBatch = this.byId("inputBatchIdAdd");
+            if (!batchDetails || !batchNumber || !inputBatch) {
+                return false;
+            }
+            // Find the batch with the earliest expiry date
+            var lowestExpiryBatch = batchDetails.reduce((minBatch, currentBatch) => {
+                var minExpiry = new Date(minBatch.expiry);
+                var currentExpiry = new Date(currentBatch.expiry);
+                return currentExpiry < minExpiry ? currentBatch : minBatch;
+            });
+            // Check if the selected batch has the lowest expiry date
+            if (batchNumber !== lowestExpiryBatch.batchNumber) {
+                var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
+                var sErrorText = oResourceBundle.getText("errorLowerBatchExpiry", [
+                    lowestExpiryBatch.batchNumber,
+                    lowestExpiryBatch.expiry
+                ]);
+                inputBatch.setValueState("Error");
+                inputBatch.setValueStateText(sErrorText);
+                var oCSaveBtn = this.getCurrentSaveButton();
+                    oCSaveBtn.setEnabled(false);
+                return false;
+            } else {
+                inputBatch.setValueState("None");
+                inputBatch.setValueStateText(null);
+                return true;
+            }
+        }
     });
 });
