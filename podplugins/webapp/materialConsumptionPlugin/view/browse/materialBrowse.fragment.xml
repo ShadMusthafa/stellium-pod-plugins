@@ -1,0 +1,141 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:fb="sap.ui.comp.filterbar" xmlns:l="sap.ui.layout">
+<Dialog id="dialog" title="{i18n-material>materialBrowse.title}" afterClose="onClose" contentHeight="2000px">
+<content>
+<fb:FilterBar id="filterBar" showGoOnFB="false" showClearOnFB="true" showFilterConfiguration="false" filterBarExpanded="false" filterContainerWidth="225px" clear="onFilterBarClear" basicSearch="searchField">
+<fb:content>
+<l:VerticalLayout visible="false">
+<SearchField id="searchField" showSearchButton="false" liveChange="onSearchLiveChange" maxLength="200"/>
+</l:VerticalLayout>
+</fb:content>
+<fb:filterGroupItems>
+<fb:FilterGroupItem groupName="basic" name="material" label="{i18n-material>common.material.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Input id="materialFilter" change="onFilterBarChange" class="mesUpperCaseTransform" maxLength="200"/>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="description" label="{i18n-global>common.description.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Input id="descriptionFilter" change="onFilterBarChange" maxLength="200"/>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="materialType" label="{i18n-objectType>common.materialType.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Select id="materialTypeFilter" selectedKey="ALL" items="{materialTypeItems>/}" change="onFilterBarChange">
+<items>
+<core:Item key="{materialTypeItems>key}" text="{materialTypeItems>text}"/>
+</items>
+</Select>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="procurementType" label="{i18n-objectType>common.procurementType.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Select id="typeFilter" selectedKey="ALL" items="{procurementTypeItems>/}" change="onFilterBarChange">
+<items>
+<core:Item key="{procurementTypeItems>key}" text="{procurementTypeItems>text}"/>
+</items>
+</Select>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="status" label="{i18n-status>common.status.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Select id="statusFilter" selectedKey="ALL" items="{materialStatusItems>/}" change="onFilterBarChange">
+<items>
+<core:Item key="{materialStatusItems>key}" text="{materialStatusItems>text}"/>
+</items>
+</Select>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="bom" label="{i18n-bom>common.bom.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Input id="bomFilter" class="mesUpperCaseTransform" showValueHelp="true" valueHelpRequest="onBomBrowse" change="onFilterBarChange" maxLength="200"/>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="routing" label="{i18n-routing>common.routing.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Input id="routingFilter" class="mesUpperCaseTransform" showValueHelp="true" valueHelpRequest="onRoutingBrowse" change="onFilterBarChange" maxLength="200"/>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="dataToCollectAtAssembly" label="{i18n-dataCollection>common.dataToCollectAtAssembly.lbl}" visibleInFilterBar="true">
+<fb:control>
+<ComboBox id="dataToCollectAtAssemblyFilter" showSecondaryValues="true" change="onFilterBarChange" items="{ path: 'product>/DataTypes', parameters: { $filter: 'category eq com.sap.mes.odata.DataTypeCategory\'ASSEMBLY\'', $select: 'ref,dataType,description' } }">
+<core:ListItem key="{ref}" text="{dataType}" additionalText="{description}"/>
+</ComboBox>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="lotSize" label="{i18n-material>common.lotSize.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Input id="lotSizeFilter" type="Number" change="onFilterBarChange" maxLength="200"/>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="materialGroup" label="{i18n-material>common.materialGroup.lbl}" visibleInFilterBar="true">
+<fb:control>
+<ComboBox id="materialGroupFilter" showSecondaryValues="true" change="onFilterBarChange" items="{ path: 'product>/MaterialGroups', parameters: { $select: 'ref,materialGroup,description' } }">
+<core:ListItem key="{ref}" text="{materialGroup}" additionalText="{description}"/>
+</ComboBox>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="creationTimeRange" label="{i18n-global>common.creationTimeRange.lbl}" visibleInFilterBar="true">
+<fb:control>
+<DateRangeSelection id="creationTimeRangeFilter" displayFormat="yyyy/MM/dd" change="onFilterBarChange"/>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="currentVersion" label="{i18n-global>common.currentVersionOnly.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Switch id="currentVersionFilter" customTextOn="{i18n>yes}" customTextOff="{i18n>no}" change="onFilterBarChange"/>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="mrpController" label="{i18n-material>materialBrowse.mrpController.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Input id="mrpControllerFilter" type="Number" change="onFilterBarChange" maxLength="3"/>
+</fb:control>
+</fb:FilterGroupItem>
+</fb:filterGroupItems>
+</fb:FilterBar>
+<Table id="resultTableAddMat" items="{ path: 'product>/Materials', parameters: { $select: ['ref','material','version','description','unitOfMeasure','status','materialType','procurementType','lotSize','currentVersion','mrpController', 'incrementBatchNumber','productionStorageLocation'] } }" mode="SingleSelectMaster" selectionChange="onSelect" growing="true" growingThreshold="20" growingScrollToLoad="true">
+<columns>
+<Column width="13em">
+<Text text="{i18n-material>common.material.lbl}"/>
+</Column>
+<Column width="5em" minScreenWidth="Tablet" demandPopin="true">
+<Text text="{i18n-global>common.version.lbl}"/>
+</Column>
+<Column minScreenWidth="Desktop" demandPopin="true">
+<Text text="{i18n-global>common.description.lbl}"/>
+</Column>
+<Column width="5em" minScreenWidth="Desktop" demandPopin="true">
+<Text text="{i18n-status>common.status.lbl}"/>
+</Column>
+<Column minScreenWidth="Desktop" demandPopin="true">
+<Text text="{i18n-objectType>common.materialType.lbl}"/>
+</Column>
+<Column minScreenWidth="Desktop" demandPopin="true">
+<Text text="{i18n-objectType>common.procurementType.lbl}"/>
+</Column>
+<Column width="5em" minScreenWidth="Desktop" demandPopin="true">
+<Text text="{i18n-global>common.currentVersion.lbl}"/>
+</Column>
+<Column width="5em" minScreenWidth="Desktop" demandPopin="true">
+<Text text="{i18n-material>materialBrowse.mrpController.lbl}"/>
+</Column>
+</columns>
+<items>
+<ColumnListItem>
+<cells>
+<Text text="{product>material}"/>
+<Text text="{product>version}"/>
+<Text text="{product>description}"/>
+<Text text="{ path: 'product>status', type: 'sap.ui.model.odata.type.String', formatter: '.statusFormatter.getStatusText' }"/>
+<Text text="{ path: 'product>materialType', type: 'sap.ui.model.odata.type.String', formatter: '.objectTypeFormatter.getMaterialTypeText' }"/>
+<Text text="{ path: 'product>procurementType', type: 'sap.ui.model.odata.type.String', formatter: '.objectTypeFormatter.getProcurementTypeText' }"/>
+<Text text="{product>currentVersion}"/>
+<Text text="{product>mrpController}"/>
+</cells>
+</ColumnListItem>
+</items>
+</Table>
+</content>
+<beginButton>
+<Button id="closeButton" text="{i18n-global>cancel}" tooltip="{i18n-global>cancel}" press="onCancel"/>
+</beginButton>
+</Dialog>
+</core:FragmentDefinition>

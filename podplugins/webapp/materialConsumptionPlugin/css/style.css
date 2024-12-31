@@ -1,0 +1,58 @@
+.chartHeight > div > div{
+	position: relative;
+    width: 100%;
+    height: 4rem !important;
+    min-height: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.tableContent .sapMListTblSubCnt {
+	display: grid !important;;
+	grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)) !important;;
+	grid-gap: 1rem !important;;
+}
+
+.sapSuiteBMCItemValue, .sapSuiteBMCTargetValue {
+    display: inline-table !important;
+    position: relative !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    max-width: 100% !important;
+}
+
+.sapSuiteBMCNoLabels .sapSuiteBMCTopLabel, .sapSuiteBMCNoLabels .sapSuiteBMCBottomLabel {
+    display: inline-table !important;
+}
+
+.boldText{
+    font-weight : bold !important;
+}
+
+.sapDmeItalicText{
+    font-style : italic !important;
+}
+
+.sapDmeJustifiedTextAlign{
+    text-align: justify !important;
+}
+
+.sapDmeFontWeightNormal{
+    font-weight: normal !important;
+}
+
+.sapDmeWidthAdjustedButton > span > span{
+    padding-left: inherit;
+    padding-right: inherit;
+}
+
+.topMargin{
+    margin-top: -7px;
+}
+
+.topLeftMargin{
+    margin-top: -7px;
+    margin-left: -5px;
+}

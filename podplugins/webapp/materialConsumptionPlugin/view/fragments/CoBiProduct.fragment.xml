@@ -1,0 +1,54 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns:suite="sap.suite.ui.microchart" xmlns:l="sap.ui.layout" xmlns="sap.m" xmlns:f="sap.f" xmlns:u="sap.ui.unified" xmlns:mvc="sap.ui.core.mvc" xmlns:x="sap.uxap" xmlns:fb="sap.ui.comp.filterbar" xmlns:vm="sap.ui.comp.variants">
+<Table id="cOBigoodsReceiptList" items="{path:'coBiProductModel>/', sorter: { path: 'coBiProductModel>componentType', descending: false, group: true }, groupHeaderFactory: '.oFormatter.getGroupHeader' }" visible="{= ${configModel>/showCoByProduct} ? true: false}" class="tableContent" popinLayout="GridLarge" autoPopinMode="true" contextualWidth="Auto">
+<headerToolbar>
+<Toolbar>
+<Title id="cOByTitleText" text="" level="H2"/>
+</Toolbar>
+</headerToolbar>
+<columns>
+<Column hAlign="Left" vAlign="Middle">
+<Text text="{i18n>matNum}"/>
+</Column>
+<Column hAlign="Left" vAlign="Middle">
+<Text text="{i18n>description}"/>
+</Column>
+<Column hAlign="Left" vAlign="Middle">
+<Text text="{i18n>plannedBatchID}"/>
+</Column>
+<Column hAlign="Left" vAlign="Middle">
+<Text text="{i18n>storageLoc}"/>
+</Column>
+<Column hAlign="Left" vAlign="Middle">
+<Text text="{i18n>postedQty}"/>
+</Column>
+<Column hAlign="Right" vAlign="Middle"/>
+</columns>
+<items>
+<ColumnListItem>
+<cells>
+<VBox>
+<Text class="boldText" text="{coBiProductModel>materialId/material}"/>
+<Text class="sapDmeItalicText" text="{=${coBiProductModel>backflushEnabled} ? '('+${i18n>backflush}+')':''}" visible="{coBiProductModel>backflushEnabled}"/>
+</VBox>
+<Text text="{coBiProductModel>description}"/>
+<Text text="{coBiProductModel>plannedBatchNumber}"/>
+<Text text="{coBiProductModel>storageLocation/storageLocation}"/>
+<suite:BulletMicroChart size="Responsive" class="chartHeight" targetValue="{coBiProductModel>targetQuantity/value}" actualValueLabel="{parts: ['coBiProductModel>consumedQuantity/value', 'coBiProductModel>consumedQuantity/unitOfMeasure/uom'], formatter: '.oFormatter.showValueWithUom'}" targetValueLabel="{parts: ['coBiProductModel>targetQuantity/value', 'coBiProductModel>consumedQuantity/unitOfMeasure/uom', 'i18n>target'], formatter: '.oFormatter.getRequiredQuantity'}" minValue="0">
+<suite:actual>
+<suite:BulletMicroChartData value="{coBiProductModel>consumedQuantity/value}" color="{parts: ['coBiProductModel>targetQuantity/value', 'coBiProductModel>consumedQuantity/value'], formatter: '.oFormatter.getScaleColor' }"/>
+</suite:actual>
+<suite:thresholds>
+<suite:BulletMicroChartData value="0"/>
+</suite:thresholds>
+</suite:BulletMicroChart>
+<FlexBox alignItems="Inherit">
+<items>
+<Button text="{i18n>postings}" press="showDetailsOfComponentCoBy" tooltip="{i18n>postings}" class="sapUiTinyMarginEnd" enabled="{=${coBiProductModel>assembledAndCanceledComponentsCount} > 0 }"/>
+<Button type="Emphasized" press="showConsumePopupCoBy" text="{i18n>co-by-post}" enabled="{parts : ['authModel>/userAuthorizedForWorkCenter','coBiProductModel>backflushEnabled'],formatter:'.oFormatter.formatConsumeButton'}" class="sapDmeWidthAdjustedButton"/>
+</items>
+</FlexBox>
+</cells>
+</ColumnListItem>
+</items>
+</Table>
+</core:FragmentDefinition>

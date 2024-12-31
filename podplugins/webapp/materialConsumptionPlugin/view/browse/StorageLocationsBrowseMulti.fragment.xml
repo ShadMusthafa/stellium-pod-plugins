@@ -1,0 +1,33 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:fb="sap.ui.comp.filterbar" xmlns:l="sap.ui.layout">
+<Dialog id="dialog" title="{i18n>storageLocation}" afterClose="onClose" contentHeight="60%" resizable="true" width="30%">
+<content>
+<fb:FilterBar id="filterBar" showGoOnFB="false" showClearOnFB="false" showFilterConfiguration="false" filterBarExpanded="false" filterContainerWidth="225px" basicSearch="searchField">
+<fb:content>
+<l:VerticalLayout visible="false">
+<SearchField id="searchField" showSearchButton="true" liveChange="onSearchLiveChange" maxLength="200"/>
+</l:VerticalLayout>
+</fb:content>
+</fb:FilterBar>
+<Table id="resultTable" items="{ path: '/StorageLocations', parameters: { $select: ['id','storageLocation','plant'] } }" mode="MultiSelect" growing="true" growingThreshold="20" growingScrollToLoad="true">
+<columns>
+<Column width="13em">
+<Text text="{i18n>storageLocation}"/>
+</Column>
+</columns>
+<items>
+<ColumnListItem>
+<cells>
+<Text text="{storageLocation}"/>
+</cells>
+</ColumnListItem>
+</items>
+</Table>
+</content>
+<beginButton>
+<Button id="okButton" text="{i18n-global>ok}" tooltip="{i18n-global>ok}" press="onOK"/>
+</beginButton>
+<endButton>
+<Button id="closeButton" text="{i18n-global>cancel}" tooltip="{i18n-global>cancel}" press="onCancel"/>
+</endButton>
+</Dialog>
+</core:FragmentDefinition>
