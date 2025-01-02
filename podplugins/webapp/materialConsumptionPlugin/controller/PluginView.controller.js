@@ -49,6 +49,7 @@ sap.ui.define([
                 "material": "",
                 "materialDescription": "",
                 "storageLocation": "",
+                "storageLocationDesc": "",
                 "useFullHandlingUnit": false,
                 "handlingUnitNumber": "",
                 "shopOrderLocationRef": "",
@@ -216,6 +217,10 @@ sap.ui.define([
         },
 
         onTabItemSelected: function () {
+            // just to fix scanner rendering issue on load
+            if(this.oPluginConfiguration === undefined){
+                this.oPluginConfiguration = this.getConfiguration();
+            }
             var isTabMatched = this.isMatchingTabCriterion();
             if (isTabMatched && this.oPluginConfiguration.autoOpenScanPopup && this.oPluginConfiguration.showScanButton) {
                 if (!this.isScanDialogOpen) {
@@ -1518,6 +1523,7 @@ sap.ui.define([
             oModel.setProperty("/expDate", batchData.modifiedDateTime);
             oModel.setProperty("/batchNumber", batchData.batchNumber);
             oModel.setProperty("/storageLocation", (batchData.storageLocation && batchData.storageLocation.storageLocation) ? batchData.storageLocation.storageLocation : null);
+            oModel.setProperty("/storageLocationDesc", (batchData.storageLocation && batchData.storageLocation.description) ? batchData.storageLocation.description : null);
             oModel.setProperty("/storageLocationRef", (batchData.storageLocation && batchData.storageLocation.ref) ? batchData.storageLocation.ref : null);
             oModel.setProperty("/shopOrderLocationRef", batchData.shopOrderLocRef);
             oModel.setProperty("/inventory", batchData.inventoryId);
@@ -2984,7 +2990,8 @@ sap.ui.define([
             this.resetAddDialogFields();
             this.isAddDialogOpen = false;
             var oFormLength = this.byId("addMaterialForm").getContent().length;
-            for (var i = oFormLength; i > 18; i--) {
+            // Fix to handle cancel dialog Add
+            for (var i = oFormLength; i > 19; i--) {
                 this.byId("addMaterialForm").getContent()[i - 1].destroy();
             }
             this.byId("storageLocationAdd").setEnabled(false);
@@ -3084,6 +3091,7 @@ sap.ui.define([
                 oModel.setProperty("/expDate", "");
                 oModel.setProperty("/batchNumber", "");
                 oModel.setProperty("/storageLocation", "");
+                oModel.setProperty("/storageLocationDesc", "");
                 oModel.setProperty("/storageLocationRef", "");
                 oModel.setProperty("/shopOrderLocationRef", "");
                 oModel.setProperty("/inventory", "");
@@ -3426,7 +3434,8 @@ sap.ui.define([
             this.resetScanDialogFields();
             this.isScanDialogOpen = false;
             var oFormLength = this.byId("scanMaterialForm").getContent().length;
-            for (var i = oFormLength; i > 18; i--) {
+            // Fix to handle cancel dialog scan
+            for (var i = oFormLength; i > 19; i--) {
                 this.byId("scanMaterialForm").getContent()[i - 1].destroy();
             }
             this.byId("storageLocationScan").setEnabled(false);
@@ -3492,6 +3501,7 @@ sap.ui.define([
             oModel.setProperty("/quantity/unitOfMeasure/internalUom", "");
             oModel.setProperty("/userId", "");
             oModel.setProperty("/storageLocation", "");
+            oModel.setProperty("/storageLocationDesc", "");
             oModel.setProperty("/storageLocationRef", "");
             oModel.setProperty("/materialRef", "");
             oModel.setProperty("/isBomComponent", true);
@@ -4474,6 +4484,7 @@ sap.ui.define([
             var oModel = this.getCurrentModel();
             var batchNumber = oModel.getProperty("/batchNumber");
             var inputBatch = this.byId("inputBatchIdAdd");
+            var inputBatchScan = this.byId("inputBatchIdScan");
             if (!batchDetails || !batchNumber || !inputBatch) {
                 return false;
             }
@@ -4490,14 +4501,27 @@ sap.ui.define([
                     lowestExpiryBatch.batchNumber,
                     lowestExpiryBatch.expiry
                 ]);
-                inputBatch.setValueState("Error");
-                inputBatch.setValueStateText(sErrorText);
+                if(inputBatch){
+                    inputBatch.setValueState("Error");
+                    inputBatch.setValueStateText(sErrorText);
+                }
+                if(inputBatchScan){
+                    inputBatchScan.setValueState("Error");
+                    inputBatchScan.setValueStateText(sErrorText);
+                }
+                
                 var oCSaveBtn = this.getCurrentSaveButton();
                     oCSaveBtn.setEnabled(false);
                 return false;
             } else {
-                inputBatch.setValueState("None");
-                inputBatch.setValueStateText(null);
+                if(inputBatch){
+                    inputBatch.setValueState("None");
+                    inputBatch.setValueStateText(null);
+                }
+                if(inputBatchScan){
+                    inputBatchScan.setValueState("None");
+                    inputBatchScan.setValueStateText(null);
+                }
                 return true;
             }
         }

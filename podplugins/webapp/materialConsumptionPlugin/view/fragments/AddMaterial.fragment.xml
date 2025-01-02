@@ -8,8 +8,33 @@
 <Text id="inputMatDescAdd" text="{addModel>/materialDescription}"/>
 <Label text="{i18n>batchid}" required="{addModel>/batchManaged}"/>
 <Input id="inputBatchIdAdd" value="{addModel>/batchNumber}" showValueHelp="{addModel>/batchManaged}" enabled="{parts: ['addModel>/batchManaged', 'addModel>/material', 'addModel>/storageLocation', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getBatchInputEnable'}" valueHelpRequest="showBatchDetails" valueHelpOnly="{parts: ['configModel>/allowFreeTextForBatch', 'addModel>/material'], formatter: '.oFormatter.getValueHelpOnly'}" change="onBatchChange" liveChange="onBatchLiveChange"> </Input>
-<Label text="{i18n>storageLocation}" required="{parts: ['addModel>/batchManaged', 'addModel>/material', 'addModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}"/>
+
+<!-- <Label text="{i18n>storageLocation}" required="{parts: ['addModel>/batchManaged', 'addModel>/material', 'addModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}"/>
 <Input id="storageLocationAdd" textAlign="Right" value="{addModel>/storageLocation}" enabled="{parts: ['addModel>/batchManaged', 'addModel>/material', 'addModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="showStorageLocationDetails"> </Input>
+
+<Label text="{i18n>storageLocationDesc}" />
+<Input id="storageLocationDesc" textAlign="Left" 
+       value="{addModel>/storageLocationDesc}" 
+       editable="false" /> -->
+<Label text="{i18n>storageLocationDesc}" 
+                    required="{parts: ['addModel>/batchManaged', 'addModel>/material', 'addModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}" />
+                <!-- Storage Location Input -->
+        <Input id="storageLocationAdd" textAlign="Left" 
+                    value="{addModel>/storageLocation}" 
+                    enabled="{parts: ['addModel>/batchManaged', 'addModel>/material', 'addModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}" 
+                    showValueHelp="true" 
+                    valueHelpOnly="true" 
+                    valueHelpRequest="showStorageLocationDetails" >
+            <layoutData>
+                <l:GridData span="XL2 L2 M2 S2"/>
+            </layoutData>
+        </Input>
+        <!-- Storage Location Description Input -->
+        <Text id="storageLocationDesc" text="{addModel>/storageLocationDesc}" >
+                <layoutData>
+                <l:GridData span="XL4 L4 M4 S4"/>
+                </layoutData>
+        </Text>
 <Label text="{i18n>avlQty}"/>
 <Text id="avlQtyAdd" text="{addModel>/avlBatchQty}"/>
 <Label id="qtyLabelAdd" text="{parts: ['i18n>qtyToConsume', 'i18n>UNIT'], formatter: '.oFormatter.getQuantityUnitLabel'}" required="{addModel>/batchManaged}"/>
