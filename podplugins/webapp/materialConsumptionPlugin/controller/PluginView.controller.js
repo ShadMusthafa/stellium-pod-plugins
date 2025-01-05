@@ -1131,7 +1131,7 @@ sap.ui.define([
 
             // Added the Storage Location Description column : AD-006
             var oColumnListItemStorageDescControl = new sap.m.Text({
-                text: "{batchDetailsModel>storageLocation/description}" // Binding for the new column
+                text: "{batchDetailsModel>storageLocation/description}"
             });
             oColumnListItem.addCell(oColumnListItemStorageDescControl);
 
@@ -1713,11 +1713,12 @@ sap.ui.define([
             var selectedMaterialType = oEvent.getSource().getBindingContext().getObject().materialType;
             var isBomComponent = oEvent.getSource().getBindingContext().getObject().isBomComponent;
             var storageLocationRef;
-            var storageLocation, storageLocationDesc;
+            var storageLocation; 
+            var storageLocationDesc = "";
             if (oEvent.getSource().getBindingContext().getObject().storageLocation) {
                 storageLocationRef = oEvent.getSource().getBindingContext().getObject().storageLocation.ref;
                 storageLocation = oEvent.getSource().getBindingContext().getObject().storageLocation.storageLocation;
-                storageLocationDesc = oEvent.getSource().getBindingContext().getObject().storageLocation.description;
+                storageLocationDesc = oEvent.getSource().getBindingContext().getObject().storageLocation?.description;
             } else {
                 storageLocationRef = "";
                 storageLocation = "";
