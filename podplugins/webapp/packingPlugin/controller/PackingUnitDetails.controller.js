@@ -457,9 +457,9 @@ sap.ui.define([
             
             var sUrl = this.getPublicApiRestDataSourceUri() + "/pe/api/v1/process/processDefinitions/start?key=REG_fcfb5385-e4a6-4534-9504-55f95dfced22";
             this.ajaxPostRequest(sUrl, oPayload, function(oResponse){
-                Log.info(oResponse);
+                console.log(oResponse);
             }, function(){
-                Log.error(...arguments)
+                console.error(...arguments)
             })
         },
 
