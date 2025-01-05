@@ -1129,6 +1129,22 @@ sap.ui.define([
             oColumnStorageLoc.setHeader(oHeaderControlStorageLoc);
             oTable.addColumn(oColumnStorageLoc);
 
+            // Added the Storage Location Description column : AD-006
+            var oColumnListItemStorageDescControl = new sap.m.Text({
+                text: "{batchDetailsModel>storageLocation/description}" // Binding for the new column
+            });
+            oColumnListItem.addCell(oColumnListItemStorageDescControl);
+
+            var oColumnStorageDesc = new sap.m.Column({
+                hAlign: "Left",
+                vAlign: "Middle"
+            });
+            var oHeaderControlStorageDesc = new sap.m.Text({
+                text: "{i18n>storageLocationDescription}"
+            });
+            oColumnStorageDesc.setHeader(oHeaderControlStorageDesc);
+            oTable.addColumn(oColumnStorageDesc);
+
             var oColumnListItemQTYControl = new sap.m.Text({
                 text: "{batchDetailsModel>qtyFormatted}"
             });
@@ -1655,6 +1671,7 @@ sap.ui.define([
                 oModel.setProperty("/avlBatchQty", "");
             }
             oModel.setProperty("/storageLocation", (sLocData.storageLocation ? sLocData.storageLocation.storageLocation : ""));
+            oModel.setProperty("/storageLocationDesc", (sLocData.storageLocation ? sLocData.storageLocation.description : ""));
             oModel.setProperty("/inventory", sLocData.inventoryId);
             this._enableConfirmButton();
         },
@@ -1696,10 +1713,11 @@ sap.ui.define([
             var selectedMaterialType = oEvent.getSource().getBindingContext().getObject().materialType;
             var isBomComponent = oEvent.getSource().getBindingContext().getObject().isBomComponent;
             var storageLocationRef;
-            var storageLocation;
+            var storageLocation, storageLocationDesc;
             if (oEvent.getSource().getBindingContext().getObject().storageLocation) {
                 storageLocationRef = oEvent.getSource().getBindingContext().getObject().storageLocation.ref;
                 storageLocation = oEvent.getSource().getBindingContext().getObject().storageLocation.storageLocation;
+                storageLocationDesc = oEvent.getSource().getBindingContext().getObject().storageLocation.description;
             } else {
                 storageLocationRef = "";
                 storageLocation = "";
@@ -1759,6 +1777,7 @@ sap.ui.define([
             oView.getModel("consumeModel").setProperty("/useFullHandlingUnit", false);
             oView.getModel("consumeModel").setProperty("/batchManaged", isBatchManaged);
             oView.getModel("consumeModel").setProperty("/storageLocation", storageLocation);
+            oView.getModel("consumeModel").setProperty("/storageLocationDesc", storageLocationDesc);
             oView.getModel("consumeModel").setProperty("/storageLocationRef", storageLocationRef);
             oView.getModel("consumeModel").setProperty("/materialRef", selectedMaterialRef);
             oView.getModel("consumeModel").setProperty("/isBomComponent", isBomComponent);
@@ -2107,7 +2126,7 @@ sap.ui.define([
             var oModel = this.getCurrentModel();
             var selectedUom = oModel.getProperty("/quantity/unitOfMeasure/uom");
             var selectedInternalUom;
-            var uomControlIndex = (this.getCurrentDialogId() === "consumeDialog") ? 15 : 12;
+            var uomControlIndex = (this.getCurrentDialogId() === "consumeDialog") ? 16 : 13;
             if (oEvent.getSource().getParent().getContent().length === 1) {
                 selectedInternalUom = oEvent.getSource().getParent().getContent()[0].getContent()[uomControlIndex].getSelectedItem().getBindingContext("unitModel").getObject().internalUom;
                 if (!selectedUom)
@@ -2243,7 +2262,7 @@ sap.ui.define([
         onCancelConsumeDialog: function () {
             this.isConsumeDialogOpen = false;
             var oFormLength = this.byId("consumeMaterialForm").getContent().length;
-            for (var i = oFormLength; i > 22; i--) {
+            for (var i = oFormLength; i > 23; i--) {
                 this.byId("consumeMaterialForm").getContent()[i - 1].destroy();
             }
             this.byId("consumeDialog").close();
@@ -4483,9 +4502,13 @@ sap.ui.define([
             var batchDetails = this.batchDetailsModel.getData();
             var oModel = this.getCurrentModel();
             var batchNumber = oModel.getProperty("/batchNumber");
+            if(batchNumber === 'Not Batch Managed'){
+                return true;
+            }
             var inputBatch = this.byId("inputBatchIdAdd");
             var inputBatchScan = this.byId("inputBatchIdScan");
-            if (!batchDetails || !batchNumber || !inputBatch) {
+            var inputBatchConsume = this.byId("inputBatchId");
+            if (!batchDetails || !batchNumber || !(inputBatch || inputBatchScan || inputBatchConsume)) {
                 return false;
             }
             // Find the batch with the earliest expiry date
@@ -4509,7 +4532,10 @@ sap.ui.define([
                     inputBatchScan.setValueState("Error");
                     inputBatchScan.setValueStateText(sErrorText);
                 }
-                
+                if(inputBatchConsume){
+                    inputBatchConsume.setValueState("Error");
+                    inputBatchConsume.setValueStateText(sErrorText);
+                }
                 var oCSaveBtn = this.getCurrentSaveButton();
                     oCSaveBtn.setEnabled(false);
                 return false;
@@ -4521,6 +4547,10 @@ sap.ui.define([
                 if(inputBatchScan){
                     inputBatchScan.setValueState("None");
                     inputBatchScan.setValueStateText(null);
+                }
+                if(inputBatchConsume){
+                    inputBatchConsume.setValueState("None");
+                    inputBatchConsume.setValueStateText(null);
                 }
                 return true;
             }

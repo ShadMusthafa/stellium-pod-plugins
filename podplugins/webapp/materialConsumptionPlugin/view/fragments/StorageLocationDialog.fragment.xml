@@ -7,6 +7,9 @@
 <Column hAlign="Left" vAlign="Middle">
 <Text text="{i18n>storageLocation}"/>
 </Column>
+<Column hAlign="Left" vAlign="Middle">
+<Text text="{i18n>storageLocationDescription}"/>
+</Column>
 <Column hAlign="Right" vAlign="Middle" visible="{invManagedModel>/showQuantity}" class="sapUiLargeMarginEnd">
 <Text text="{i18n>QUANTITY}"/>
 </Column>
@@ -16,6 +19,7 @@
 <cells>
 <Text class="boldText" text="{storageLocationModel>inventoryId}"/>
 <Text text="{storageLocationModel>storageLocation/storageLocation}"/>
+<Text text="{storageLocationModel>storageLocation/description}"/>
 <l:VerticalLayout>
 <l:content>
 <Button visible="{parts: ['storageLocationModel>remainingQuantity', 'invManagedModel>/isInventoryManaged'], formatter:'.oFormatter.showUpdateBtnStorLoc'}" text="{i18n>update}" width="100%" press="onGetStockForStorageLoc"/>

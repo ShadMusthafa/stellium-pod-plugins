@@ -8,8 +8,29 @@
 <Text id="inputMatDesc" text="{consumeModel>/materialDescription}"/>
 <Label text="{i18n>batchid}" required="{consumeModel>/batchManaged}"/>
 <Input id="inputBatchId" value="{consumeModel>/batchNumber}" showValueHelp="{consumeModel>/batchManaged}" enabled="{parts: ['consumeModel>/batchManaged', 'consumeModel>/material', 'consumeModel>/materialType', 'consumeModel>/storageLocation', 'invManagedModel>/isInventoryManaged', 'consumeModel>/isEWM'], formatter: '.oFormatter.getBatchInputEnable'}" valueHelpRequest="showBatchDetails" valueHelpOnly="{parts: ['configModel>/allowFreeTextForBatch', 'consumeModel>/material'], formatter: '.oFormatter.getValueHelpOnly'}" change="onBatchChange" liveChange="onBatchLiveChange"> </Input>
-<Label text="{i18n>storageLocation}" required="{parts: ['consumeModel>/batchManaged', 'consumeModel>/material', 'consumeModel>/materialType', 'invManagedModel>/isInventoryManaged', 'consumeModel>/isEWM'], formatter: '.oFormatter.getEnabledStorageLoc'}"/>
-<Input id="storageLocation" textAlign="Right" enabled="{parts: ['consumeModel>/batchManaged', 'consumeModel>/material', 'consumeModel>/materialType', 'invManagedModel>/isInventoryManaged', 'consumeModel>/isEWM'], formatter: '.oFormatter.getEnabledStorageLoc'}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="showStorageLocationDetails" value="{consumeModel>/storageLocation}"> </Input>
+
+<!-- <Label text="{i18n>storageLocation}" required="{parts: ['consumeModel>/batchManaged', 'consumeModel>/material', 'consumeModel>/materialType', 'invManagedModel>/isInventoryManaged', 'consumeModel>/isEWM'], formatter: '.oFormatter.getEnabledStorageLoc'}"/>
+<Input id="storageLocation" textAlign="Right" enabled="{parts: ['consumeModel>/batchManaged', 'consumeModel>/material', 'consumeModel>/materialType', 'invManagedModel>/isInventoryManaged', 'consumeModel>/isEWM'], formatter: '.oFormatter.getEnabledStorageLoc'}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="showStorageLocationDetails" value="{consumeModel>/storageLocation}"> </Input> -->
+
+<Label text="{i18n>storageLocationDesc}" 
+                    required="{parts: ['consumeModel>/batchManaged', 'consumeModel>/material', 'consumeModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}" />
+                <!-- Storage Location Input -->
+<Input id="storageLocation" textAlign="Left" 
+                    value="{consumeModel>/storageLocation}" 
+                    enabled="{parts: ['consumeModel>/batchManaged', 'consumeModel>/material', 'consumeModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}" 
+                    showValueHelp="true" 
+                    valueHelpOnly="true" 
+                    valueHelpRequest="showStorageLocationDetails" >
+            <layoutData>
+                <l:GridData span="XL2 L2 M2 S2"/>
+            </layoutData>
+</Input>
+        <!-- Storage Location Description Input -->
+<Text id="storageLocationDescConsume" text="{consumeModel>/storageLocationDesc}" >
+                <layoutData>
+                <l:GridData span="XL4 L4 M4 S4"/>
+                </layoutData>
+</Text>
 <Label id="huLabel" text="{i18n>handlingUnit}" visible="{consumeModel>/isEWM}"/>
 <Input id="inputHU" textAlign="Right" value="{consumeModel>/handlingUnitNumber}" liveChange="onHULiveChange" visible="{consumeModel>/isEWM}">
 <layoutData>
