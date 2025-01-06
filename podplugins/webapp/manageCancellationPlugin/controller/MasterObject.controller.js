@@ -1187,7 +1187,7 @@ sap.ui.define(
         // Confirmation table search
         onSearchConfirmation: function (oEvent) {
           const sQuery = oEvent.getParameter("query");
-          const aSearchableProperties = ["operationActivity", "confirmationGroup", "confirmationCounter"];
+          const aSearchableProperties = ["operationActivity", "confirmationGroup", "confirmationCounter", "operationActivityDescription", "postedBy", "shopOrder", "workCenter", "resource"];
           const oTable = this.byId("idConfirmationsTable");
           const oListBinding = oTable.getBinding("items");
           const aFilters = [];
@@ -1210,7 +1210,7 @@ sap.ui.define(
         // Goods Issue Table Search
         onSearchGoodsIssue: function (oEvent) {
           const sQuery = oEvent.getParameter("query");
-          const aSearchableProperties = ["inventoryId", "batch", "handlingUnit"];
+          const aSearchableProperties = ["inventoryId", "batch", "handlingUnit", "material", "materialVersion", "materialDescription", "postedBy", "storageLocation"];
           const oTable = this.byId("goodsIssueTable");
           const oListBinding = oTable.getBinding("items");
           const aFilters = [];
@@ -1231,7 +1231,7 @@ sap.ui.define(
         // Finished Goods Table Search
         onSearchFinishedGoods: function (oEvent) {
           const sQuery = oEvent.getParameter("query");
-          const aSearchableProperties = ["inventoryId", "batch", "handlingUnit"];
+          const aSearchableProperties = ["inventoryId", "batch", "handlingUnit", "material", "materialVersion", "materialDescription", "postedBy", "storageLocation"];
           const oTable = this.byId("goodsReceiptFinishGoodTable");
           const oListBinding = oTable.getBinding("items");
           const aFilters = [];
@@ -1252,7 +1252,7 @@ sap.ui.define(
         // By Products Table Search
         onSearchByProducts: function (oEvent) {
           const sQuery = oEvent.getParameter("query");
-          const aSearchableProperties = ["inventoryId", "batch", "handlingUnit"];
+          const aSearchableProperties = ["inventoryId", "batch", "handlingUnit", "material", "materialVersion", "materialDescription", "postedBy", "storageLocation"];
           const oTable = this.byId("goodsReceiptByProductTable");
           const oListBinding = oTable.getBinding("items");
           const aFilters = [];
@@ -1274,7 +1274,7 @@ sap.ui.define(
         // Co Products Table Search
         onSearchCoProducts: function (oEvent) {
           const sQuery = oEvent.getParameter("query");
-          const aSearchableProperties = ["inventoryId", "batch", "handlingUnit"];
+          const aSearchableProperties = ["inventoryId", "batch", "handlingUnit",, "material", "materialVersion", "materialDescription", "postedBy", "storageLocation"];
           const oTable = this.byId("goodsReceiptCoProductTable");
           const oListBinding = oTable.getBinding("items");
           const aFilters = [];
