@@ -4,12 +4,13 @@
     <Table id="goodsReceiptByProductTable" items="{BY_PRODUCT>/}">
     <headerToolbar>
         <OverflowToolbar>
-            <Title text="{= 'By-Products (' + ${BY_PRODUCT>/}.length + ')'}" />
+            <Title id="idByProdTitleText" text="{= 'By-Products (' + ${BY_PRODUCT>/}.length + ')'}" />
             <ToolbarSpacer/>
-            <Input 
+            <!-- <Input 
                 placeholder="Search" 
                 liveChange="onGR_BP_Search" 
-                width="10rem" />
+                width="10rem" /> -->
+            <SearchField placeholder="Search" search=".onSearchByProducts" width="10rem" />
             <Button icon="sap-icon://action-settings" press="onGoodsReceiptBPSettingsBtnPress" tooltip="Settings" visible="true"/>
         </OverflowToolbar>
     </headerToolbar>

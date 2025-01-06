@@ -18,7 +18,7 @@
                             <fb:FilterGroupItem id="idOrderSearchFGI" name="Search" label="" groupName="Group1"
                                 visibleInFilterBar="true">
                                 <fb:control>
-                                    <SearchField id="idOrderSF" />
+                                    <SearchField id="idOrderSF" search=".onOrdersSearch" />
                                 </fb:control>
                             </fb:FilterGroupItem>
                             <fb:FilterGroupItem id="idSFCFilterFGI" name="SFC" label="SFC" groupName="Group1"

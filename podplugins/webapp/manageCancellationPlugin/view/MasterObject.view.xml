@@ -73,12 +73,14 @@
                         }">
                 <headerToolbar>
                         <OverflowToolbar>
-                            <Title text="{= 'Confirmations (' + ${confirmationItems>/}.length + ')'}" />
+                            <Title id="idConfirmTitleText" text="{= 'Confirmations (' + ${confirmationItems>/}.length + ')'}" />
                             <ToolbarSpacer/>
-                            <Input 
+                            <!-- <Input 
                                 placeholder="Search" 
                                 liveChange="onConfirmationsSearch" 
-                                width="10rem" />
+                                width="10rem" /> -->
+                            <SearchField id="confirmationSearch" placeholder="Search" 
+                                search=".onSearchConfirmation" width="10rem" />
                             <Button icon="sap-icon://action-settings" press="onConfirmSettingsBtnPress" tooltip="Settings" visible="true"/>
                         </OverflowToolbar>
                 </headerToolbar>

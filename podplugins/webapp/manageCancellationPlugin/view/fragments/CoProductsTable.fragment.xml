@@ -4,12 +4,13 @@
     <Table id="goodsReceiptCoProductTable" items="{CO_PRODUCT>/}">
      <headerToolbar>
         <OverflowToolbar>
-            <Title text="{= 'Co-Products (' + ${CO_PRODUCT>/}.length + ')'}" />
+            <Title id="idCoProdTitleText" text="{= 'Co-Products (' + ${CO_PRODUCT>/}.length + ')'}" />
             <ToolbarSpacer/>
-            <Input 
+            <!-- <Input 
                 placeholder="Search" 
                 liveChange="onCR_BP_Search" 
-                width="10rem" />
+                width="10rem" /> -->
+            <SearchField placeholder="Search" search=".onSearchCoProducts" width="10rem" />
             <Button icon="sap-icon://action-settings" press="onGoodsReceiptCPSettingsBtnPress" tooltip="Settings" visible="true"/>
         </OverflowToolbar>
     </headerToolbar>

@@ -4,12 +4,13 @@
     <Table id="goodsReceiptFinishGoodTable" items="{FINISH_GOOD>/}">
     <headerToolbar>
         <OverflowToolbar>
-            <Title text="{= 'Finished Goods (' + ${FINISH_GOOD>/}.length + ')'}" />
+            <Title id="idFinGoodsTitleText" text="{= 'Finished Goods (' + ${FINISH_GOOD>/}.length + ')'}" />
             <ToolbarSpacer/>
-            <Input 
+            <!-- <Input 
                 placeholder="Search" 
                 liveChange="onGR_FG_Search" 
-                width="10rem" />
+                width="10rem" /> -->
+            <SearchField placeholder="Search" search=".onSearchFinishedGoods" width="10rem" />
             <Button icon="sap-icon://action-settings" press="onGoodsReceiptFGSettingsBtnPress" tooltip="Settings" visible="true"/>
         </OverflowToolbar>
     </headerToolbar>

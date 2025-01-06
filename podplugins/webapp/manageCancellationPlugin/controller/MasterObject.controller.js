@@ -412,6 +412,8 @@ sap.ui.define(
         },
 
         onConfirmCancellationBtnPress: function() {
+          // fix to close the dialog after confirm press
+          this.byId('idConfirmCancellationDialog')?.close();
           //this.onSubmitDialogPress();
           this.onSubmitDialogPress(null,'ActQtyCombined');
         },
@@ -1181,6 +1183,114 @@ sap.ui.define(
         // Goods Receipt Co-Product Table Settings press
         onGoodsReceiptCPSettingsBtnPress: function() {
           this.goodsReceiptCoProductTableSettings.openDialog();
+        },
+        // Confirmation table search
+        onSearchConfirmation: function (oEvent) {
+          const sQuery = oEvent.getParameter("query");
+          const aSearchableProperties = ["operationActivity", "confirmationGroup", "confirmationCounter"];
+          const oTable = this.byId("idConfirmationsTable");
+          const oListBinding = oTable.getBinding("items");
+          const aFilters = [];
+          if (sQuery) {
+            aSearchableProperties.forEach(function (property) {
+              aFilters.push(new sap.ui.model.Filter(property, sap.ui.model.FilterOperator.Contains, sQuery));
+            });
+            oListBinding.filter(new sap.ui.model.Filter({
+              filters: aFilters,
+              and: false
+            }));
+          } else {
+            oListBinding.filter([]);
+          }
+          const iItemCount = oListBinding.getLength();
+          this.byId("idConfirmTitleText").setText(this.getI18nText("confirmTitle", [iItemCount]));
+
+        },
+
+        // Goods Issue Table Search
+        onSearchGoodsIssue: function (oEvent) {
+          const sQuery = oEvent.getParameter("query");
+          const aSearchableProperties = ["inventoryId", "batch", "handlingUnit"];
+          const oTable = this.byId("goodsIssueTable");
+          const oListBinding = oTable.getBinding("items");
+          const aFilters = [];
+          if (sQuery) {
+            aSearchableProperties.forEach(function (property) {
+              aFilters.push(new sap.ui.model.Filter(property, sap.ui.model.FilterOperator.Contains, sQuery));
+            });
+            oListBinding.filter(new sap.ui.model.Filter({
+              filters: aFilters,
+              and: false
+            }));
+          } else {
+            oListBinding.filter([]);
+          }
+          const iItemCount = oListBinding.getLength();
+          this.byId("idGoodIssueTitleText").setText(this.getI18nText("postingTitle", [iItemCount]));
+        },
+        // Finished Goods Table Search
+        onSearchFinishedGoods: function (oEvent) {
+          const sQuery = oEvent.getParameter("query");
+          const aSearchableProperties = ["inventoryId", "batch", "handlingUnit"];
+          const oTable = this.byId("goodsReceiptFinishGoodTable");
+          const oListBinding = oTable.getBinding("items");
+          const aFilters = [];
+          if (sQuery) {
+            aSearchableProperties.forEach(function (property) {
+              aFilters.push(new sap.ui.model.Filter(property, sap.ui.model.FilterOperator.Contains, sQuery));
+            });
+            oListBinding.filter(new sap.ui.model.Filter({
+              filters: aFilters,
+              and: false
+            }));
+          } else {
+            oListBinding.filter([]);
+          }
+          const iItemCount = oListBinding.getLength();
+          this.byId("idFinGoodsTitleText").setText(this.getI18nText("FINISH_GOOD", [iItemCount]));
+        },
+        // By Products Table Search
+        onSearchByProducts: function (oEvent) {
+          const sQuery = oEvent.getParameter("query");
+          const aSearchableProperties = ["inventoryId", "batch", "handlingUnit"];
+          const oTable = this.byId("goodsReceiptByProductTable");
+          const oListBinding = oTable.getBinding("items");
+          const aFilters = [];
+          if (sQuery) {
+            aSearchableProperties.forEach(function (property) {
+              aFilters.push(new sap.ui.model.Filter(property, sap.ui.model.FilterOperator.Contains, sQuery));
+            });
+            oListBinding.filter(new sap.ui.model.Filter({
+              filters: aFilters,
+              and: false
+            }));
+          } else {
+            oListBinding.filter([]);
+          }
+          const iItemCount = oListBinding.getLength();
+          this.byId("idByProdTitleText").setText(this.getI18nText("BY_PRODUCT", [iItemCount]));
+        },
+
+        // Co Products Table Search
+        onSearchCoProducts: function (oEvent) {
+          const sQuery = oEvent.getParameter("query");
+          const aSearchableProperties = ["inventoryId", "batch", "handlingUnit"];
+          const oTable = this.byId("goodsReceiptCoProductTable");
+          const oListBinding = oTable.getBinding("items");
+          const aFilters = [];
+          if (sQuery) {
+            aSearchableProperties.forEach(function (property) {
+              aFilters.push(new sap.ui.model.Filter(property, sap.ui.model.FilterOperator.Contains, sQuery));
+            });
+            oListBinding.filter(new sap.ui.model.Filter({
+              filters: aFilters,
+              and: false
+            }));
+          } else {
+            oListBinding.filter([]);
+          }
+          const iItemCount = oListBinding.getLength();
+          this.byId("idCoProdTitleText").setText(this.getI18nText("CO_PRODUCT", [iItemCount]));
         },
       }
     );
