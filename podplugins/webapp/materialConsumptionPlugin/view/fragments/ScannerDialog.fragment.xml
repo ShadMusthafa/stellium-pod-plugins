@@ -1,0 +1,71 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns:f="sap.ui.layout.form" xmlns:l="sap.ui.layout" xmlns="sap.m">
+<Dialog id="scanDialog" class="sapUiContentPadding" title="{i18n>scanAndConsumeMaterial}" resizable="true" width="50%">
+<MessageStrip text="{i18n>scanReadyMessage}" type="Information" showCloseButton="true" showIcon="true" customIcon="sap-icon://bar-code" class="sapUiTinyMargin"> </MessageStrip>
+<f:SimpleForm id="scanMaterialForm" editable="true" layout="ResponsiveGridLayout" labelSpanXL="2" labelSpanL="2" labelSpanM="4" labelSpanS="4" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="1" columnsL="1" columnsM="1" singleContainerFullSize="true">
+<f:content>
+<Label text="{i18n>matNum}"/>
+<Input id="inputMatNumScan" change="handleLiveChangeScan" value="{scanModel>/material}" class="boldText" editable="true" required="true"/>
+<Label text="{i18n>materialDescription}"/>
+<Text id="inputMatDescScan" text="{scanModel>/materialDescription}"/>
+<Label text="{i18n>batchid}" required="{scanModel>/batchManaged}"/>
+<Input id="inputBatchIdScan" value="{scanModel>/batchNumber}" showValueHelp="{scanModel>/batchManaged}" enabled="{parts: ['scanModel>/batchManaged', 'scanModel>/material', 'scanModel>/storageLocation', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getBatchInputEnable'}" valueHelpRequest="showBatchDetails" valueHelpOnly="{parts: ['configModel>/allowFreeTextForBatch', 'scanModel>/material'], formatter: '.oFormatter.getValueHelpOnly'}" change="onBatchChange" liveChange="onBatchLiveChange"> </Input>
+
+<!-- <Label text="{i18n>storageLocation}" required="{parts: ['scanModel>/batchManaged', 'scanModel>/material', 'scanModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}"/>
+<Input id="storageLocationScan" textAlign="Right" value="{scanModel>/storageLocation}" enabled="{parts: ['scanModel>/batchManaged', 'scanModel>/material', 'scanModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="showStorageLocationDetails"> </Input> -->
+
+<Label text="{i18n>storageLocationDesc}" required="{parts: ['scanModel>/batchManaged', 'scanModel>/material', 'scanModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}"/>
+        <Input id="storageLocationScan" textAlign="Left" 
+                    value="{scanModel>/storageLocation}" 
+                    enabled="{parts: ['scanModel>/batchManaged', 'scanModel>/material', 'scanModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}" 
+                    showValueHelp="true" 
+                    valueHelpOnly="true" 
+                    valueHelpRequest="showStorageLocationDetails" >
+            <layoutData>
+                <l:GridData span="XL2 L2 M2 S2"/>
+            </layoutData>
+        </Input>
+        <!-- Storage Location Description Input -->
+        <Text id="storageLocationScanDesc" text="{scanModel>/storageLocationDesc}" >
+                <layoutData>
+                <l:GridData span="XL4 L4 M4 S4"/>
+                </layoutData>
+        </Text>
+<Label text="{i18n>avlQty}"/>
+<Text id="avlQtyScan" text="{scanModel>/avlBatchQty}"/>
+<Label id="qtyLabelScan" text="{parts: ['i18n>qtyToConsume', 'i18n>UNIT'], formatter: '.oFormatter.getQuantityUnitLabel'}" required="true"/>
+<Input id="inputQuantityScan" textAlign="Right" required="true" ariaLabelledBy="qtyLabelScan" value="{parts:[{path:'scanModel>/quantity/value'},{path:'scanModel>/quantity/unitOfMeasure/uom'}], type:'.types.quantity'}" change="onQuantityLiveChange">
+<layoutData>
+<l:GridData span="XL4 L4 M4 S4"/>
+</layoutData>
+</Input>
+<Select id="inputUnitScan" items="{unitModel>/}" selectedKey="{scanModel>/quantity/unitOfMeasure/uom}" enabled="true" ariaLabelledBy="qtyLabelScan">
+<layoutData>
+<l:GridData span="XL4 L4 M4 S4"/>
+</layoutData>
+<core:Item key="{unitModel>uom}" text="{unitModel>uom} - {unitModel>longText}"/>
+</Select>
+<Label text="{parts: ['i18n>postedBy', 'i18n>postingDate'], formatter: '.oFormatter.getQuantityUnitLabel'}"/>
+<Input id="inputPostedByScan" value="{scanModel>/userId}" enabled="false">
+<layoutData>
+<l:GridData span="XL4 L4 M4 S4"/>
+</layoutData>
+</Input>
+<DatePicker id="inputPostingDateScan" change="onChangePostingDate" valueFormat="yyyy-MM-dd" class="sapUiSmallMarginBottom" value="{path : 'scanModel>/dateTime',formatter:'oFormatter.formatDate'}">
+<layoutData>
+<l:GridData span="XL4 L4 M4 S4"/>
+</layoutData>
+</DatePicker>
+<Label text="{i18n>calculateQTYtoConsume.comments.lbl}" labelFor="inputCommentsForScan" width="100%"/>
+<TextArea id="inputCommentsForScan" maxLength="2048" rows="3" cols="100" value="{scanModel>/comments}" growing="true" liveChange="onChangeOfComments">
+<layoutData>
+<l:GridData span="XL8 L8 M8 S8"/>
+</layoutData>
+</TextArea>
+</f:content>
+</f:SimpleForm>
+<buttons>
+<Button id="giConfirmBtnScan" text="{i18n>confirm}" type="Emphasized" press="onConfirmConsumeDialog" enabled="false"/>
+<Button id="giCancelBtnScan" text="{i18n>cancel}" press="onCancelScanDialog"/>
+</buttons>
+</Dialog>
+</core:FragmentDefinition>

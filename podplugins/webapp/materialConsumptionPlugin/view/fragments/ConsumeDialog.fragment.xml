@@ -1,0 +1,88 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns:f="sap.ui.layout.form" xmlns:l="sap.ui.layout" xmlns="sap.m">
+<Dialog id="consumeDialog" class="sapUiContentPadding" title="{i18n>consumeMaterial}" resizable="true" width="50%">
+<f:SimpleForm id="consumeMaterialForm" editable="true" layout="ResponsiveGridLayout" labelSpanXL="2" labelSpanL="2" labelSpanM="4" labelSpanS="4" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="1" columnsL="1" columnsM="1" singleContainerFullSize="true">
+<f:content>
+<Label text="{i18n>matNum}"/>
+<Text id="inputMatNum" text="{consumeModel>/material}" class="boldText"/>
+<Label text="{i18n>materialDescription}"/>
+<Text id="inputMatDesc" text="{consumeModel>/materialDescription}"/>
+<Label text="{i18n>batchid}" required="{consumeModel>/batchManaged}"/>
+<Input id="inputBatchId" value="{consumeModel>/batchNumber}" showValueHelp="{consumeModel>/batchManaged}" enabled="{parts: ['consumeModel>/batchManaged', 'consumeModel>/material', 'consumeModel>/materialType', 'consumeModel>/storageLocation', 'invManagedModel>/isInventoryManaged', 'consumeModel>/isEWM'], formatter: '.oFormatter.getBatchInputEnable'}" valueHelpRequest="showBatchDetails" valueHelpOnly="{parts: ['configModel>/allowFreeTextForBatch', 'consumeModel>/material'], formatter: '.oFormatter.getValueHelpOnly'}" change="onBatchChange" liveChange="onBatchLiveChange"> </Input>
+
+<!-- <Label text="{i18n>storageLocation}" required="{parts: ['consumeModel>/batchManaged', 'consumeModel>/material', 'consumeModel>/materialType', 'invManagedModel>/isInventoryManaged', 'consumeModel>/isEWM'], formatter: '.oFormatter.getEnabledStorageLoc'}"/>
+<Input id="storageLocation" textAlign="Right" enabled="{parts: ['consumeModel>/batchManaged', 'consumeModel>/material', 'consumeModel>/materialType', 'invManagedModel>/isInventoryManaged', 'consumeModel>/isEWM'], formatter: '.oFormatter.getEnabledStorageLoc'}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="showStorageLocationDetails" value="{consumeModel>/storageLocation}"> </Input> -->
+
+<Label text="{i18n>storageLocationDesc}" 
+                    required="{parts: ['consumeModel>/batchManaged', 'consumeModel>/material', 'consumeModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}" />
+                <!-- Storage Location Input -->
+<Input id="storageLocation" textAlign="Left" 
+                    value="{consumeModel>/storageLocation}" 
+                    enabled="{parts: ['consumeModel>/batchManaged', 'consumeModel>/material', 'consumeModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}" 
+                    showValueHelp="true" 
+                    valueHelpOnly="true" 
+                    valueHelpRequest="showStorageLocationDetails" >
+            <layoutData>
+                <l:GridData span="XL2 L2 M2 S2"/>
+            </layoutData>
+</Input>
+        <!-- Storage Location Description Input -->
+<Text id="storageLocationDescConsume" text="{consumeModel>/storageLocationDesc}" >
+                <layoutData>
+                <l:GridData span="XL4 L4 M4 S4"/>
+                </layoutData>
+</Text>
+<Label id="huLabel" text="{i18n>handlingUnit}" visible="{consumeModel>/isEWM}"/>
+<Input id="inputHU" textAlign="Right" value="{consumeModel>/handlingUnitNumber}" liveChange="onHULiveChange" visible="{consumeModel>/isEWM}">
+<layoutData>
+<l:GridData span="XL4 L4 M4 S4"/>
+</layoutData>
+</Input>
+<Button id="inventoryBtn" text="{i18n>inventories}" press="onFindHUInv" visible="{consumeModel>/isEWM}">
+<layoutData>
+<l:GridData span="XL4 L4 M4 S4"/>
+</layoutData>
+</Button>
+<Label text="{i18n>avlQty}"/>
+<Text id="avlQty" text="{consumeModel>/avlBatchQty}"/>
+<Label id="qtyLabel" text="{parts: ['i18n>qtyToConsume', 'i18n>UNIT'], formatter: '.oFormatter.getQuantityUnitLabel'}" required="{consumeModel>/batchManaged}"/>
+<Input id="inputQuantity" textAlign="Right" required="true" ariaLabelledBy="qtyLabel" value="{parts:[{path:'consumeModel>/quantity/value'},{path:'consumeModel>/quantity/unitOfMeasure/uom'}], type:'.types.quantity'}" change="onQuantityLiveChange" enabled="{parts: ['consumeModel>/useFullHandlingUnit'], formatter: '.oFormatter.getQtyEnable'}">
+<layoutData>
+<l:GridData span="XL2 L2 M2 S2"/>
+</layoutData>
+</Input>
+<Select id="inputUnit" items="{unitModel>/}" selectedKey="{consumeModel>/quantity/unitOfMeasure/uom}" enabled="{parts: ['consumeModel>/useFullHandlingUnit'], formatter: '.oFormatter.getQtyEnable'}" ariaLabelledBy="qtyLabel">
+<layoutData>
+<l:GridData span="XL4 L4 M4 S4"/>
+</layoutData>
+<core:Item key="{unitModel>uom}" text="{unitModel>uom} - {unitModel>longText}"/>
+</Select>
+<Button id="giCalculateButton" text="{i18n>calculate}" press="onCalculateDialog" enabled="{consumeModel>/recalculationEnabled}">
+<layoutData>
+<l:GridData span="XL2 L2 M2 S2"/>
+</layoutData>
+</Button>
+<Label text="{parts: ['i18n>postedBy', 'i18n>postingDate'], formatter: '.oFormatter.getQuantityUnitLabel'}"/>
+<Input id="inputPostedBy" value="{consumeModel>/userId}" enabled="false">
+<layoutData>
+<l:GridData span="XL4 L4 M4 S4"/>
+</layoutData>
+</Input>
+<DatePicker id="inputPostingDate" valueFormat="yyyy-MM-dd" change="onChangePostingDate" class="sapUiSmallMarginBottom" value="{path : 'consumeModel>/dateTime',formatter:'oFormatter.formatDate'}">
+<layoutData>
+<l:GridData span="XL4 L4 M4 S4"/>
+</layoutData>
+</DatePicker>
+<Label text="{i18n>calculateQTYtoConsume.comments.lbl}" labelFor="inputCommentsForConsume" width="100%"/>
+<TextArea id="inputCommentsForConsume" maxLength="2048" rows="3" width="100%" value="{consumeModel>/comments}" growing="true" liveChange="onChangeOfComments">
+<layoutData>
+<l:GridData span="XL8 L8 M8 S8"/>
+</layoutData>
+</TextArea>
+</f:content>
+</f:SimpleForm>
+<buttons>
+<Button id="giConfirmBtn" text="{i18n>confirm}" type="Emphasized" press="onConfirmConsumeDialog" enabled="false"/>
+<Button id="giCancelBtn" text="{i18n>cancel}" press="onCancelConsumeDialog"/>
+</buttons>
+</Dialog>
+</core:FragmentDefinition>
