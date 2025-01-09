@@ -1222,6 +1222,7 @@ sap.ui.define([
                 oTable.setGrowingScrollToLoad(false);
             }
             this.setNumberOfItemsInBatchList();
+            this.onSearchBatchListWithValue();
             oDialog.setBusy(false);
         },
 
@@ -1498,6 +1499,7 @@ sap.ui.define([
 
         handleSearch: function (oValue, propertiesArray, oBinding) {
             var aFilters = [],
+                aCombinedFilters = [],
                 filter, oFilterWithAllProperties;
             if (oValue && oValue.length > 0) {
                 $.each(propertiesArray, function (oIndex, oObj) {
@@ -1508,8 +1510,27 @@ sap.ui.define([
                     filters: aFilters,
                     and: false
                 });
+                aCombinedFilters.push(oFilterWithAllProperties);
             }
-            oBinding.filter(oFilterWithAllProperties);
+
+            var oModelData = this.getCurrentModel().getData(),
+                oSLocFilter;
+            if(oModelData.storageLocation){
+                oSLocFilter = new sap.ui.model.Filter({
+                    path: "storageLocation/storageLocation",
+                    operator: 'EQ',
+                    value1: this.getCurrentModel().getData().storageLocation
+                });
+                aCombinedFilters.push(oSLocFilter);
+            }
+
+            var oCombinedFilter = new sap.ui.model.Filter({
+                filters: aCombinedFilters,
+                and: true
+            });
+
+            oBinding.filter(oCombinedFilter);
+            // oBinding.filter(oFilterWithAllProperties);
             this.setNumberOfItemsInBatchList();
         },
 
