@@ -1,131 +1,166 @@
-<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form" xmlns:viz="sap.viz.ui5.controls" xmlns:viz.data="sap.viz.ui5.data" xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds">
-<Dialog id="addWeighDialog" title="{i18n>AddWeighDialogTitle}" contentHeight="auto" contentWidth="45%" resizable="true" draggable="false" afterOpen="afterWeighingDialogOpened">
-<content>
-<l:VerticalLayout width="100%">
-<f:SimpleForm id="addWeighMaterialForm" editable="true" layout="ColumnLayout">
-<f:content>
-<Label text="{i18n>LabelOrderNumber}"/>
-<Text text="{addWeighingModel>/shopOrder}"/>
-<Label text="{i18n>LabelPhase}"/>
-<Text text="{addWeighingModel>/phaseId}"/>
-<Label text="{i18n>matNum}"/>
-<Input id="inAddWeighMatNum" type="Text" value="{addModel>/material}" showSuggestion="true" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="onMaterialBrowse" class="sapMesUpperCaseTransform" change="onChange">
-<layoutData>
-<f:ColumnElementData cellsSmall="10" cellsLarge="6"/>
-</layoutData>
-</Input>
-<Label text="{i18n>materialDescription}"/>
-<Text text="{addWeighingModel>/materialDescription}"/>
-<Label text="{i18n>batchid} / {i18n>storageLoc}" required="{addWeighingModel>/batchManaged}"/>
-<Input id="inAddWeighBatchID" value="{addWeighingModel>/batchNumber}" showValueHelp="{addWeighingModel>/batchManaged}" enabled="{addWeighingModel>/batchManaged}" valueHelpRequest="showBatchDetails" valueHelpOnly="{ parts: [ 'configModel>/allowFreeTextForBatch', 'addWeighingModel>/material' ], formatter: '.oFormatter.getValueHelpOnly' }" change="onBatchChange" liveChange="onBatchLiveChange">
-<layoutData>
-<f:ColumnElementData cellsSmall="5" cellsLarge="3"/>
-</layoutData>
-</Input>
-<Input id="inAddWeighStorageLocation" textAlign="Right" enabled="{=!${addWeighingModel>/batchManaged} && ${addWeighingModel>/materialType} !== 'PIPELINE'}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="showStorageLocationDetails" value="{addWeighingModel>/storageLocation}">
-<layoutData>
-<f:ColumnElementData cellsSmall="5" cellsLarge="3"/>
-</layoutData>
-</Input>
-<Label text="{i18n>avlQty}"/>
-<Text id="inputAddAvlQty" text="{addWeighingModel>/avlBatchQty}"/>
-<Label text="{i18n>LabelScale}"/>
-<Select id="cmbAddWeighScaleList" items="{ path: 'addWeighingModel>/scaleList' }" change="onSelectScale" forceSelection="false">
-<core:Item key="{addWeighingModel>resource}" text="{addWeighingModel>description}"/>
-<layoutData>
-<f:ColumnElementData cellsSmall="10" cellsLarge="6"/>
-</layoutData>
-</Select>
-<Label text=""/>
-<Button id="btnAddWeighSetZero" text="{i18n>ButtonZero}" press="onSetScaleZero" visible="{configModel>/showWeighingSetZero}" enabled="false" class="sapUiSmallMarginEnd">
-<layoutData>
-<f:ColumnElementData cellsSmall="4" cellsLarge="2"/>
-</layoutData>
-</Button>
-<Button id="btnAddWeighSetTare" text="{i18n>ButtonTare}" press="onSetScaleTare" visible="{configModel>/showWeighingSetTare}" enabled="false" class="sapUiSmallMarginEnd">
-<layoutData>
-<f:ColumnElementData cellsSmall="4" cellsLarge="2"/>
-</layoutData>
-</Button>
-<Text id="inputAddTotQty" text="{i18n>LabelTaraWeight} {addWeighingModel>/TaraWeight} {addWeighingModel>/quantity/unitOfMeasure/uom}" visible="{configModel>/showWeighingSetTare}"> </Text>
-</f:content>
-</f:SimpleForm>
-<HBox id="beforeScaleAddWeighMaterialPopupStatusContainer" width="auto" height="300px" class="sapUiResponsiveMargin" visible="true" justifyContent="Center" alignItems="Center">
-<Title text="{i18n>wd.NoData}"/>
-</HBox>
-<Panel id="vizFrameAddWeighMaterialPopupParentContainer" width="auto" visible="false">
-<content>
-<viz:VizFrame id="vizFrameAddWeighTotalWeight" uiConfig="{ applicationSet:'fiori' }" height="150px" width="auto" vizType="stacked_bar">
-<viz:dataset>
-<viz.data:FlattenedDataset data="{path:'addWeighingModel>/TotalWeight/'}">
-<viz.data:dimensions>
-<viz.data:DimensionDefinition value="{addWeighingModel>Name}" identity="idTotalWeightDefinition"/>
-</viz.data:dimensions>
-<viz.data:measures>
-<viz.data:MeasureDefinition name="CurrentWeight" value="{addWeighingModel>CurrentWeight}" identity="idCurrentWeight"/>
-<viz.data:MeasureDefinition name="ConsumedWeight" value="{addWeighingModel>ConsumedWeight}" identity="idConsumedWeight"/>
-</viz.data:measures>
-</viz.data:FlattenedDataset>
-</viz:dataset>
-<viz:feeds>
-<viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="idTotalWeightDefinition"/>
-<viz.feeds:FeedItem uid="valueAxis" type="Measure" values="idCurrentWeight"/>
-<viz.feeds:FeedItem uid="valueAxis" type="Measure" values="idConsumedWeight"/>
-</viz:feeds>
-</viz:VizFrame>
-<HBox id="vizLineAddWeighLegend" visible="false" width="auto" justifyContent="End" alignItems="Center" class="sapUiMediumMarginEnd">
-<core:Icon src="sap-icon://color-fill" color="#E6600D" class="sapUiTinyMarginEnd"/>
-<Label text="{i18n>VFRefLineMatTolerance}" class="sapUiTinyMarginEnd"/>
-<core:Icon src="sap-icon://color-fill" color="#91C8F6" class="sapUiTinyMarginEnd"/>
-<Label text="{i18n>VFTitleCurrentWeight}" class="sapUiTinyMarginEnd"/>
-<core:Icon src="sap-icon://color-fill" color="#427CAC" class="sapUiTinyMarginEnd"/>
-<Label text="{i18n>VFTitleTotalIssuedGoodsWeight}"/>
-</HBox>
-<viz:VizFrame id="vizFrameAddWeighCurrentWeight" uiConfig="{ applicationSet:'fiori' }" height="150px" width="auto" vizType="bar">
-<viz:dataset>
-<viz.data:FlattenedDataset data="{path:'addWeighingModel>/CurrentWeight/'}">
-<viz.data:dimensions>
-<viz.data:DimensionDefinition value="{addWeighingModel>Name}" identity="idCurrWeightDefinition"/>
-</viz.data:dimensions>
-<viz.data:measures>
-<viz.data:MeasureDefinition value="{addWeighingModel>CurrentWeight}" identity="idCurrWeight"/>
-</viz.data:measures>
-</viz.data:FlattenedDataset>
-</viz:dataset>
-<viz:feeds>
-<viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="idCurrWeightDefinition"/>
-<viz.feeds:FeedItem uid="valueAxis" type="Measure" values="idCurrWeight"/>
-</viz:feeds>
-</viz:VizFrame>
-</content>
-</Panel>
-</l:VerticalLayout>
-<f:SimpleForm id="addWeighMaterialForm2" editable="true" layout="ColumnLayout">
-<f:content>
-<Label text="{i18n>postedBy} / {i18n>postingDate}"/>
-<Input id="inAddWeighWeighingPostedBy" value="{addWeighingModel>/userId}" showValueHelp="true" valueHelpOnly="true" enabled="false" valueHelpRequest="showUserDialog">
-<layoutData>
-<f:ColumnElementData cellsSmall="5" cellsLarge="3"/>
-</layoutData>
-</Input>
-<DatePicker id="inAddWeighPostingDate" valueFormat="yyyy-MM-dd" displayFormat="long" class="sapUiSmallMarginBottom" value="{addWeighingModel>/dateTime}" change="onChangePostingDate">
-<layoutData>
-<f:ColumnElementData cellsSmall="5" cellsLarge="3"/>
-</layoutData>
-</DatePicker>
-<Label text="{i18n>calculateQTYtoConsume.comments.lbl}"/>
-<TextArea id="inAddWeighComments" maxLength="2048" rows="3" value="{addWeighingModel>/comments}" growing="true" liveChange="onChangeOfComments">
+<core:FragmentDefinition 
+    xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form"
+    xmlns:viz="sap.viz.ui5.controls" xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds">
+    <Dialog id="addWeighDialog" title="{i18n>AddWeighDialogTitle}" contentHeight="auto" contentWidth="45%"
+        resizable="true" draggable="false" afterOpen="afterWeighingDialogOpened">
+        <content>
+            <l:VerticalLayout width="100%">
+                <f:SimpleForm id="addWeighMaterialForm" editable="true" layout="ColumnLayout">
+                    <f:content>
+                        <Label text="{i18n>LabelOrderNumber}" />
+                        <Text text="{addWeighingModel>/shopOrder}" />
+                        <Label text="{i18n>LabelPhase}" />
+                        <Text text="{addWeighingModel>/phaseId}" />
+                        <Label text="{i18n>matNum}" />
+                        <Input id="inAddWeighMatNum" type="Text" value="{addModel>/material}" showSuggestion="true"
+                            showValueHelp="true" valueHelpOnly="true" valueHelpRequest="onMaterialBrowse"
+                            class="sapMesUpperCaseTransform" change="onChange">
+                            <layoutData>
+                                <f:ColumnElementData cellsSmall="10" cellsLarge="6" />
+                            </layoutData>
+                        </Input>
+                        <Label text="{i18n>materialDescription}" />
+                        <Text text="{addWeighingModel>/materialDescription}" />
+                        <Label text="{i18n>batchid} / {i18n>storageLoc}" required="{addWeighingModel>/batchManaged}" />
+                        <Input id="inAddWeighBatchID" value="{addWeighingModel>/batchNumber}"
+                            showValueHelp="{addWeighingModel>/batchManaged}" enabled="{addWeighingModel>/batchManaged}"
+                            valueHelpRequest="showBatchDetails"
+                            valueHelpOnly="{ parts: [ 'configModel>/allowFreeTextForBatch', 'addWeighingModel>/material' ], formatter: '.oFormatter.getValueHelpOnly' }"
+                            change="onBatchChange" liveChange="onBatchLiveChange">
+                            <layoutData>
+                                <f:ColumnElementData cellsSmall="5" cellsLarge="3" />
+                            </layoutData>
+                        </Input>
+                        <Input id="inAddWeighStorageLocation" textAlign="Right"
+                            enabled="{=!${addWeighingModel>/batchManaged} &amp;&amp; ${addWeighingModel>/materialType} !== 'PIPELINE'}"
+                            showValueHelp="true" valueHelpOnly="true" valueHelpRequest="showStorageLocationDetails"
+                            value="{addWeighingModel>/storageLocation}">
+                        <layoutData>
+                            <f:ColumnElementData cellsSmall="5" cellsLarge="3" />
+                        </layoutData>
+                        </Input>
+                        <Label text="{i18n>avlQty}" />
+                        <Text id="inputAddAvlQty" text="{addWeighingModel>/avlBatchQty}" />
+                        <Label text="{i18n>LabelScale}" />
+                        <Select id="cmbAddWeighScaleList" items="{ path: 'addWeighingModel>/scaleList' }"
+                            change="onSelectScale" forceSelection="false">
+                            <core:Item key="{addWeighingModel>resource}" text="{addWeighingModel>description}" />
+                            <layoutData>
+                                <f:ColumnElementData cellsSmall="10" cellsLarge="6" />
+                            </layoutData>
+                        </Select>
+                        <Label text="" />
+                        <Button id="btnAddWeighSetZero" text="{i18n>ButtonZero}" press="onSetScaleZero"
+                            visible="{configModel>/showWeighingSetZero}" enabled="false" class="sapUiSmallMarginEnd">
+                            <layoutData>
+                                <f:ColumnElementData cellsSmall="4" cellsLarge="2" />
+                            </layoutData>
+                        </Button>
+                        <Button id="btnAddWeighSetTare" text="{i18n>ButtonTare}" press="onSetScaleTare"
+                            visible="{configModel>/showWeighingSetTare}" enabled="false" class="sapUiSmallMarginEnd">
+                            <layoutData>
+                                <f:ColumnElementData cellsSmall="4" cellsLarge="2" />
+                            </layoutData>
+                        </Button>
+                        <Text id="inputAddTotQty"
+                            text="{i18n>LabelTaraWeight} {addWeighingModel>/TaraWeight} {addWeighingModel>/quantity/unitOfMeasure/uom}"
+                            visible="{configModel>/showWeighingSetTare}"> </Text>
+                    </f:content>
+                </f:SimpleForm>
+                <HBox id="beforeScaleAddWeighMaterialPopupStatusContainer" width="auto" height="300px"
+                    class="sapUiResponsiveMargin" visible="true" justifyContent="Center" alignItems="Center">
+                    <Title text="{i18n>wd.NoData}" />
+                </HBox>
+                <Panel id="vizFrameAddWeighMaterialPopupParentContainer" width="auto" visible="false">
+                    <content>
+                        <viz:VizFrame id="vizFrameAddWeighTotalWeight" uiConfig="{ applicationSet:'fiori' }"
+                            height="150px" width="auto" vizType="stacked_bar">
+                            <viz:dataset>
+                                <viz.data:FlattenedDataset data="{path:'addWeighingModel>/TotalWeight/'}">
+                                    <viz.data:dimensions>
+                                        <viz.data:DimensionDefinition value="{addWeighingModel>Name}"
+                                            identity="idTotalWeightDefinition" />
+                                    </viz.data:dimensions>
+                                    <viz.data:measures>
+                                        <viz.data:MeasureDefinition name="CurrentWeight"
+                                            value="{addWeighingModel>CurrentWeight}" identity="idCurrentWeight" />
+                                        <viz.data:MeasureDefinition name="ConsumedWeight"
+                                            value="{addWeighingModel>ConsumedWeight}" identity="idConsumedWeight" />
+                                    </viz.data:measures>
+                                </viz.data:FlattenedDataset>
+                            </viz:dataset>
+                            <viz:feeds>
+                                <viz.feeds:FeedItem uid="categoryAxis" type="Dimension"
+                                    values="idTotalWeightDefinition" />
+                                <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="idCurrentWeight" />
+                                <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="idConsumedWeight" />
+                            </viz:feeds>
+                        </viz:VizFrame>
+                        <HBox id="vizLineAddWeighLegend" visible="false" width="auto" justifyContent="End"
+                            alignItems="Center" class="sapUiMediumMarginEnd">
+                            <core:Icon src="sap-icon://color-fill" color="#E6600D" class="sapUiTinyMarginEnd" />
+                            <Label text="{i18n>VFRefLineMatTolerance}" class="sapUiTinyMarginEnd" />
+                            <core:Icon src="sap-icon://color-fill" color="#91C8F6" class="sapUiTinyMarginEnd" />
+                            <Label text="{i18n>VFTitleCurrentWeight}" class="sapUiTinyMarginEnd" />
+                            <core:Icon src="sap-icon://color-fill" color="#427CAC" class="sapUiTinyMarginEnd" />
+                            <Label text="{i18n>VFTitleTotalIssuedGoodsWeight}" />
+                        </HBox>
+                        <viz:VizFrame id="vizFrameAddWeighCurrentWeight" uiConfig="{ applicationSet:'fiori' }"
+                            height="150px" width="auto" vizType="bar">
+                            <viz:dataset>
+                                <viz.data:FlattenedDataset data="{path:'addWeighingModel>/CurrentWeight/'}">
+                                    <viz.data:dimensions>
+                                        <viz.data:DimensionDefinition value="{addWeighingModel>Name}"
+                                            identity="idCurrWeightDefinition" />
+                                    </viz.data:dimensions>
+                                    <viz.data:measures>
+                                        <viz.data:MeasureDefinition value="{addWeighingModel>CurrentWeight}"
+                                            identity="idCurrWeight" />
+                                    </viz.data:measures>
+                                </viz.data:FlattenedDataset>
+                            </viz:dataset>
+                            <viz:feeds>
+                                <viz.feeds:FeedItem uid="categoryAxis" type="Dimension"
+                                    values="idCurrWeightDefinition" />
+                                <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="idCurrWeight" />
+                            </viz:feeds>
+                        </viz:VizFrame>
+                    </content>
+                </Panel>
+            </l:VerticalLayout>
+            <f:SimpleForm id="addWeighMaterialForm2" editable="true" layout="ColumnLayout">
+                <f:content>
+                    <Label text="{i18n>postedBy} / {i18n>postingDate}" />
+                    <Input id="inAddWeighWeighingPostedBy" value="{addWeighingModel>/userId}" showValueHelp="true"
+                        valueHelpOnly="true" enabled="false" valueHelpRequest="showUserDialog">
+                    <layoutData>
+                        <f:ColumnElementData cellsSmall="5" cellsLarge="3" />
+                    </layoutData>
+                    </Input>
+                    <DatePicker id="inAddWeighPostingDate" valueFormat="yyyy-MM-dd" displayFormat="long"
+                        class="sapUiSmallMarginBottom" value="{addWeighingModel>/dateTime}"
+                        change="onChangePostingDate">
+                        <layoutData>
+                            <f:ColumnElementData cellsSmall="5" cellsLarge="3" />
+                        </layoutData>
+                    </DatePicker>
+                    <Label text="{i18n>calculateQTYtoConsume.comments.lbl}" />
+                    <TextArea id="inAddWeighComments" maxLength="2048" rows="3" value="{addWeighingModel>/comments}"
+                        growing="true" liveChange="onChangeOfComments">
 <layoutData>
 <f:ColumnElementData cellsSmall="10" cellsLarge="6"/>
 </layoutData>
 </TextArea>
-</f:content>
-</f:SimpleForm>
-</content>
-<buttons>
-<Button id="btnAddWeighConfirmWeight" text="{i18n>BtnConfirm}" enabled="false" type="Emphasized" press="onWeighDialogConfirm"/>
-<Button id="btnAddWeighAddWeight" enabled="false" text="{i18n>BtnAddWeight}" press="onWeighDialogAddWeight"/>
-<Button id="btnAddWeighCancelWeight" text="{i18n>BtnCancel}" press="onWeighDialogCancel"/>
-</buttons>
-</Dialog>
+                </f:content>
+            </f:SimpleForm>
+        </content>
+        <buttons>
+            <Button id="btnAddWeighConfirmWeight" text="{i18n>BtnConfirm}" enabled="false" type="Emphasized"
+                press="onWeighDialogConfirm" />
+            <Button id="btnAddWeighAddWeight" enabled="false" text="{i18n>BtnAddWeight}"
+                press="onWeighDialogAddWeight" />
+            <Button id="btnAddWeighCancelWeight" text="{i18n>BtnCancel}" press="onWeighDialogCancel" />
+        </buttons>
+    </Dialog>
 </core:FragmentDefinition>

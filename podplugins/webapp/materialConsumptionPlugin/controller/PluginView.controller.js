@@ -917,6 +917,7 @@ sap.ui.define([
 
             var oFilterBar = this.byId("filterBar");
 
+            oFilterBar.removeBasicSearch();
             let oBasicSearchField;
             if (this.isInventoryManaged) {
                  oBasicSearchField = new sap.m.SearchField({
@@ -3189,6 +3190,18 @@ sap.ui.define([
             var scannedMat = that.getCurrentInputMaterialControl().getValue();
             var oDialogSelected = this.getCurrentDialogId();
             var scannedMatDetails;
+
+            //QR code scan for material
+            try{
+                var oMaterialInput = that.getCurrentInputMaterialControl();                
+                var oMatParsed = JSON.parse(oMaterialInput.getValue());
+                scannedMat = oMatParsed.material;
+
+                oMaterialInput.setValue(scannedMat);
+            }catch(e){
+
+            }
+
             if (!that.validateMaterialInputRegEx(scannedMat)) {
                 flag = false;
                 scannedMatDetails = {};

@@ -1,68 +1,91 @@
-<mvc:View xmlns:core="sap.ui.core" xmlns:suite="sap.suite.ui.microchart" xmlns:l="sap.ui.layout" xmlns="sap.m" xmlns:f="sap.f" xmlns:u="sap.ui.unified" xmlns:mvc="sap.ui.core.mvc" xmlns:x="sap.uxap" xmlns:fb="sap.ui.comp.filterbar" xmlns:vm="sap.ui.comp.variants" controllerName="stellium.ext.podplugins.materialConsumptionPlugin.controller.PluginView" width="100%" height="100%">
-<Table id="consumptionList" items="{/lineItems}" visible="true" class="tableContent" popinLayout="GridLarge">
-<headerToolbar>
-<Toolbar>
-<Title id="titleText" text="{testTitle>/title}" level="H2"/>
-<ToolbarSpacer/>
-<SearchField id="materialSearch" liveChange="onSearch" width="35%"/>
-<Button id="addButton" tooltip="{i18n>ADD_AND_CONSUME_MATERIAL}" icon="sap-icon://add" type="Transparent" press="handleOpenAddDialog" visible="{configModel>/showAddButton}" enabled="{parts : ['authModel>/userAuthorizedForWorkCenter','configModel>/showAddButton'],formatter:'.oFormatter.formatHeaderButtons'}"/>
-<Button id="scanButton" tooltip="{i18n>scanAndConsumeMaterial}" icon="sap-icon://bar-code" type="Transparent" press="handleOpenScanDialog" visible="{configModel>/showScanButton}" enabled="{parts : ['authModel>/userAuthorizedForWorkCenter','configModel>/showScanButton'],formatter:'.oFormatter.formatHeaderButtons'}"/>
-</Toolbar>
-</headerToolbar>
-<columns>
-<Column hAlign="Left" vAlign="Middle">
-<Text text="{i18n>matNum}"/>
-</Column>
-<Column hAlign="Left" vAlign="Middle">
-<Text text="{i18n>plannedBatchID}"/>
-</Column>
-<Column hAlign="Left" vAlign="Middle">
-<Text text="{i18n>storageLoc}"/>
-</Column>
-<Column hAlign="Left" vAlign="Middle">
-<Text text="{i18n>threshold}"/>
-</Column>
-<Column hAlign="Left" vAlign="Middle">
-<Text text="{i18n>postedQty}"/>
-</Column>
-<Column id="workInsAndAltBomCompCol" hAlign="Right" vAlign="Middle" demandPopin="true" visible="false"/>
-<Column hAlign="Left" vAlign="Middle" width="20rem"/>
-</columns>
-<items>
-<ColumnListItem>
-<cells>
-<VBox>
-<Text class="boldText" text="{materialId/material}"/>
-<Text text="{description}"/>
-<Text class="sapDmeItalicText" text="{=${backflushEnabled} ? '('+${i18n>backflush}+')':''}" visible="{backflushEnabled}"/>
-</VBox>
-<Text text="{plannedBatchNumber}"/>
-<Text text="{storageLocation/storageLocation}"/>
-<Text text="{parts : ['upperThresholdValueToBeDisplayed','lowerThresholdValueToBeDisplayed', 'totalQtyEntryUom','totalQtyBaseUom','targetQuantity'],formatter:'.oFormatter.getThresholdValues'}"/>
-<suite:BulletMicroChart size="Responsive" class="chartHeight" targetValue="{parts : ['totalQtyEntryUom','totalQtyBaseUom','targetQuantity'],formatter:'.oFormatter.getValidTargetValues'}" actualValueLabel="{parts: ['consumedQuantity', 'consumedQtyEntryUom'], formatter: '.oFormatter.getActualValue'}" targetValueLabel="{parts: ['totalQtyEntryUom','totalQtyBaseUom','targetQuantity', 'i18n>target'], formatter: '.oFormatter.getValidRequiredQuantity'}" minValue="0">
-<suite:actual>
-<suite:BulletMicroChartData value="{parts : ['consumedQuantity','consumedQtyEntryUom'],formatter:'.oFormatter.getValidConsumedQtyValue'}" color="{parts: ['totalQtyEntryUom','totalQtyBaseUom','targetQuantity', 'consumedQuantity', 'consumedQtyEntryUom'], formatter: '.oFormatter.getColor'}"/>
-</suite:actual>
-<suite:thresholds>
-<suite:BulletMicroChartData value="0"/>
-</suite:thresholds>
-</suite:BulletMicroChart>
-<HBox justifyContent="End">
-<Button tooltip="{i18n>showWI}" icon="sap-icon://activities" type="Transparent" press="onPressViewWorkinstructions" visible="{showWorkInstructions}">
-<customData>
-<BadgeCustomData key="badge" value="{noOfWorkinstructions}"/>
-</customData>
-</Button>
-<Button tooltip="{i18n>showAB}" icon="sap-icon://duplicate" type="Transparent" press="onPressViewAlternateBoms" visible="{showAlternateBomComponents}"/>
-</HBox>
-<HBox class="sapUiTinyMarginBegin">
-<Button text="{i18n>postings}" press="showDetailsOfComponent" class="sapUiSmallMarginEnd" tooltip="{i18n>postings}" enabled="{=${assembledAndCanceledComponentsCount} > 0 }"/>
-<Button type="Emphasized" press="showConsumePopup" text="{i18n>consume}" class="sapUiTinyMarginEnd" enabled="{parts : ['authModel>/userAuthorizedForWorkCenter','backflushEnabled', 'authModel>/weighRelevant'],formatter:'.oFormatter.formatConsumeButton'}"/>
-<Button type="Emphasized" press="showWeighingPopup" text="{i18n>weigh}" class="sapUiTinyMarginEnd" enabled="{parts : ['authModel>/userAuthorizedForWorkCenter','backflushEnabled', 'authModel>/weighRelevant'],formatter:'.oFormatter.formatWeighButton'}"/>
-</HBox>
-</cells>
-</ColumnListItem>
-</items>
-</Table>
-<core:Fragment fragmentName="stellium.ext.podplugins.materialConsumptionPlugin.view.fragments.CoBiProduct" type="XML" class="sapUiMediumMarginTop"/>
+<mvc:View xmlns:core="sap.ui.core" xmlns:suite="sap.suite.ui.microchart" xmlns:l="sap.ui.layout" xmlns="sap.m"
+    xmlns:f="sap.f" xmlns:u="sap.ui.unified" xmlns:mvc="sap.ui.core.mvc" xmlns:x="sap.uxap"
+    xmlns:fb="sap.ui.comp.filterbar" xmlns:vm="sap.ui.comp.variants"
+    controllerName="stellium.ext.podplugins.materialConsumptionPlugin.controller.PluginView" width="100%" height="100%">
+    <Table id="consumptionList" items="{/lineItems}" visible="true" class="tableContent" popinLayout="GridLarge">
+        <headerToolbar>
+            <Toolbar>
+                <Title id="titleText" text="{testTitle>/title}" level="H2" />
+                <ToolbarSpacer />
+                <SearchField id="materialSearch" liveChange="onSearch" width="35%" />
+                <Button id="addButton" tooltip="{i18n>ADD_AND_CONSUME_MATERIAL}" icon="sap-icon://add"
+                    type="Transparent" press="handleOpenAddDialog" visible="{configModel>/showAddButton}"
+                    enabled="{parts : ['authModel>/userAuthorizedForWorkCenter','configModel>/showAddButton'],formatter:'.oFormatter.formatHeaderButtons'}" />
+                <Button id="scanButton" tooltip="{i18n>scanAndConsumeMaterial}" icon="sap-icon://bar-code"
+                    type="Transparent" press="handleOpenScanDialog" visible="{configModel>/showScanButton}"
+                    enabled="{parts : ['authModel>/userAuthorizedForWorkCenter','configModel>/showScanButton'],formatter:'.oFormatter.formatHeaderButtons'}" />
+            </Toolbar>
+        </headerToolbar>
+        <columns>
+            <Column hAlign="Left" vAlign="Middle">
+                <Text text="{i18n>matNum}" />
+            </Column>
+            <Column hAlign="Left" vAlign="Middle">
+                <Text text="{i18n>plannedBatchID}" />
+            </Column>
+            <Column hAlign="Left" vAlign="Middle">
+                <Text text="{i18n>storageLoc}" />
+            </Column>
+            <Column hAlign="Left" vAlign="Middle">
+                <Text text="{i18n>threshold}" />
+            </Column>
+            <Column hAlign="Left" vAlign="Middle">
+                <Text text="{i18n>postedQty}" />
+            </Column>
+            <Column id="workInsAndAltBomCompCol" hAlign="Right" vAlign="Middle" demandPopin="true" visible="false" />
+            <Column hAlign="Left" vAlign="Middle" width="20rem" />
+        </columns>
+        <items>
+            <ColumnListItem>
+                <cells>
+                    <VBox>
+                        <Text class="boldText" text="{materialId/material}" />
+                        <Text text="{description}" />
+                        <Text class="sapDmeItalicText" text="{=${backflushEnabled} ? '('+${i18n>backflush}+')':''}"
+                            visible="{backflushEnabled}" />
+                    </VBox>
+                    <Text text="{plannedBatchNumber}" />
+                    <Text text="{storageLocation/storageLocation}" />
+                    <Text
+                        text="{parts : ['upperThresholdValueToBeDisplayed','lowerThresholdValueToBeDisplayed', 'totalQtyEntryUom','totalQtyBaseUom','targetQuantity'],formatter:'.oFormatter.getThresholdValues'}" />
+                    <suite:BulletMicroChart size="Responsive" class="chartHeight"
+                        targetValue="{parts : ['totalQtyEntryUom','totalQtyBaseUom','targetQuantity'],formatter:'.oFormatter.getValidTargetValues'}"
+                        actualValueLabel="{parts: ['consumedQuantity', 'consumedQtyEntryUom'], formatter: '.oFormatter.getActualValue'}"
+                        targetValueLabel="{parts: ['totalQtyEntryUom','totalQtyBaseUom','targetQuantity', 'i18n>target'], formatter: '.oFormatter.getValidRequiredQuantity'}"
+                        minValue="0">
+                        <suite:actual>
+                            <suite:BulletMicroChartData
+                                value="{parts : ['consumedQuantity','consumedQtyEntryUom'],formatter:'.oFormatter.getValidConsumedQtyValue'}"
+                                color="{parts: ['totalQtyEntryUom','totalQtyBaseUom','targetQuantity', 'consumedQuantity', 'consumedQtyEntryUom'], formatter: '.oFormatter.getColor'}" />
+                        </suite:actual>
+                        <suite:thresholds>
+                            <suite:BulletMicroChartData value="0" />
+                        </suite:thresholds>
+                    </suite:BulletMicroChart>
+                    <HBox justifyContent="End">
+                        <Button tooltip="{i18n>showWI}" icon="sap-icon://activities" type="Transparent"
+                            press="onPressViewWorkinstructions" visible="{showWorkInstructions}">
+                            <customData>
+                                <BadgeCustomData key="badge" value="{noOfWorkinstructions}" />
+                            </customData>
+                        </Button>
+                        <Button tooltip="{i18n>showAB}" icon="sap-icon://duplicate" type="Transparent"
+                            press="onPressViewAlternateBoms" visible="{showAlternateBomComponents}" />
+                    </HBox>
+                    <HBox class="sapUiTinyMarginBegin">
+                        <Button text="{i18n>postings}" press="showDetailsOfComponent" class="sapUiSmallMarginEnd"
+                            tooltip="{i18n>postings}" enabled="{=${assembledAndCanceledComponentsCount} > 0 }" />
+                        <Button type="Emphasized" press="showConsumePopup" text="{i18n>consume}"
+                            class="sapUiTinyMarginEnd"
+                            enabled="{parts : ['authModel>/userAuthorizedForWorkCenter','backflushEnabled', 'authModel>/weighRelevant'],formatter:'.oFormatter.formatConsumeButton'}" />
+                        <Button type="Emphasized" press="showWeighingPopup" text="{i18n>weigh}"
+                            class="sapUiTinyMarginEnd"
+                            enabled="{parts : ['authModel>/userAuthorizedForWorkCenter','backflushEnabled', 'authModel>/weighRelevant'],formatter:'.oFormatter.formatWeighButton'}" />
+                    </HBox>
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
+    <core:Fragment fragmentName="stellium.ext.podplugins.materialConsumptionPlugin.view.fragments.CoBiProduct"
+        type="XML" class="sapUiMediumMarginTop" />
 </mvc:View>
