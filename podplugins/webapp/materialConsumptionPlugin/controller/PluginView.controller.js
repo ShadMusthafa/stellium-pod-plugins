@@ -4534,61 +4534,32 @@ sap.ui.define([
         },
         // To set Validation of lower expiry Batch - AD-006
         _validateBatchSelection: function () {
-            var batchDetails = this.batchDetailsModel.getData();
-            var oModel = this.getCurrentModel();
-            var batchNumber = oModel.getProperty("/batchNumber");
-            if(batchNumber === 'Not Batch Managed'){
-                return true;
+            var oModelData = this.getCurrentModel().getData(),
+              aBatchDetails = this.batchDetailsModel.getData(),
+              oInput = this.getCurrentInputBatchIdControl();
+          
+            if (!oModelData.batchManaged) {
+              return true;
             }
-            var inputBatch = this.byId("inputBatchIdAdd");
-            var inputBatchScan = this.byId("inputBatchIdScan");
-            var inputBatchConsume = this.byId("inputBatchId");
-            if (!batchDetails || !batchNumber || !(inputBatch || inputBatchScan || inputBatchConsume)) {
-                return false;
-            }
+          
             // Find the batch with the earliest expiry date
-            var lowestExpiryBatch = batchDetails.reduce((minBatch, currentBatch) => {
-                var minExpiry = new Date(minBatch.expiry);
-                var currentExpiry = new Date(currentBatch.expiry);
-                return currentExpiry < minExpiry ? currentBatch : minBatch;
+            var oLowExpBatch = aBatchDetails.reduce((minBatch, currentBatch) => {
+              var minExpiry = new Date(minBatch.expiry);
+              var currentExpiry = new Date(currentBatch.expiry);
+              return currentExpiry < minExpiry ? currentBatch : minBatch;
             });
+          
             // Check if the selected batch has the lowest expiry date
-            if (batchNumber !== lowestExpiryBatch.batchNumber) {
-                var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
-                var sErrorText = oResourceBundle.getText("errorLowerBatchExpiry", [
-                    lowestExpiryBatch.batchNumber,
-                    lowestExpiryBatch.expiry
-                ]);
-                if(inputBatch){
-                    inputBatch.setValueState("Error");
-                    inputBatch.setValueStateText(sErrorText);
-                }
-                if(inputBatchScan){
-                    inputBatchScan.setValueState("Error");
-                    inputBatchScan.setValueStateText(sErrorText);
-                }
-                if(inputBatchConsume){
-                    inputBatchConsume.setValueState("Error");
-                    inputBatchConsume.setValueStateText(sErrorText);
-                }
-                var oCSaveBtn = this.getCurrentSaveButton();
-                    oCSaveBtn.setEnabled(false);
-                return false;
-            } else {
-                if(inputBatch){
-                    inputBatch.setValueState("None");
-                    inputBatch.setValueStateText(null);
-                }
-                if(inputBatchScan){
-                    inputBatchScan.setValueState("None");
-                    inputBatchScan.setValueStateText(null);
-                }
-                if(inputBatchConsume){
-                    inputBatchConsume.setValueState("None");
-                    inputBatchConsume.setValueStateText(null);
-                }
-                return true;
+            if (oModelData.batchNumber !== oLowExpBatch.batchNumber) {
+              var sErrorText = this.getI18nText('errorLowerBatchExpiry', [oLowExpBatch.batchNumber, oLowExpBatch.expiry]);
+              oInput.setValueState('Error');
+              oInput.setValueStateText(sErrorText);
+              return false;
             }
-        }
+          
+            oInput.setValueState('None');
+            oInput.setValueStateText('');
+            return true;
+          }
     });
 });
