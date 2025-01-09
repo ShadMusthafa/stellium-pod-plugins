@@ -1482,7 +1482,7 @@ sap.ui.define([
         },
 
         handleSearchSloc: function (oValue, propertiesArray, oBinding) {
-            var aFilters = [],
+            var aFilters = [], aCombinedFilters= [],
                 filter, oFilterWithAllProperties;
             if (oValue && oValue.length > 0) {
                 $.each(propertiesArray, function (oIndex, oObj) {
@@ -1493,8 +1493,27 @@ sap.ui.define([
                     filters: aFilters,
                     and: false
                 });
+
+                aCombinedFilters.push(oFilterWithAllProperties);
             }
-            oBinding.filter(oFilterWithAllProperties);
+
+            var oModel = this.getCurrentModel(),
+                sStorageLoc = oModel.getProperty('/storageLocation');
+            if(sStorageLoc){
+                var oSLocFilter = new sap.ui.model.Filter({
+                    path: "storageLocation/storageLocation",
+                    operator: 'EQ',
+                    value1: sStorageLoc
+                });
+                aCombinedFilters.push(oSLocFilter);
+            }
+            var oCombinedFilter = new sap.ui.model.Filter({
+                filters: aCombinedFilters,
+                and: true
+            });
+            oBinding.filter(oCombinedFilter);
+
+            // oBinding.filter(oFilterWithAllProperties);
         },
 
         handleSearch: function (oValue, propertiesArray, oBinding) {
