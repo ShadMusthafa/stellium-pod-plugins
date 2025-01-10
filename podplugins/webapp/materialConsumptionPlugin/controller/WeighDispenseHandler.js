@@ -366,7 +366,8 @@ sap.ui.define([
                 oInStorageLocation = this.getCurrentStorageLocationInput(),
                 sStorageLocation = oInStorageLocation.getValue(),
                 oCMBScale = this.getCurrentWeighScaleList(),
-                sScaleValue = oCMBScale.getSelectedKey(),
+                // sScaleValue = oCMBScale.getSelectedKey(),
+                sScaleValue = oCMBScale.getValue(),
                 bBatchValid = false,
                 bStorageLocValid = false,
                 bScaleValid = false;
@@ -404,7 +405,8 @@ sap.ui.define([
 
             this.setWeighPopUpVizFrameBusyState(false);
             var oCMBScale = this.getCurrentWeighScaleList();
-            oCMBScale.setSelectedKey(null);
+            // oCMBScale.setSelectedKey(null);
+            oCMBScale.setValue(null);
             this.customFieldJson = [];
 
         },
@@ -616,7 +618,8 @@ sap.ui.define([
             var oCMBScale = this.getCurrentWeighScaleList(),
                 oCurrWeighingModel = this.getCurrentModel();
             if (oCurrWeighingModel) {
-                var sResource = oCMBScale.getSelectedKey(),
+                // var sResource = oCMBScale.getSelectedKey(),
+                var sResource = oCMBScale.getValue(),
                     oResourceObject = oCurrWeighingModel.getProperty("/scaleList").find(oData => oData.resource === sResource);
                 if (Object.keys(oResourceObject).length > 0 && oResourceObject.equipment && oResourceObject.equipment.length > 0) {
                     return oResourceObject.equipment[0].equipmentId;

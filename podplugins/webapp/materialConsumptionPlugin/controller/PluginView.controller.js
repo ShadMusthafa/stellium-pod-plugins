@@ -121,7 +121,8 @@ sap.ui.define([
         handleWdScaleMessage: function (oMsg) {
             oLogger.info("Got Scale message: ", oMsg);
             const oScaleList = this.oWeighDispenseHandler.getCurrentWeighScaleList();
-            const sSelectedScale = oScaleList && oScaleList.getSelectedKey();
+            // const sSelectedScale = oScaleList && oScaleList.getSelectedKey();
+            const sSelectedScale = oScaleList && oScaleList.getValue();
             if (oMsg.resource === sSelectedScale) {
                 this.oWeighDispenseHandler._initializeScale();
                 this.oWeighDispenseHandler.setNewScaleValue(oMsg.quantity && oMsg.quantity.value || 0);
@@ -1535,7 +1536,7 @@ sap.ui.define([
 
             var oModel = this.getCurrentModel(),
                 bBatchManaged = oModel.getProperty('/batchManaged'),
-                sStorageLoc = oModel.getProperty('/storageLocation')
+                sStorageLoc = oModel.getProperty('/storageLocation'),
                 oSLocFilter;
 
             if(bBatchManaged && sStorageLoc){
@@ -4088,6 +4089,7 @@ sap.ui.define([
         },
 
         getScaleTareData: function (oView) {
+            //TODO:
             var oScale = oView.byId("cmbScaleList");
             if (oScale.getItems().length > 0) {
                 var oScaleSelect = oScale.getItems()[0].getKey();
@@ -4127,8 +4129,46 @@ sap.ui.define([
             this.oWeighDispenseHandler.closeWeighingDialog(oEvent);
         },
 
-        onSelectScale: function (oEvent) {
-            this.oWeighDispenseHandler.onSelectScale(oEvent);
+        onSelectScale: async function (oEvent) {
+            var oScaleInput = this.oWeighDispenseHandler.getCurrentWeighScaleList();
+            var selectedScale;
+            try{
+                var oSelectedResource = JSON.parse(oEvent.getParameter('newValue')),
+                    sSelectedAsset = oSelectedResource.asset;
+                
+                selectedScale = oSelectedResource.resource;
+                oScaleInput.setValue(selectedScale);
+            }catch(e){
+                selectedScale = oEvent.getParameter('newValue');
+            }
+
+            //Validate resource
+            var oModel = this.getCurrentModel(),
+                aScaleList = oModel.getProperty('/scaleList');
+            var oResource = aScaleList.find(oScale=>oScale.resource === selectedScale);
+
+            if(!oResource){
+                oScaleInput.setValueState('Error');
+                oScaleInput.setValueStateText(this.getI18nText('INVALID_RESOURCE'));   
+                return;
+            }else{
+                oScaleInput.setValueState('None');
+                oScaleInput.setValueStateText(''); 
+            }
+
+            //Validate asset
+            if(!sSelectedAsset){
+                this.oWeighDispenseHandler.onSelectScale(oEvent);
+                return;
+            }
+
+            this._validateAsset(selectedScale, sSelectedAsset).then(function(bIsAssetValid){
+                if(!bIsAssetValid)return;
+
+                this.oWeighDispenseHandler.onSelectScale(oEvent);
+            }.bind(this)).catch(function(oError){
+                this.showErrorMessage('Error occured during asset validation');
+            }.bind(this));
         },
         onSetScaleZero: function (oEvent) {
             var oPluginConfiguration = this.oPluginConfiguration,
@@ -4341,7 +4381,7 @@ sap.ui.define([
                 if (oCMBScale !== undefined) {
                     if (aResourceArray.length === 1) {
                         let sSelKey = aResourceArray[0].resource;
-                        oCMBScale.setSelectedKey(sSelKey);
+                        // oCMBScale.setSelectedKey(sSelKey);
                         that.oWeighDispenseHandler._checkUpdateScale();
                         that.oWeighDispenseHandler._setEnabledScaleButtons(true);
                         this.aIndicatorData = null;
@@ -4351,7 +4391,7 @@ sap.ui.define([
                             that.oWeighDispenseHandler.readTareValue();
                         }
                     } else {
-                        oCMBScale.setSelectedKey(null);
+                        // oCMBScale.setSelectedKey(null);
                     }
                 }
             }, function (oError) {
@@ -4604,6 +4644,36 @@ sap.ui.define([
             oInput.setValueState('None');
             oInput.setValueStateText('');
             return true;
+          },
+
+          _validateAsset:function(sResourceId, sAssetId){
+            var sUrl = this.getPublicApiRestDataSourceUri() + '/resource/v2/resources';
+            var oParams={
+                plant: this.getPodController().getUserPlant(),
+                resource: sResourceId
+            }
+
+            return new Promise(function(resolve, reject){
+                this.ajaxGetRequest(sUrl, oParams, function(oResponse){
+                    var bIsResourceValid = false;
+                    if(oResponse && oResponse.length > 0 && oResponse[0].asset.name === sAssetId){
+                        bIsResourceValid = true;
+                    }
+    
+                    var oResourceInput = this.oWeighDispenseHandler.getCurrentWeighScaleList();
+                    if(bIsResourceValid){
+                        oResourceInput.setValueState('None');
+                        oResourceInput.setValueStateText('');
+                    }else{
+                        oResourceInput.setValueState('Error');
+                        oResourceInput.setValueStateText(this.getI18nText('INVALID_ASSET'));
+                    }
+
+                    resolve(bIsResourceValid);    
+                }.bind(this), function(){
+                    reject(...arguments);
+                });
+            }.bind(this));            
           }
     });
 });
