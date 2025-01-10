@@ -1498,8 +1498,9 @@ sap.ui.define([
             }
 
             var oModel = this.getCurrentModel(),
+                bBatchManaged = oModel.getProperty('/batchManaged'),
                 sStorageLoc = oModel.getProperty('/storageLocation');
-            if(sStorageLoc){
+            if(bBatchManaged && sStorageLoc){
                 var oSLocFilter = new sap.ui.model.Filter({
                     path: "storageLocation/storageLocation",
                     operator: 'EQ',
@@ -1532,9 +1533,12 @@ sap.ui.define([
                 aCombinedFilters.push(oFilterWithAllProperties);
             }
 
-            var oModelData = this.getCurrentModel().getData(),
+            var oModel = this.getCurrentModel(),
+                bBatchManaged = oModel.getProperty('/batchManaged'),
+                sStorageLoc = oModel.getProperty('/storageLocation')
                 oSLocFilter;
-            if(oModelData.storageLocation){
+
+            if(bBatchManaged && sStorageLoc){
                 oSLocFilter = new sap.ui.model.Filter({
                     path: "storageLocation/storageLocation",
                     operator: 'EQ',
@@ -2357,12 +2361,18 @@ sap.ui.define([
 
         _enableConfirmButton: function () {
             var isErrorStateExist = false;
+            var oModel = this.getCurrentModel();
+            
             // Call the new batch validation function - AD-006
-            if (this.batchDetailsModel && this.batchDetailsModel.getData() && this.batchDetailsModel.getData().length > 0) {
-                if (!this._validateBatchSelection()) {
-                    return;
-                }
+            var sBatchNumber = oModel.getProperty('/batchNumber');
+            if(sBatchNumber){
+                isErrorStateExist = this._validateBatchSelection();
             }
+            // if (this.batchDetailsModel && this.batchDetailsModel.getData() && this.batchDetailsModel.getData().length > 0) {
+            //     if (!this._validateBatchSelection()) {
+            //         return;
+            //     }
+            // }
             var oFormContent = this.getFormControl();
             // validation for initial popup opening
             if (!oFormContent) return;
@@ -2372,7 +2382,7 @@ sap.ui.define([
                     break;
                 }
             }
-            var oModel = this.getCurrentModel();
+
             var oSaveBtn = this.getCurrentSaveButton();
             var postedBy = oModel.getProperty("/userId");
             var batchNumber = (oModel.getProperty("/batchNumber") || oModel.getProperty("/useFullHandlingUnit"));
@@ -4561,16 +4571,31 @@ sap.ui.define([
               return true;
             }
           
-            // Find the batch with the earliest expiry date
-            var oLowExpBatch = aBatchDetails.reduce((minBatch, currentBatch) => {
-              var minExpiry = new Date(minBatch.expiry);
-              var currentExpiry = new Date(currentBatch.expiry);
-              return currentExpiry < minExpiry ? currentBatch : minBatch;
-            });
+            /**
+             * Filter out the relevant batches
+             *  - If there is default sloc, then get all batches for that sloc with expiry date
+             *  - If there is no default sloc, then get all batches with expiry date
+             */
+            var sDefaultSloc = oModelData.storageLocation,
+                aBatches = [];
+            if(sDefaultSloc){
+                aBatches = aBatchDetails.filter(oItem=>!!oItem.expiry && oItem.storageLocation.storageLocation === sDefaultSloc);
+            }else{
+                aBatches = aBatchDetails.filter(oItem=>!!oItem.expiry);
+            }
+
+            // Find the batch with lowest expiry date in the result from filtering
+            var oLowestExpBatch = aBatches[0];
+            for(var i=1;i<aBatches.length;i++){
+                if(new Date(oLowestExpBatch.expiry) < new Date(aBatches[i].expiry)){
+                    continue;
+                }
+                oLowestExpBatch = aBatches[i];
+            }
           
             // Check if the selected batch has the lowest expiry date
-            if (oModelData.batchNumber !== oLowExpBatch.batchNumber) {
-              var sErrorText = this.getI18nText('errorLowerBatchExpiry', [oLowExpBatch.batchNumber, oLowExpBatch.expiry]);
+            if (oLowestExpBatch && oModelData.batchNumber !== oLowestExpBatch.batchNumber) {
+              var sErrorText = this.getI18nText('errorLowerBatchExpiry', [oLowestExpBatch.batchNumber, oLowestExpBatch.expiry]);
               oInput.setValueState('Error');
               oInput.setValueStateText(sErrorText);
               return false;
