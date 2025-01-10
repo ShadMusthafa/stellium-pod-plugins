@@ -43,13 +43,21 @@
                         <Label text="{i18n>avlQty}" />
                         <Text id="inputScanAvlQty" text="{scanWeighingModel>/avlBatchQty}" />
                         <Label text="{i18n>LabelScale}" />
-                        <Select id="cmbScanWeighScaleList" items="{ path: 'scanWeighingModel>/scaleList' }"
+                        <!-- <Select id="cmbScanWeighScaleList" items="{ path: 'scanWeighingModel>/scaleList' }"
                             change="onSelectScale" forceSelection="false">
                             <core:Item key="{scanWeighingModel>resource}" text="{scanWeighingModel>description}" />
                             <layoutData>
                                 <f:ColumnElementData cellsSmall="10" cellsLarge="6" />
                             </layoutData>
-                        </Select>
+                        </Select> -->
+                        <Input id="cmbScanWeighScaleList"
+                            showSuggestion="true"
+                            suggestionItems="{scanWeighingModel>/scaleList}"
+                            change="onSelectScale">
+                            <suggestionItems>
+                                <core:Item text="{scanWeighingModel>description}" />
+                            </suggestionItems>
+                        </Input>
                         <Label text="" />
                         <Button id="btnScanWeighSetZero" text="{i18n>ButtonZero}" press="onSetScaleZero"
                             visible="{configModel>/showWeighingSetZero}" enabled="false" class="sapUiSmallMarginEnd">
