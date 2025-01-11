@@ -1501,7 +1501,7 @@ sap.ui.define([
             var oModel = this.getCurrentModel(),
                 bBatchManaged = oModel.getProperty('/batchManaged'),
                 sStorageLoc = oModel.getProperty('/storageLocation');
-            if(bBatchManaged && sStorageLoc){
+            if(sStorageLoc){
                 var oSLocFilter = new sap.ui.model.Filter({
                     path: "storageLocation/storageLocation",
                     operator: 'EQ',
@@ -1539,7 +1539,7 @@ sap.ui.define([
                 sStorageLoc = oModel.getProperty('/storageLocation'),
                 oSLocFilter;
 
-            if(bBatchManaged && sStorageLoc){
+            if(sStorageLoc){
                 oSLocFilter = new sap.ui.model.Filter({
                     path: "storageLocation/storageLocation",
                     operator: 'EQ',
@@ -2367,13 +2367,9 @@ sap.ui.define([
             // Call the new batch validation function - AD-006
             var sBatchNumber = oModel.getProperty('/batchNumber');
             if(sBatchNumber){
-                isErrorStateExist = this._validateBatchSelection();
+                isErrorStateExist = !this._validateBatchSelection();
             }
-            // if (this.batchDetailsModel && this.batchDetailsModel.getData() && this.batchDetailsModel.getData().length > 0) {
-            //     if (!this._validateBatchSelection()) {
-            //         return;
-            //     }
-            // }
+
             var oFormContent = this.getFormControl();
             // validation for initial popup opening
             if (!oFormContent) return;
