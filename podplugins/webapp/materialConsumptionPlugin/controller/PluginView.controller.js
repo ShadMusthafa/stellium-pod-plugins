@@ -2609,6 +2609,8 @@ sap.ui.define([
                         that.handleOpenScanDialog();
                     }
                 }
+
+                that._checkBatchCorrectionCondition();
             }, function (oError, oHttpErrorMessage) {
                 var err = oError ? oError : oHttpErrorMessage;
                 that.showErrorMessage(err, true, true);
@@ -4670,6 +4672,30 @@ sap.ui.define([
                     reject(...arguments);
                 });
             }.bind(this));            
+          },
+
+          /**
+           * If any of the table items have bom components meeting the 'Park' or 'Batch Correction' criteria,
+           * show error message and navigate user back to order selection screen
+           */
+          _checkBatchCorrectionCondition:function(){
+            if(!this.giModel) return;
+
+            var aLineItems =this.giModel.getProperty('/lineItems');
+
+            if(!aLineItems || aLineItems.length < 1) return;
+
+            var oBatchCorrectionItem = aLineItems.find(oItem=>{
+                return oItem.consumedQuantity.value < oItem.lowerThresholdValue || oItem.consumedQuantity.value > oItem.upperThresholdValue
+            });
+
+            if(oBatchCorrectionItem){
+                MessageBox.error("Supervisor action required", {
+                    onClose: function () {
+                        window.history.go(-1);
+                    }
+                });
+            }
           }
     });
 });
