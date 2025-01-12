@@ -4681,20 +4681,48 @@ sap.ui.define([
           _checkBatchCorrectionCondition:function(){
             if(!this.giModel) return;
 
-            var aLineItems =this.giModel.getProperty('/lineItems');
+            var sShopOrder = this.giModel.getProperty('/shopOrder'),
+                aLineItems =this.giModel.getProperty('/lineItems');
 
             if(!aLineItems || aLineItems.length < 1) return;
 
-            var oBatchCorrectionItem = aLineItems.find(oItem=>{
-                return oItem.consumedQuantity.value < oItem.lowerThresholdValue || oItem.consumedQuantity.value > oItem.upperThresholdValue
-            });
+            var aParkedItems = [],
+                bBatchCorrectionFlag = false;
 
-            if(oBatchCorrectionItem){
-                MessageBox.error("Supervisor action required", {
+            for(var i=0; i<aLineItems.length; i++){
+                //If there is no consumed qty or if consumed qty is 0 then continue
+                if(!aLineItems[i].consumedQuantity.value || aLineItems[i].consumedQuantity.value <= 0){
+                    continue;
+                }
+
+                //If consumed qty is less than lower threshold, then mark as parked
+                var lowerThreshold = aLineItems[i].lowerThresholdValue || 0;
+                if(aLineItems[i].consumedQuantity.value < lowerThreshold){
+                    aParkedItems.push(aLineItems[i]);
+                    continue;
+                }
+
+                //If consumed qty is greater than upper threshold, then mark as batch correction item
+                var upperThreshold = aLineItems[i].upperThresholdValue || 0;
+                if(aLineItems[i].consumedQuantity.value > upperThreshold){
+                    bBatchCorrectionFlag = true;
+                    break;
+                }
+            }
+
+            if(bBatchCorrectionFlag){
+                var sErrorMessage = this.getI18nText('batchCorrectionRequiredErrorMessage',[sShopOrder]);
+                MessageBox.error(sErrorMessage, {
                     onClose: function () {
                         window.history.go(-1);
                     }
                 });
+                return;
+            }
+
+            if(aParkedItems && aParkedItems.length > 0){
+                var sWarningMsg = this.getI18nText('parkWarningMessage',[aParkedItems[0].materialId.material, sShopOrder]);
+                MessageBox.warning(sWarningMsg);
             }
           }
     });
