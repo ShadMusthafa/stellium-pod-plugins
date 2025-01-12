@@ -4633,7 +4633,7 @@ sap.ui.define([
           
             // Check if the selected batch has the lowest expiry date
             if (oLowestExpBatch && oModelData.batchNumber !== oLowestExpBatch.batchNumber) {
-              var sErrorText = this.getI18nText('errorLowerBatchExpiry', [oLowestExpBatch.batchNumber, oLowestExpBatch.expiry]);
+              var sErrorText = this.getI18nText('errorLowerBatchExpiry', [oModelData.material, oLowestExpBatch.batchNumber]);
               oInput.setValueState('Error');
               oInput.setValueStateText(sErrorText);
               return false;
