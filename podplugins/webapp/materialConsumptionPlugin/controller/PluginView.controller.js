@@ -714,6 +714,30 @@ sap.ui.define([
             this.getBatchDetailsForPopup(sUrl, oParameters);
         },
 
+        _createBatchDetailsServiceCall: function(){
+            var inventryUrl = this.getInventoryDataSourceUri();
+            var oParameters = {};
+            var oModel = this.getCurrentModel();
+            var sUrl;
+            if (this.isInventoryManaged) {
+                oParameters.materialRef = oModel.getProperty("/materialRef");
+                oParameters.shopOrderRef = this.selectedDataInList.selectedShopOrderRef;
+                oParameters.emptyBatchNumberIgnored = true;
+                sUrl = inventryUrl + "inventory/findInventory";
+            } else {
+                this.oPageable = this.oPageable || {};
+                this.oPageable.page = 0;
+                oParameters = this.prepareInvStockParams(oModel);
+                var storLocs = [];
+                storLocs.push(oModel.getProperty("/storageLocation"));
+                this.multiStorLocs = storLocs;
+                oParameters.storageLocations = storLocs.join(',');
+                sUrl = inventryUrl + "inventory/inventoryStock";
+            }
+
+            return {sUrl, oParameters};
+        },
+
         prepareInvStockParams: function (oModel) {
             var oParameters = {};
             if(this.oSelectedBrowseType === "StorageLocation"){
@@ -774,29 +798,55 @@ sap.ui.define([
             var that = this;
             var oDialog = that.byId("batchDialog");
             oDialog.setBusy(true);
-            AjaxUtil.get(sUrl, oParameters, function (oResponseData) {
-                that.filteredRecords = that.filterRecordsWithZeroQuantity(oResponseData);
-                that.batchDetailsList = that.filteredRecords;
-                if (!that.isInventoryManaged) {
-                    that.batchDetailsList = that.filteredRecords.content;
-                    that.totalPaginationElems = oResponseData.totalElements;
-                    that.prepareStockData(that.batchDetailsList);
-                }
-                that.batchDetailsModel = new JSONModel();
-                that.batchDetailsModel.setSizeLimit(that.batchDetailsList.length);
-                //find max 5 characteristics sorted alphanumerically on the basis of characteristics name.
-                that.batchDetailsList = that.findCharacteristicsToBeShown(that.batchDetailsList);
-                that.batchDetailsModel.setData(that.batchDetailsList);
-                //Create table dynamically where characteristics values along with batchId, quantity,
-                //storage location and expiry date will be shown.
-                that.createBatchTable(that.batchDetailsList, true);
-            }, function (oError, oHttpErrorMessage) {
-                var err = oError ? oError : oHttpErrorMessage;
-                oDialog.setBusy(false);
-                oDialog.close();
-                that.showErrorMessage(err, true, true);
-                that.batchDetailsList = {};
-            });
+            return new Promise(function(resolve, reject){
+                AjaxUtil.get(sUrl, oParameters, function (oResponseData) {
+                    that.filteredRecords = that.filterRecordsWithZeroQuantity(oResponseData);
+                    that.batchDetailsList = that.filteredRecords;
+                    if (!that.isInventoryManaged) {
+                        that.batchDetailsList = that.filteredRecords.content;
+                        that.totalPaginationElems = oResponseData.totalElements;
+                        that.prepareStockData(that.batchDetailsList);
+                    }
+                    that.batchDetailsModel = new JSONModel();
+                    that.batchDetailsModel.setSizeLimit(that.batchDetailsList.length);
+                    //find max 5 characteristics sorted alphanumerically on the basis of characteristics name.
+                    that.batchDetailsList = that.findCharacteristicsToBeShown(that.batchDetailsList);
+                    that.batchDetailsModel.setData(that.batchDetailsList);
+                    //Create table dynamically where characteristics values along with batchId, quantity,
+                    //storage location and expiry date will be shown.
+                    that.createBatchTable(that.batchDetailsList, true);
+                }, function (oError, oHttpErrorMessage) {
+                    var err = oError ? oError : oHttpErrorMessage;
+                    oDialog.setBusy(false);
+                    oDialog.close();
+                    that.showErrorMessage(err, true, true);
+                    that.batchDetailsList = {};
+                });
+            }.bind(this));            
+        },
+
+        getBatchDetails:function(sUrl, oParameters){
+            var that = this;
+            return new Promise(function(resolve, reject){
+                AjaxUtil.get(sUrl, oParameters, function (oResponseData) {
+                    that.filteredRecords = that.filterRecordsWithZeroQuantity(oResponseData);
+                    that.batchDetailsList = that.filteredRecords;
+                    if (!that.isInventoryManaged) {
+                        that.batchDetailsList = that.filteredRecords.content;
+                        that.totalPaginationElems = oResponseData.totalElements;
+                        that.prepareStockData(that.batchDetailsList);
+                    }
+                    that.batchDetailsModel = new JSONModel();
+                    that.batchDetailsModel.setSizeLimit(that.batchDetailsList.length);
+                    //find max 5 characteristics sorted alphanumerically on the basis of characteristics name.
+                    that.batchDetailsList = that.findCharacteristicsToBeShown(that.batchDetailsList);
+                    that.batchDetailsModel.setData(that.batchDetailsList);
+                    that.prepareData(that.batchDetailsList);
+                    resolve(oResponseData);
+                }, function () {
+                    reject(...arguments)
+                });
+            });    
         },
 
         _enhanceCharacteristicsValues: function(oData) {
@@ -3245,8 +3295,8 @@ sap.ui.define([
                 var oMaterialInput = that.getCurrentInputMaterialControl();                
                 var oMatParsed = JSON.parse(oMaterialInput.getValue());
                 scannedMat = oMatParsed.material;
-
                 oMaterialInput.setValue(scannedMat);
+                this.scannedMaterial = oMatParsed;
             }catch(e){
 
             }
@@ -3354,7 +3404,11 @@ sap.ui.define([
                 //  Extend WeighingScreen
                 var oInStorageLocation = this.getCurrentStorageLocationInput();
                 if (isBatchManaged) {
-                    defaultBatchId = bomItem.plannedBatchNumber || "";
+                    if(this.scannedMaterial && this.scannedMaterial.stockId){
+                        defaultBatchId = this.scannedMaterial.stockId;
+                    }else{
+                        defaultBatchId = bomItem.plannedBatchNumber || "";
+                    }
                     oInStorageLocation.setEnabled(false);
                 } else {
                     defaultBatchId = this.getI18nText("notBatchManaged");
@@ -4600,11 +4654,16 @@ sap.ui.define([
             aStorageLocations && aStorageLocations.length > 0 && this.handleStorageLocationDetails(aStorageLocations.join(','));
         },
         // To set Validation of lower expiry Batch - AD-006
-        _validateBatchSelection: function () {
+        _validateBatchSelection: async function () {
             var oModelData = this.getCurrentModel().getData(),
-              aBatchDetails = this.batchDetailsModel.getData(),
+            //   aBatchDetails = this.batchDetailsModel.getData(),
               oInput = this.getCurrentInputBatchIdControl();
           
+            if(!this.batchDetailsModel){
+                var {sUrl, oParameters} = this._createBatchDetailsServiceCall();
+                await this.getBatchDetails(sUrl, oParameters);
+            }
+
             if (!oModelData.batchManaged) {
               return true;
             }
@@ -4615,11 +4674,24 @@ sap.ui.define([
              *  - If there is no default sloc, then get all batches with expiry date
              */
             var sDefaultSloc = oModelData.storageLocation,
+                aBatchDetails = this.batchDetailsModel.getData(),
                 aBatches = [];
             if(sDefaultSloc){
                 aBatches = aBatchDetails.filter(oItem=>!!oItem.expiry && oItem.storageLocation.storageLocation === sDefaultSloc);
             }else{
                 aBatches = aBatchDetails.filter(oItem=>!!oItem.expiry);
+            }
+
+            //Check if the scanned batch number is in the batch list for material
+            var sSelectedBatch = oInput.getValue();
+            var oSelectedBatch = aBatches.find(oBatch=>oBatch.batchNumber === sSelectedBatch);
+            if(!oSelectedBatch){
+                oInput.setValueState('Error');
+                oInput.setValueStateText(this.getI18nText('REQUIRED_BATCH_INPUT'));
+                return;
+            }else{
+                oInput.setValueState('None');
+                oInput.setValueStateText('');
             }
 
             // Find the batch with lowest expiry date in the result from filtering
