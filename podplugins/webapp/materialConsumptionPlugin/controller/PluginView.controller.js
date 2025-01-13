@@ -5076,64 +5076,64 @@ sap.ui.define(
         //Now we have storagelocations, call and get the remaining quantities
         aStorageLocations && aStorageLocations.length > 0 && this.handleStorageLocationDetails(aStorageLocations.join(','));
       },
+
       // To set Validation of lower expiry Batch - AD-006
       _validateBatchSelection: async function() {
-        var oModelData = this.getCurrentModel().getData(),
-          //   aBatchDetails = this.batchDetailsModel.getData(),
+        var oModel = this.getCurrentModel(),
+          bIsBatchManaged = oModel.getProperty('/batchManaged'),
+          sDefaultSloc = oModel.getProperty('/storageLocation'),
+          sSelectedBatchId = oModel.getProperty('/batchNumber'),
+          sSelectedMaterial = oModel.getProperty('/material'),
           oInput = this.getCurrentInputBatchIdControl();
 
-        if (!this.batchDetailsModel) {
+        //If material is not batch managed, no batch validation
+        if (!bIsBatchManaged) {
+          return true;
+        }
+
+        //Fetch batch data if model is not set
+        if (!this.batchDetailsModel || this.scannedMaterial.stockId) {
           var { sUrl, oParameters } = this._createBatchDetailsServiceCall();
           await this.getBatchDetails(sUrl, oParameters);
         }
 
-        if (!oModelData.batchManaged) {
-          return true;
-        }
+        var aBatchDetails = this.batchDetailsModel.getData(),
+          oSelectedBatch = aBatchDetails.find(oBatch => oBatch.batchNumber === sSelectedBatchId);
 
-        /**
-             * Filter out the relevant batches
-             *  - If there is default sloc, then get all batches for that sloc with expiry date
-             *  - If there is no default sloc, then get all batches with expiry date
-             */
-        var sDefaultSloc = oModelData.storageLocation,
-          aBatchDetails = this.batchDetailsModel.getData(),
-          aBatches = [];
-        if (sDefaultSloc) {
-          aBatches = aBatchDetails.filter(oItem => !!oItem.expiry && oItem.storageLocation.storageLocation === sDefaultSloc);
-        } else {
-          aBatches = aBatchDetails.filter(oItem => !!oItem.expiry);
-        }
-
-        //Check if the scanned batch number is in the batch list for material
-        var sSelectedBatch = oInput.getValue();
-        var oSelectedBatch = aBatches.find(oBatch => oBatch.batchNumber === sSelectedBatch);
+        //Check if selected batch exists in the model
         if (!oSelectedBatch) {
           oInput.setValueState('Error');
           oInput.setValueStateText(this.getI18nText('REQUIRED_BATCH_INPUT'));
-          return;
-        } else {
-          oInput.setValueState('None');
-          oInput.setValueStateText('');
-        }
-
-        // Find the batch with lowest expiry date in the result from filtering
-        var oLowestExpBatch = aBatches[0];
-        for (var i = 1; i < aBatches.length; i++) {
-          if (new Date(oLowestExpBatch.expiry) < new Date(aBatches[i].expiry)) {
-            continue;
-          }
-          oLowestExpBatch = aBatches[i];
-        }
-
-        // Check if the selected batch has the lowest expiry date
-        if (oLowestExpBatch && oModelData.batchNumber !== oLowestExpBatch.batchNumber) {
-          var sErrorText = this.getI18nText('errorLowerBatchExpiry', [oModelData.material, oLowestExpBatch.batchNumber]);
-          oInput.setValueState('Error');
-          oInput.setValueStateText(sErrorText);
           return false;
         }
 
+        //Check if selected batch has expiry
+        if (!oSelectedBatch.expiry) {
+          oInput.setValueState('Error');
+          oInput.setValueStateText(this.getI18nText('batchDoesNotHaveExpiryDateErrMsg', [sSelectedBatchId]));
+          return false;
+        }
+
+        //If material has default sloc, ensure selected batch is in the default sloc
+        if (sDefaultSloc && oSelectedBatch.storageLocation.storageLocation !== sDefaultSloc) {
+          oInput.setValueState('Error');
+          oInput.setValueStateText(this.getI18nText('batchNotInDefaultSlocErrMsg', [sSelectedBatchId, sDefaultSloc]));
+          return false;
+        }
+
+        //Check if selected batch has lowest expiry in the batch list
+        var aBatches = aBatchDetails.filter(oBatch => !!oBatch.expiry && oBatch.storageLocation.storageLocation === sDefaultSloc);
+        var aDates = aBatches.map(oBatch => new Date(oBatch.expiry));
+        var oLowestExpiryDate = new Date(Math.min(...aDates));
+        var oLowestExpiryBatch = aBatches.find(oBatch => moment(oBatch.expiry).isSame(oLowestExpiryDate));
+
+        if (!moment(oLowestExpiryDate).isSame(oSelectedBatch.expiry)) {
+          oInput.setValueState('Error');
+          oInput.setValueStateText(this.getI18nText('errorLowerBatchExpiry', [sSelectedMaterial, oLowestExpiryBatch.batchNumber]));
+          return false;
+        }
+
+        //Reset the value states in case of validation pass
         oInput.setValueState('None');
         oInput.setValueStateText('');
         return true;
