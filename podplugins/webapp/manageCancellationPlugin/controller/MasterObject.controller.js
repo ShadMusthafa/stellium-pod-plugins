@@ -412,9 +412,6 @@ sap.ui.define(
         },
 
         onConfirmCancellationBtnPress: function() {
-          // fix to close the dialog after confirm press
-          this.byId('idConfirmCancellationDialog')?.close();
-          //this.onSubmitDialogPress();
           this.onSubmitDialogPress(null,'ActQtyCombined');
         },
 
@@ -533,7 +530,9 @@ sap.ui.define(
                         console.log('All cancellations posted', ...arguments);
                         //TODO: Handle confirmation statuses
                         that.getActQtyConfirmationData();
-                      });
+                        var oDialog = this.byId('idConfirmCancellationDialog');
+                        if(oDialog) oDialog.close();
+                      }.bind(this));
                       break;
 
                     case 'GR':
