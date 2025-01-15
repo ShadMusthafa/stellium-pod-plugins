@@ -5217,6 +5217,11 @@ sap.ui.define(
             continue;
           }
 
+          //If the consumed quantity is equal to target quantity, then no validation requirement
+          if(aLineItems[i].consumedQuantity.value === aLineItems[i].targetQuantity.value){
+            continue;
+          }
+
           //If consumed qty is less than lower threshold, then mark as parked
           var lowerThreshold = aLineItems[i].lowerThresholdValue || 0;
           if (aLineItems[i].consumedQuantity.value < lowerThreshold) {
