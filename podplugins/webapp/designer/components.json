@@ -59,6 +59,16 @@
       "i18n": "stellium.ext.podplugins.materialConsumptionPlugin.i18n.i18n",
       "productionProcessEnabled": false,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
+    },
+    {
+      "id": "stelliumMassOperatorAssignmentPlugin",
+      "type": "VIEW_PLUGIN",
+      "allowMultipleInstances": false,
+      "name": "stellium.ext.podplugins.massOperatorAssignmentPlugin",
+      "propertyEditor": "stellium.ext.podplugins.massOperatorAssignmentPlugin.builder.PropertyEditor",
+      "i18n": "stellium.ext.podplugins.massOperatorAssignmentPlugin.i18n.i18n",
+      "productionProcessEnabled": false,
+      "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     }
   ]
 }
