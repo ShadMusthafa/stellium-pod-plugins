@@ -1915,6 +1915,11 @@ sap.ui.define(
         var oView = this.getView();
         var oBindingObject = oEvent.getSource().getBindingContext().getObject();
 
+        if (!this._validatePhaseStatus()) {
+          MessageBox.error(this.getI18nText('phaseNotInActiveStatusErrMsg', [this.selectedDataInList.truncatedPhaseId]));
+          return;
+        }
+
         var selectedMaterial = oEvent.getSource().getBindingContext().getObject().materialId.material;
         var selectedMaterialRef = oEvent.getSource().getBindingContext().getObject().materialId.ref;
         var selectedMaterialVersion = oEvent.getSource().getBindingContext().getObject().materialId.version;
@@ -3353,6 +3358,11 @@ sap.ui.define(
         var sWorkcenter = oView.getModel('WorkcenterInfo').getProperty('/workcenter');
         var oWeighweighRelevantFlag = oView.getModel('authModel').getProperty('/weighRelevant');
 
+        if (!this._validatePhaseStatus()) {
+          MessageBox.error(this.getI18nText('phaseNotInActiveStatusErrMsg', [this.selectedDataInList.truncatedPhaseId]));
+          return;
+        }
+
         if (sWorkcenter !== undefined) {
           if (!oWeighweighRelevantFlag) {
             this.openAddDialog();
@@ -3419,6 +3429,11 @@ sap.ui.define(
         //  Extend WeighingScreen
         var sWorkcenter = oView.getModel('WorkcenterInfo').getProperty('/workcenter');
         var oWeighweighRelevantFlag = oView.getModel('authModel').getProperty('/weighRelevant');
+
+        if (!this._validatePhaseStatus()) {
+          MessageBox.error(this.getI18nText('phaseNotInActiveStatusErrMsg', [this.selectedDataInList.truncatedPhaseId]));
+          return;
+        }
 
         if (sWorkcenter !== undefined) {
           if (!oWeighweighRelevantFlag) {
@@ -4505,6 +4520,11 @@ sap.ui.define(
         var oBindingObject = oEvent.getSource().getBindingContext().getObject();
         this._initWeighingHeaderModel(oBindingObject);
 
+        if (!this._validatePhaseStatus()) {
+          MessageBox.error(this.getI18nText('phaseNotInActiveStatusErrMsg', [this.selectedDataInList.truncatedPhaseId]));
+          return;
+        }
+
         // Init Functions
         this.getWorkCenters();
 
@@ -5226,6 +5246,11 @@ sap.ui.define(
           var sWarningMsg = this.getI18nText('parkWarningMessage', [aParkedItems[0].materialId.material, sShopOrder]);
           MessageBox.warning(sWarningMsg);
         }
+      },
+
+      _validatePhaseStatus: function() {
+        if (this.selectedDataInList.status === 'ACTIVE') return true;
+        return false;
       }
     });
   }
