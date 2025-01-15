@@ -5112,7 +5112,7 @@ sap.ui.define(
         }
 
         //Fetch batch data if model is not set
-        if (!this.batchDetailsModel || this.scannedMaterial.stockId) {
+        if (!this.batchDetailsModel || (this.scannedMaterial && this.scannedMaterial.stockId)) {
           var { sUrl, oParameters } = this._createBatchDetailsServiceCall();
           await this.getBatchDetails(sUrl, oParameters);
         }
