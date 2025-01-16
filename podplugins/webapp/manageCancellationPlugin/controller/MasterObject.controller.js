@@ -191,9 +191,9 @@ sap.ui.define(
           // this.byId('goodsReceiptByCoProductSearch').setValue('');
           // this.byId('goodsIssueSearch').setValue('');
 
-          // this.currentTab = 'activityConfirmation';
-          // this.byId('detailPage').setSelectedSection(this.byId('activityConfirmation'));
-          // this.byId('activityConfirmationSearch').setValue('');
+          this.currentTab = 'actQtyConfirmations';
+          this.byId('idMasterObjectPage').setSelectedSection(this.byId('actQtyConfirmations'));
+          this.byId('confirmationSearch').setValue('');
 
           const oData = oEvent.getParameter('data');
           this.mGroupFunctions = {
