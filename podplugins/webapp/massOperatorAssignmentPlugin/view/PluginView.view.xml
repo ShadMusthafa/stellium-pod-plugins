@@ -96,7 +96,8 @@
                             forceSelection="false"
                             showSecondaryValues="true"
                             columnRatio="2:3"
-                            items="{resourceData>/}" 
+                            items="{resourceData>/}"
+                            editable="{viewModel>isNew}"
                             selectedKey="{viewModel>resource}"
                             change=".onAssignedResourceChanged">
                             <!-- <core:Item key="{resourceData>resource}" text="{resourceData>resource} {resourceData>description}"/> -->
@@ -108,7 +109,7 @@
                         <VBox items="{viewModel>resourceType}">
                             <Text text="{viewModel>type}"/>
                         </VBox>
-                        <Input value="{viewModel>operator}" change=".onAssignedOperatorIdChange"/>
+                        <Input value="{viewModel>operator}" editable="{viewModel>isNew}" change=".onAssignedOperatorIdChange"/>
                         <!-- <Select 
                             selectedKey="{
                                 path: 'viewModel>autoAcceptance',
@@ -119,6 +120,7 @@
                         </Select> -->
                         <SegmentedButton  
                             selectionChange=".onAutoAcceptanceModeChange"
+                            enabled="{viewModel>isNew}"
                             selectedKey="{
                                 path: 'viewModel>autoAcceptance',
                                 formatter:'.autoAcceptanceFormatter'
@@ -130,7 +132,7 @@
                         </SegmentedButton>
                         <Input 
                             value="{viewModel>acceptanceDelay}" 
-                            editable="{viewModel>autoAcceptance}"
+                            editable="{= ${viewModel>autoAcceptance} &amp;&amp; ${viewModel>isNew}}"
                             change=".onAutoAcceptanceDelayChange"/>
                         <Text />
                         <Text 

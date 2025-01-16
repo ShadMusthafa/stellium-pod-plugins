@@ -81,7 +81,7 @@ sap.ui.define(
               };
             });
             oOrderData.sfcs = aSFCs;
-
+            this.selectedSFC = aSFCs[0].sfc;
             this.getView().getModel('orderData').setData(oOrderData);
           }.bind(this)
         );
@@ -239,6 +239,7 @@ sap.ui.define(
         var oNewRowItem = {
           ...oSelectedRowData,
           isDirty: true,
+          isNew: true,
           asset: '',
           resource: '',
           resourceType: '',
@@ -406,6 +407,8 @@ sap.ui.define(
         var aRecipeItems = aData.flatMap(recipe =>
           recipe.phases.flatMap(phase =>
             phase.recipePhaseComponentList.map(component => ({
+              isDirty: false,
+              isNew: false,
               workCenter: phase.workCenter,
               workCenterDesc: '',
               phaseId: phase.phaseId,
@@ -432,6 +435,7 @@ sap.ui.define(
 
           //If there are no resources assigned then show line
           if (aResources.length === 0) {
+            oItem.isNew = true;
             aLineItems.push(oItem);
             return;
           }
