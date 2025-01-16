@@ -39,6 +39,8 @@ sap.ui.define(
           }
         };
 
+        this.materialsList = {};
+
         this.getView().setModel(new JSONModel(oViewData), 'viewModel');
         this.getView().setModel(new JSONModel([]), 'resourceData');
         this.getView().setModel(new JSONModel({}), 'orderData');
@@ -82,6 +84,12 @@ sap.ui.define(
             });
             oOrderData.sfcs = aSFCs;
             this.selectedSFC = aSFCs[0].sfc;
+
+            this.workCenters = oOrderData.workCenters.reduce((acc, val) => {
+              acc[val.workCenter] = val;
+              return acc;
+            }, {});
+
             this.getView().getModel('orderData').setData(oOrderData);
           }.bind(this)
         );
@@ -419,11 +427,37 @@ sap.ui.define(
           this.getView().getModel('resourceData').setSizeLimit(aResources.length);
         }
 
-        this._getOrderRoutingData(this.selectedOrder.order).then(
-          function(aRecipeData) {
-            this._createTableLineItems(aRecipeData);
-          }.bind(this)
-        );
+        this._getOrderRoutingData(this.selectedOrder.order)
+          .then(
+            function(aRecipeData) {
+              return this._createTableLineItems(aRecipeData);
+            }.bind(this)
+          )
+          .then(
+            function(aLineItems) {
+              var oMaterials = aLineItems.reduce((acc, val) => {
+                acc[val.component] = '';
+                return acc;
+              }, {});
+
+              var aMaterials = Object.keys(oMaterials);
+              var aPromises = aMaterials.map(oMaterial => this._getDetailsForMaterial(oMaterial));
+              Promise.all(aPromises).then(this._handleMaterialDataFetch.bind(this));
+            }.bind(this)
+          );
+      },
+
+      _handleMaterialDataFetch: function(aMaterials) {
+        this.materialsList = aMaterials.reduce((acc, val) => {
+          acc[val.material] = val;
+          return acc;
+        }, {});
+
+        var aLineItems = this.getView().getModel('viewModel').getProperty('/lineItems');
+        for (var oItem of aLineItems) {
+          oItem.componentDesc = this.materialsList[oItem.component].description;
+        }
+        this.getView().getModel('viewModel').setProperty('/lineItems', aLineItems);
       },
 
       _getResourceListForComponent: function(sOrderId, sSFC, sComponent) {
@@ -436,6 +470,30 @@ sap.ui.define(
         );
       },
 
+      _getDetailsForMaterial: function(sMaterial) {
+        var sUrl =
+          this.getProductDataSourceUri() +
+          "Materials?$select=ref,material,description,version&$filter=(material eq '" +
+          encodeURIComponent(sMaterial) +
+          "' and currentVersion eq true)";
+        var oParameters = {};
+
+        return new Promise(
+          function(resolve, reject) {
+            this.ajaxGetRequest(
+              sUrl,
+              oParameters,
+              function(oResponse) {
+                resolve(oResponse.value[0]);
+              },
+              function() {
+                reject(...arguments);
+              }
+            );
+          }.bind(this)
+        );
+      },
+
       _createTableLineItems: function(aData) {
         var aRecipeItems = aData.flatMap(recipe =>
           recipe.phases.flatMap(phase =>
@@ -443,7 +501,7 @@ sap.ui.define(
               isDirty: false,
               isNew: false,
               workCenter: phase.workCenter,
-              workCenterDesc: '',
+              workCenterDesc: this.workCenters[phase.workCenter].description,
               phaseId: phase.phaseId,
               component: component.bomComponent.material.material,
               componentDesc: '',
@@ -498,6 +556,7 @@ sap.ui.define(
         });
 
         this.getView().getModel('viewModel').setProperty('/lineItems', aLineItems);
+        return aLineItems;
       },
 
       _saveResourceAssignments: function(aItems) {
