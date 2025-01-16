@@ -19,6 +19,10 @@ sap.ui.define([], function() {
     hasErrors: function() {
       let oMessageModel = sap.ui.getCore().getMessageManager().getMessageModel();
       return oMessageModel.getData().length > 0;
+    },
+
+    clearAllErrors: function() {
+      sap.ui.getCore().getMessageManager().removeAllMessages();
     }
   };
 });

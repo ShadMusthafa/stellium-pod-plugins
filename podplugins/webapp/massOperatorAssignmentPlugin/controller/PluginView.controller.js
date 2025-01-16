@@ -164,6 +164,13 @@ sap.ui.define(
 
         this._markItemAsDirty(oLineItemContext);
 
+        ErrorHandler.clearErrorState(oControl);
+
+        if (!sOperatorId) {
+          ErrorHandler.setErrorState(oControl, this.getI18nText('requiredFieldErrMsg'));
+          return;
+        }
+
         //Check if operator is assigned to other resource or not
         var oResourceForOperator = aResourceList.find(oItem => oItem.customData && oItem.customData.OPERATOR === sOperatorId);
         if (oResourceForOperator) {
@@ -195,19 +202,17 @@ sap.ui.define(
         var oContext = oEvent.getSource().getBindingContext('viewModel');
         this._markItemAsDirty(oContext);
 
-        var oInput = oEvent.getSource(),
-          iAcceptanceDelay = oEvent.getParameter('newValue');
+        // var oInput = oEvent.getSource(),
+        //   iAcceptanceDelay = oEvent.getParameter('newValue');
 
-        //Check if the entered value is a positive non-zero integer
-        var regex = /^0*[1-9]\d*$/;
-        if (!regex.test(iAcceptanceDelay)) {
-          ErrorHandler.setValueState(oInput, this.getI18nText('inputPositiveNonZeroErrMsg'));
-        } else {
-          ErrorHandler.clearValueState(oInput);
-        }
+        // //Check if the entered value is a positive non-zero integer
+        // var regex = /^0*[1-9]\d*$/;
+        // if (!regex.test(iAcceptanceDelay)) {
+        //   ErrorHandler.setErrorState(oInput, this.getI18nText('inputPositiveNonZeroErrMsg'));
+        // } else {
+        //   ErrorHandler.clearValueState(oInput);
+        // }
       },
-
-      onAssignResouceBtnPress: function(oEvent) {},
 
       onRevokeResouceBtnPress: function(oEvent) {
         var oTable = this.getView().byId('idMassOpAsmtTable'),
@@ -269,6 +274,32 @@ sap.ui.define(
       onSaveAssignmentsPress: function(oEvent) {
         var oViewModel = this.getView().getModel('viewModel'),
           aItems = oViewModel.getProperty('/lineItems');
+
+        if (ErrorHandler.hasErrors()) {
+          return MessageBox.error(this.getI18nText('fixErrorsBeforeSaveErrMsg'));
+        }
+
+        var oTable = this.getView().byId('idMassOpAsmtTable');
+        oTable.getItems().forEach(oItem => {
+          var oData = oItem.getBindingContext('viewModel').getObject(),
+            aCells = oItem.getCells();
+
+          if (!oData.isDirty && !oData.isNew) {
+            return;
+          }
+
+          if (!oData.resource) {
+            ErrorHandler.setErrorState(aCells[3], this.getI18nText('requiredFieldErrMsg'), 'selectedKey');
+          }
+
+          if (!oData.operator) {
+            ErrorHandler.setErrorState(aCells[5], this.getI18nText('requiredFieldErrMsg'));
+          }
+
+          if (oData.autoAcceptance && parseInt(oData.acceptanceDelay) < 1) {
+            ErrorHandler.setErrorState(aCells[7], this.getI18nText('inputPositiveNonZeroErrMsg'));
+          }
+        });
 
         if (ErrorHandler.hasErrors()) {
           return MessageBox.error(this.getI18nText('fixErrorsBeforeSaveErrMsg'));
@@ -381,6 +412,8 @@ sap.ui.define(
         var aResourceList = await this._getResourceData();
         var aResources = this._createCustomDataObject(aResourceList);
         this.getView().getModel('resourceData').setData(aResources);
+
+        ErrorHandler.clearAllErrors();
 
         if (aResources.length > 100) {
           this.getView().getModel('resourceData').setSizeLimit(aResources.length);
