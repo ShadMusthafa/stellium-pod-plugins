@@ -10,7 +10,7 @@
     <f:DynamicPage id="idMassOpAsmtPage" showFooter="{viewModel>/isDirty}">
         <f:header>
             <f:DynamicPageHeader id="idMassOpAsmtDynHeader">
-                <filterbar:FilterBar id="idFilterBar">
+                <filterbar:FilterBar id="idFilterBar" search=".onFBSearch">
                     <filterbar:filterGroupItems>
                         <filterbar:FilterGroupItem id="idOrderSearch"
                             name="Order"
@@ -41,11 +41,39 @@
             </f:DynamicPageHeader>
         </f:header>
         <f:content>
-            <Table id="idMassOpAsmtTable" items="{viewModel>/lineItems}">
+            <Table id="idMassOpAsmtTable" 
+                mode="MultiSelect"
+                selectionChange=".onTableItemsSelectionChange"
+                items="{
+                    path:'viewModel>/lineItems',
+                    sorter: [
+                        {
+                            path: 'workCenter',
+                            descending: false
+                        },
+                        {
+                            path: 'phaseId',
+                            descending: false
+                        },
+                        {
+                            path: 'component',
+                            descending: false
+                        }
+                    ]
+                }">
+                <headerToolbar>
+                    <Toolbar>
+                        <ToolbarSpacer/>
+                        <Button text="Assign" enabled="{viewModel>/tableHeaderBtn/assign/enabled}"/>
+                        <Button text="Revoke" enabled="{viewModel>/tableHeaderBtn/revoke/enabled}"/>
+                        <Button text="Add" enabled="{viewModel>/tableHeaderBtn/add/enabled}"/>
+                        <Button text="Remove" enabled="{viewModel>/tableHeaderBtn/remove/enabled}"/>
+                    </Toolbar>
+                </headerToolbar>
                 <columns>
-                    <Column><Text text="Work Center"/></Column>
-                    <Column width="6rem"><Text text="Phase Id"/></Column>
-                    <Column><Text text="Component"/></Column>
+                    <Column mergeDuplicates="true" mergeFunctionName="getTitle"><Text text="Work Center"/></Column>
+                    <Column mergeDuplicates="true" width="6rem"><Text text="Phase Id"/></Column>
+                    <Column mergeDuplicates="true" mergeFunctionName="getTitle"><Text text="Component"/></Column>
                     <Column><Text text="Asset / Resource"/></Column>
                     <Column><Text text="Resource Type"/></Column>
                     <Column><Text text="Operator"/></Column>

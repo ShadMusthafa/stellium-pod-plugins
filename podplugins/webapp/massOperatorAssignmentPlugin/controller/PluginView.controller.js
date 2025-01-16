@@ -16,7 +16,21 @@ sap.ui.define(
         }
 
         var oViewData = {
-          isDirty: false
+          isDirty: false,
+          tableHeaderBtn: {
+            assign: {
+              enabled: false
+            },
+            revoke: {
+              enabled: false
+            },
+            add: {
+              enabled: false
+            },
+            remove: {
+              enabled: false
+            }
+          }
         };
 
         this.getView().setModel(new JSONModel(oViewData), 'viewModel');
@@ -29,20 +43,18 @@ sap.ui.define(
      * @see PluginViewController.onBeforeRenderingPlugin()
      */
       onBeforeRenderingPlugin: function() {
-        this._getResourceData().then(
-          function(aResponse) {
-            var aResources = this._createCustomDataObject(aResponse);
-            this.getView().getModel('resourceData').setData(aResources);
-
-            if (aResources.length > 100) {
-              this.getView().getModel('resourceData').setSizeLimit(aResources.length);
-            }
-          }.bind(this)
-        );
-
-        this._getOrderRoutingData('120000000002').then(function(aRecipe) {
-          console.log('Recipe Info', aRecipe);
-        });
+        // this._getResourceData().then(
+        //   function(aResponse) {
+        //     var aResources = this._createCustomDataObject(aResponse);
+        //     this.getView().getModel('resourceData').setData(aResources);
+        //     if (aResources.length > 100) {
+        //       this.getView().getModel('resourceData').setSizeLimit(aResources.length);
+        //     }
+        //   }.bind(this)
+        // );
+        // this._getOrderRoutingData('120000000002').then(function(aRecipe) {
+        //   console.log('Recipe Info', aRecipe);
+        // });
       },
 
       onExit: function() {
@@ -62,7 +74,20 @@ sap.ui.define(
           //TODO
           return;
         }
-        this._getAssignmentData(sOrderId);
+
+        this._getOrderDetails(sOrderId).then(
+          function(oOrderData) {
+            this.selectedOrder = oOrderData;
+            var aSFCs = oOrderData.sfcs.map(sSFC => {
+              return {
+                sfc: sSFC
+              };
+            });
+            oOrderData.sfcs = aSFCs;
+
+            this.getView().getModel('orderData').setData(oOrderData);
+          }.bind(this)
+        );
       },
 
       onSFCSelectionChange: function(oEvent) {
@@ -70,6 +95,15 @@ sap.ui.define(
           bIsDirty = this.getView().getModel('viewModel').getProperty('/isDirty');
 
         this.selectedSFC = sSFC;
+      },
+
+      onFBSearch: function(oEvent) {
+        this._getAssignmentData();
+      },
+
+      onTableItemsSelectionChange: function(oEvent) {
+        var aSelectedRows = oEvent.getParameter('listItems');
+        console.log(aSelectedRows);
       },
 
       onAssignedResourceChanged: function(oEvent) {
@@ -236,30 +270,43 @@ sap.ui.define(
         );
       },
 
-      _getAssignmentData: async function(sOrderId) {
-        this._getOrderDetails(sOrderId).then(
-          function(oOrderData) {
-            this.selectedOrder = oOrderData;
-            var aSFCs = oOrderData.sfcs.map(sSFC => {
-              return {
-                sfc: sSFC
-              };
-            });
-            oOrderData.sfcs = aSFCs;
+      _getAssignmentData: async function() {
+        var aResourceList = await this._getResourceData();
+        var aResources = this._createCustomDataObject(aResourceList);
+        this.getView().getModel('resourceData').setData(aResources);
 
-            this.getView().getModel('orderData').setData(oOrderData);
+        if (aResources.length > 100) {
+          this.getView().getModel('resourceData').setSizeLimit(aResources.length);
+        }
 
-            this._getResourceData();
-
-            // this._getBomData(oOrderData.bom.bom, oOrderData.bom.type);
-
-            this._getOrderRoutingData(oOrderData.order).then(
-              function(aRecipeData) {
-                this._createTableLineItems(aRecipeData);
-              }.bind(this)
-            );
+        this._getOrderRoutingData(this.selectedOrder.order).then(
+          function(aRecipeData) {
+            this._createTableLineItems(aRecipeData);
           }.bind(this)
         );
+        // this._getOrderDetails(sOrderId).then(
+        //   function(oOrderData) {
+        //     this.selectedOrder = oOrderData;
+        //     var aSFCs = oOrderData.sfcs.map(sSFC => {
+        //       return {
+        //         sfc: sSFC
+        //       };
+        //     });
+        //     oOrderData.sfcs = aSFCs;
+
+        //     this.getView().getModel('orderData').setData(oOrderData);
+
+        //     this._getResourceData();
+
+        //     // this._getBomData(oOrderData.bom.bom, oOrderData.bom.type);
+
+        //     this._getOrderRoutingData(oOrderData.order).then(
+        //       function(aRecipeData) {
+        //         this._createTableLineItems(aRecipeData);
+        //       }.bind(this)
+        //     );
+        //   }.bind(this)
+        // );
       },
 
       _getResourceListForComponent: function(sOrderId, sComponent) {
@@ -309,7 +356,7 @@ sap.ui.define(
             oLineItem.resource = oResource.resource;
             oLineItem.resourceType = oResource.types;
             oLineItem.lastModified = moment(oResource.modifiedDateTime).toDate();
-            if(oResource.asset){
+            if (oResource.asset) {
               oLineItem.asset = oResource.asset.name;
             }
 
