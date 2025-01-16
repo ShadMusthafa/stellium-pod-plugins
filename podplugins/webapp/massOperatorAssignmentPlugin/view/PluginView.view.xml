@@ -81,6 +81,7 @@
                     <Column width="6rem"><Text text="Acceptance Delay"/></Column>
                     <Column><Text text="Correction Time"/></Column>
                     <Column><Text text="Last Modified"/></Column>
+                    <Column><Text text="Actions"/></Column>
                 </columns>
                 <items>
                     <ColumnListItem>
@@ -137,6 +138,11 @@
                                 path: 'viewModel>lastModified',
                                 formatter: '.dateTimeFormatter'
                             }"/>
+                        <HBox>
+                            <Button text="Assign" press=".onAssignResouceBtnPress"/>
+                            <Button text="Revoke" press=".onRevokeResouceBtnPress"/>
+                            <Button text="Add" press=".onAddResouceBtnPress"/>
+                        </HBox>
                     </ColumnListItem>
                 </items>
             </Table>

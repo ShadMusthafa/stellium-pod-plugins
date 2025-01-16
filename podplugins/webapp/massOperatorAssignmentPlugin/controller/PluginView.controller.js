@@ -170,6 +170,26 @@ sap.ui.define(
         }
       },
 
+      onAssignResouceBtnPress: function(oEvent) {},
+
+      onRevokeResouceBtnPress: function(oEvent) {
+        var oSelectedRowData = oEvent.getSource().getBindingContext('viewModel').getObject();
+        var oRequestBody = {
+          plant: this.getPodController().getUserPlant(),
+          resource: oSelectedRowData.resource,
+          modifiedDateTime: oSelectedRowData.resourceLastModifiedAt
+        };
+
+        oRequestBody.customValues = this._createCustomValuesForResource(oSelectedRowData, true);
+        this._patchResourceServiceCall(oRequestBody).then(
+          function() {
+            this._getAssignmentData();
+          }.bind(this)
+        );
+      },
+
+      onAddResouceBtnPress: function(oEvent) {},
+
       autoAcceptanceFormatter: function(bIsAutoAcceptance) {
         if (bIsAutoAcceptance) return 'auto';
         return 'manual';
@@ -301,29 +321,6 @@ sap.ui.define(
             this._createTableLineItems(aRecipeData);
           }.bind(this)
         );
-        // this._getOrderDetails(sOrderId).then(
-        //   function(oOrderData) {
-        //     this.selectedOrder = oOrderData;
-        //     var aSFCs = oOrderData.sfcs.map(sSFC => {
-        //       return {
-        //         sfc: sSFC
-        //       };
-        //     });
-        //     oOrderData.sfcs = aSFCs;
-
-        //     this.getView().getModel('orderData').setData(oOrderData);
-
-        //     this._getResourceData();
-
-        //     // this._getBomData(oOrderData.bom.bom, oOrderData.bom.type);
-
-        //     this._getOrderRoutingData(oOrderData.order).then(
-        //       function(aRecipeData) {
-        //         this._createTableLineItems(aRecipeData);
-        //       }.bind(this)
-        //     );
-        //   }.bind(this)
-        // );
       },
 
       _getResourceListForComponent: function(sOrderId, sComponent) {
@@ -373,6 +370,8 @@ sap.ui.define(
             oLineItem.resource = oResource.resource;
             oLineItem.resourceType = oResource.types;
             oLineItem.lastModified = moment(oResource.modifiedDateTime).toDate();
+            oLineItem.resourceLastModifiedAt = moment(oResource.modifiedDateTime).toDate();
+
             if (oResource.asset) {
               oLineItem.asset = oResource.asset.name;
             }
@@ -434,8 +433,74 @@ sap.ui.define(
         );
       },
 
-      _createCustomValuesForResource: function(oItem) {
+      _createCustomValuesForResource: function(oItem, bClearValues) {
         var customValues = [];
+
+        if (bClearValues) {
+          return [
+            {
+              attribute: 'OPERATOR',
+              value: ''
+            },
+            {
+              attribute: 'AUTOACCEPTANCEDELAY',
+              value: ''
+            },
+            {
+              attribute: 'USE_AUTO_ACCEPTANCE',
+              value: ''
+            },
+            {
+              attribute: 'MATERIAL',
+              value: ''
+            },
+            {
+              attribute: 'USE_SUBSTRACTIVE_WEIGHING',
+              value: ''
+            },
+            {
+              attribute: 'BOM',
+              value: ''
+            },
+            {
+              attribute: 'BOM_VERSION',
+              value: ''
+            },
+            {
+              attribute: 'MATERIAL_VERSION',
+              value: ''
+            },
+            {
+              attribute: 'ORDER',
+              value: ''
+            },
+            {
+              attribute: 'SFC',
+              value: ''
+            },
+            {
+              attribute: 'OPERATION_ACTIVITY',
+              value: ''
+            },
+            {
+              attribute: 'WORK_CENTER',
+              value: ''
+            },
+            {
+              attribute: 'CURRENT_UOM',
+              value: ''
+            },
+            {
+              attribute: 'ERP_BOM',
+              value: ''
+            },
+            {
+              attribute: 'ERP_SEQUENCE',
+              value: ''
+            }
+          ];
+        }
+
         customValues.push({
           attribute: 'OPERATOR',
           value: oItem.operator
