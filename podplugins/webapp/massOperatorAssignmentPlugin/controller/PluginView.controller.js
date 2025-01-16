@@ -1,6 +1,12 @@
 sap.ui.define(
-  ['sap/ui/model/json/JSONModel', 'sap/dm/dme/podfoundation/controller/PluginViewController', 'sap/base/Log', 'sap/m/MessageBox'],
-  function(JSONModel, PluginViewController, Log, MessageBox) {
+  [
+    'sap/ui/model/json/JSONModel',
+    'sap/dm/dme/podfoundation/controller/PluginViewController',
+    'sap/base/Log',
+    'sap/m/MessageBox',
+    '../util/ErrorHandler'
+  ],
+  function(JSONModel, PluginViewController, Log, MessageBox, ErrorHandler) {
     'use strict';
 
     var oLogger = Log.getLogger('massOperatorAssignmentPlugin', Log.Level.INFO);
@@ -124,25 +130,47 @@ sap.ui.define(
       },
 
       onAssignedResourceChanged: function(oEvent) {
-        var oSelectedRowData = oEvent.getSource().getBindingContext('viewModel').getObject(),
+        var oControl = oEvent.getSource(),
+          oSelectedContext = oControl.getBindingContext('viewModel'),
+          oSelectedRowData = oSelectedContext.getObject(),
           oSelectedItem = oEvent.getParameter('selectedItem'),
           oResourceData = oSelectedItem.getBindingContext('resourceData').getObject();
 
-        var oControl = oEvent.getSource();
+        this._markItemAsDirty(oSelectedContext);
+
         if (oResourceData.customData.ORDER) {
-          oControl.setValueState('Error');
-          oControl.setValueStateText(`Resource already assigned to order ${oResourceData.customData.ORDER}`);
+          ErrorHandler.setErrorState(
+            oControl,
+            this.getI18nText('ResourceAssignedToOtherOrderErrMsg', [oResourceData.customData.ORDER]),
+            'selectedKey'
+          );
+
+          oSelectedRowData.resourceLastModifiedAt = '';
+          oSelectedRowData.resourceType = '';
           return;
         } else {
-          oControl.setValueState('None');
-          oControl.setValueStateText('');
+          ErrorHandler.clearErrorState(oControl, 'selectedKey');
+          oSelectedRowData.resourceLastModifiedAt = oResourceData.modifiedDateTime;
+          oSelectedRowData.resourceType = oResourceData.types;
         }
+      },
 
-        oSelectedRowData.resourceLastModifiedAt = oResourceData.modifiedDateTime;
-        oSelectedRowData.resourceType = oResourceData.types;
+      onAssignedOperatorIdChange: function(oEvent) {
+        var oControl = oEvent.getSource(),
+          oLineItemContext = oControl.getBindingContext('viewModel'),
+          oLineItemData = oLineItemContext.getObject(),
+          sOperatorId = oControl.getValue(),
+          aResourceList = this.getView().getModel('resourceData').getData();
 
-        var oContext = oEvent.getSource().getBindingContext('viewModel');
-        this._markItemAsDirty(oContext);
+        this._markItemAsDirty(oLineItemContext);
+
+        //Check if operator is assigned to other resource or not
+        var oResourceForOperator = aResourceList.find(oItem => oItem.customData && oItem.customData.OPERATOR === sOperatorId);
+        if (oResourceForOperator) {
+          ErrorHandler.setErrorState(oControl, this.getI18nText('operatorAlreadyAssignedErrMsg', [oResourceForOperator.resource]));
+        } else {
+          ErrorHandler.clearErrorState(oControl);
+        }
       },
 
       onAutoAcceptanceModeChange: function(oEvent) {
@@ -173,11 +201,9 @@ sap.ui.define(
         //Check if the entered value is a positive non-zero integer
         var regex = /^0*[1-9]\d*$/;
         if (!regex.test(iAcceptanceDelay)) {
-          oInput.setValueState('Error');
-          oInput.setValueStateText('Enter positive non zero value');
+          ErrorHandler.setValueState(oInput, this.getI18nText('inputPositiveNonZeroErrMsg'));
         } else {
-          oInput.setValueState('None');
-          oInput.setValueStateText('');
+          ErrorHandler.clearValueState(oInput);
         }
       },
 
@@ -242,6 +268,10 @@ sap.ui.define(
       onSaveAssignmentsPress: function(oEvent) {
         var oViewModel = this.getView().getModel('viewModel'),
           aItems = oViewModel.getProperty('/lineItems');
+
+        if (ErrorHandler.hasErrors()) {
+          return MessageBox.error(this.getI18nText('fixErrorsBeforeSaveErrMsg'));
+        }
 
         var aItemsForServiceCall = aItems.filter(oItem => oItem.isDirty);
         this._saveResourceAssignments(aItemsForServiceCall);
@@ -362,11 +392,14 @@ sap.ui.define(
         );
       },
 
-      _getResourceListForComponent: function(sOrderId, sComponent) {
+      _getResourceListForComponent: function(sOrderId, sSFC, sComponent) {
         var oResourceModel = this.getView().getModel('resourceData'),
           aResourceList = oResourceModel.getProperty('/');
 
-        return aResourceList.filter(oResource => oResource.customData.ORDER === sOrderId && oResource.customData.MATERIAL === sComponent);
+        return aResourceList.filter(
+          oResource =>
+            oResource.customData.ORDER === sOrderId && oResource.customData.SFC === sSFC && oResource.customData.MATERIAL === sComponent
+        );
       },
 
       _createTableLineItems: function(aData) {
@@ -395,7 +428,7 @@ sap.ui.define(
 
         var aLineItems = [];
         aRecipeItems.forEach(oItem => {
-          var aResources = this._getResourceListForComponent(this.selectedOrder.order, oItem.component);
+          var aResources = this._getResourceListForComponent(this.selectedOrder.order, this.selectedSFC, oItem.component);
 
           //If there are no resources assigned then show line
           if (aResources.length === 0) {

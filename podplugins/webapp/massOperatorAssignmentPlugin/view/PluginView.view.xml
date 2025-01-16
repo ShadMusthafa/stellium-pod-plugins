@@ -64,8 +64,8 @@
                 <headerToolbar>
                     <Toolbar>
                         <ToolbarSpacer/>
-                        <Button text="Assign" press=".onAssignResouceBtnPress"/>
-                        <Button text="Revoke" press=".onRevokeResouceBtnPress"/>
+                        <!-- <Button text="Assign" press=".onAssignResouceBtnPress"/> -->
+                        <Button text="Revoke" type="Reject" press=".onRevokeResouceBtnPress"/>
                         <!-- <Button text="Add" /> -->
                         <!-- <Button text="Remove" /> -->
                     </Toolbar>
@@ -108,7 +108,7 @@
                         <VBox items="{viewModel>resourceType}">
                             <Text text="{viewModel>type}"/>
                         </VBox>
-                        <Input value="{viewModel>operator}"/>
+                        <Input value="{viewModel>operator}" change=".onAssignedOperatorIdChange"/>
                         <!-- <Select 
                             selectedKey="{
                                 path: 'viewModel>autoAcceptance',
@@ -148,7 +148,7 @@
         <f:footer>
             <Toolbar id="idMassOpAsmtFooter">
                 <ToolbarSpacer />
-                <Button text="Save" type="Emphasized" press=".onSaveAssignmentsPress"/>
+                <Button text="Assign" type="Emphasized" press=".onSaveAssignmentsPress"/>
                 <Button text="Cancel" type="Reject" press=".onCancelAssignmentsPress"/>
             </Toolbar>
         </f:footer>
