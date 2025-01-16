@@ -126,9 +126,20 @@ sap.ui.define(
       onAssignedResourceChanged: function(oEvent) {
         var oSelectedRowData = oEvent.getSource().getBindingContext('viewModel').getObject(),
           oSelectedItem = oEvent.getParameter('selectedItem'),
-          oSelectedItemData = oSelectedItem.getBindingContext('resourceData').getObject();
+          oResourceData = oSelectedItem.getBindingContext('resourceData').getObject();
 
-        oSelectedRowData.resourceLastModifiedAt = oSelectedItemData.modifiedDateTime;
+        var oControl = oEvent.getSource();
+        if (oResourceData.customData.ORDER) {
+          oControl.setValueState('Error');
+          oControl.setValueStateText(`Resource already assigned to order ${oResourceData.customData.ORDER}`);
+          return;
+        } else {
+          oControl.setValueState('None');
+          oControl.setValueStateText('');
+        }
+
+        oSelectedRowData.resourceLastModifiedAt = oResourceData.modifiedDateTime;
+        oSelectedRowData.resourceType = oResourceData.types;
 
         var oContext = oEvent.getSource().getBindingContext('viewModel');
         this._markItemAsDirty(oContext);
@@ -173,22 +184,50 @@ sap.ui.define(
       onAssignResouceBtnPress: function(oEvent) {},
 
       onRevokeResouceBtnPress: function(oEvent) {
-        var oSelectedRowData = oEvent.getSource().getBindingContext('viewModel').getObject();
-        var oRequestBody = {
-          plant: this.getPodController().getUserPlant(),
-          resource: oSelectedRowData.resource,
-          modifiedDateTime: oSelectedRowData.resourceLastModifiedAt
-        };
+        var oTable = this.getView().byId('idMassOpAsmtTable'),
+          aSelectedItems = oTable.getSelectedItems();
 
-        oRequestBody.customValues = this._createCustomValuesForResource(oSelectedRowData, true);
-        this._patchResourceServiceCall(oRequestBody).then(
+        var aPromises = aSelectedItems.map(
+          function(oItem) {
+            var oSelectedRowData = oItem.getBindingContext('viewModel').getObject();
+            var oRequestBody = {
+              plant: this.getPodController().getUserPlant(),
+              resource: oSelectedRowData.resource,
+              modifiedDateTime: oSelectedRowData.resourceLastModifiedAt
+            };
+            oRequestBody.customValues = this._createCustomValuesForResource(oSelectedRowData, true);
+            return this._patchResourceServiceCall(oRequestBody);
+          }.bind(this)
+        );
+
+        Promise.allSettled(aPromises).then(
           function() {
             this._getAssignmentData();
+            oTable.removeSelections(true);
           }.bind(this)
         );
       },
 
-      onAddResouceBtnPress: function(oEvent) {},
+      onAddResouceBtnPress: function(oEvent) {
+        var oSelectedRowData = oEvent.getSource().getBindingContext('viewModel').getObject();
+        var oNewRowItem = {
+          ...oSelectedRowData,
+          isDirty: true,
+          asset: '',
+          resource: '',
+          resourceType: '',
+          operator: '',
+          autoAcceptance: false,
+          acceptanceDelay: 0,
+          correctionTime: '',
+          lastModified: ''
+        };
+
+        var oViewModel = this.getView().getModel('viewModel'),
+          aTableItems = oViewModel.getProperty('/lineItems');
+        aTableItems.push(oNewRowItem);
+        oViewModel.setProperty('/lineItems', aTableItems);
+      },
 
       autoAcceptanceFormatter: function(bIsAutoAcceptance) {
         if (bIsAutoAcceptance) return 'auto';
@@ -408,6 +447,7 @@ sap.ui.define(
         Promise.allSettled(aPromises).then(
           function(aData) {
             this._getAssignmentData(this.selectedOrder.order);
+            this.getView().getModel('viewModel').setProperty('/isDirty', false);
           }.bind(this)
         );
       },

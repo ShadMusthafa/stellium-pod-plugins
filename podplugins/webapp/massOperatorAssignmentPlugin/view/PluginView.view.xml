@@ -64,10 +64,10 @@
                 <headerToolbar>
                     <Toolbar>
                         <ToolbarSpacer/>
-                        <Button text="Assign" enabled="{viewModel>/tableHeaderBtn/assign/enabled}"/>
-                        <Button text="Revoke" enabled="{viewModel>/tableHeaderBtn/revoke/enabled}"/>
-                        <Button text="Add" enabled="{viewModel>/tableHeaderBtn/add/enabled}"/>
-                        <Button text="Remove" enabled="{viewModel>/tableHeaderBtn/remove/enabled}"/>
+                        <Button text="Assign" press=".onAssignResouceBtnPress"/>
+                        <Button text="Revoke" press=".onRevokeResouceBtnPress"/>
+                        <!-- <Button text="Add" /> -->
+                        <!-- <Button text="Remove" /> -->
                     </Toolbar>
                 </headerToolbar>
                 <columns>
@@ -139,8 +139,6 @@
                                 formatter: '.dateTimeFormatter'
                             }"/>
                         <HBox>
-                            <Button text="Assign" press=".onAssignResouceBtnPress"/>
-                            <Button text="Revoke" press=".onRevokeResouceBtnPress"/>
                             <Button text="Add" press=".onAddResouceBtnPress"/>
                         </HBox>
                     </ColumnListItem>
