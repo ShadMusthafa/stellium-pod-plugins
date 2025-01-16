@@ -241,9 +241,9 @@ sap.ui.define(
                 BY_PRODUCT: 0
               };
               //TODO:
-              // this.getGoodsReceiptItems('FINISH_GOOD', true, this.byId('goodsReceiptSearch').getValue());
-              // this.getGoodsReceiptItems('CO_PRODUCT', true, this.byId('goodsReceiptByCoProductSearch').getValue());
-              // this.getGoodsReceiptItems('BY_PRODUCT', true, this.byId('goodsReceiptByProductSearch').getValue());
+              this.getGoodsReceiptItems('FINISH_GOOD', true, this.byId('goodsReceiptSearch').getValue());
+              this.getGoodsReceiptItems('CO_PRODUCT', true, this.byId('goodsReceiptByCoProductSearch').getValue());
+              this.getGoodsReceiptItems('BY_PRODUCT', true, this.byId('goodsReceiptByProductSearch').getValue());
               break;
 
             case 'goodsIssue':
