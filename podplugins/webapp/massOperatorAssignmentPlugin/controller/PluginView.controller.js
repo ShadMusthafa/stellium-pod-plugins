@@ -42,20 +42,7 @@ sap.ui.define(
       /**
      * @see PluginViewController.onBeforeRenderingPlugin()
      */
-      onBeforeRenderingPlugin: function() {
-        // this._getResourceData().then(
-        //   function(aResponse) {
-        //     var aResources = this._createCustomDataObject(aResponse);
-        //     this.getView().getModel('resourceData').setData(aResources);
-        //     if (aResources.length > 100) {
-        //       this.getView().getModel('resourceData').setSizeLimit(aResources.length);
-        //     }
-        //   }.bind(this)
-        // );
-        // this._getOrderRoutingData('120000000002').then(function(aRecipe) {
-        //   console.log('Recipe Info', aRecipe);
-        // });
-      },
+      onBeforeRenderingPlugin: function() {},
 
       onExit: function() {
         if (PluginViewController.prototype.onExit) {
@@ -71,9 +58,13 @@ sap.ui.define(
         var sOrderId = oEvent.getParameter('newValue');
 
         if (!sOrderId) {
-          //TODO
+          //Clear the order model
+          this.getView().getModel('orderData').setData({});
           return;
         }
+
+        this.getView().byId('idOrderFilterInput').setValueState('None');
+        this.getView().byId('idSFCSelect').setValueState('None');
 
         this._getOrderDetails(sOrderId).then(
           function(oOrderData) {
@@ -98,7 +89,33 @@ sap.ui.define(
       },
 
       onFBSearch: function(oEvent) {
-        this._getAssignmentData();
+        var oFilterBar = oEvent.getSource(),
+          aMandatoryItems = oFilterBar.getFilterGroupItems().filter(oItem => oItem.getMandatory());
+
+        var aInvalidItems = aMandatoryItems.filter(oItem => {
+          var oControl = oItem.getControl(),
+            bIsValid = false;
+
+          if (oControl.getValue) {
+            bIsValid = oControl.getValue() !== '';
+          } else if (oControl.getSelectedKey) {
+            bIsValid = oControl.getSelectedKey() != '';
+          }
+
+          if (!bIsValid) {
+            oControl.setValueState('Error');
+            oControl.setValueStateText('Please fill required fields');
+          } else {
+            oControl.setValueState('None');
+            oControl.setValueStateText('');
+          }
+
+          return !bIsValid;
+        });
+
+        if (aInvalidItems.length === 0) {
+          this._getAssignmentData();
+        }
       },
 
       onTableItemsSelectionChange: function(oEvent) {
