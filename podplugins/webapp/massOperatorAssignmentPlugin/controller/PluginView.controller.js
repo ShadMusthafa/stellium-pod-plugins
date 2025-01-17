@@ -139,6 +139,7 @@ sap.ui.define(
 
       onAssignedResourceChanged: function(oEvent) {
         var oControl = oEvent.getSource(),
+          oViewModel = this.getView().getModel('viewModel'),
           oSelectedContext = oControl.getBindingContext('viewModel'),
           oSelectedRowData = oSelectedContext.getObject(),
           oSelectedItem = oEvent.getParameter('selectedItem'),
@@ -147,31 +148,33 @@ sap.ui.define(
         this._markItemAsDirty(oSelectedContext);
         ErrorHandler.clearErrorState(oControl, 'selectedKey');
 
+        //Clear resource data from lineItem
+        this._setLineItemResourceData(oViewModel, oSelectedContext.getPath(), {});
+
+        //Get allowed statuses for resource assignment
         var aAllowedStatuses = this.getConfiguration().allowedResourceStatusesForAssignment.reduce((acc, val) => {
           if (val.value) acc.push(val.key);
           return acc;
         }, []);
 
+        //Validate resource status
         if (!aAllowedStatuses.includes(oResourceData.status)) {
           ErrorHandler.setErrorState(oControl, this.getI18nText('resourceStatusInvalidErrMsg', [oResourceData.status]), 'selectedKey');
           return;
         }
 
+        //Validate resource assignment
         if (oResourceData.customData.ORDER) {
           ErrorHandler.setErrorState(
             oControl,
             this.getI18nText('ResourceAssignedToOtherOrderErrMsg', [oResourceData.customData.ORDER]),
             'selectedKey'
           );
-
-          oSelectedRowData.resourceLastModifiedAt = '';
-          oSelectedRowData.resourceType = '';
           return;
-        } else {
-          ErrorHandler.clearErrorState(oControl, 'selectedKey');
-          oSelectedRowData.resourceLastModifiedAt = oResourceData.modifiedDateTime;
-          oSelectedRowData.resourceType = oResourceData.types;
         }
+
+        //Set selected resource to line item
+        this._setLineItemResourceData(oViewModel, oSelectedContext.getPath(), oResourceData);
       },
 
       onAssignedOperatorIdChange: function(oEvent) {
@@ -762,6 +765,25 @@ sap.ui.define(
           oItem.customData = oCustomData;
           return oItem;
         });
+      },
+
+      _setLineItemResourceData: function(oModel, sPath, oResourceData) {
+        var oData = oModel.getProperty(sPath);
+        var oCustomData = oResourceData.customData;
+
+        oData = {
+          ...oData,
+          resource: oResourceData.resource || '',
+          resourceType: oResourceData.types || '',
+          lastModified: oResourceData.modifiedDateTime ? moment(oResourceData.modifiedDateTime).toDate() : '',
+          resourceLastModifiedAt: oResourceData.modifiedDateTime ? moment(oResourceData.modifiedDateTime).toDate() : '',
+          asset: oResourceData.asset ? oResourceData.asset.name : ''
+          // autoAcceptance: oCustomData ? oCustomData.USE_AUTO_ACCEPTANCE === 'true' : 'false',
+          // acceptanceDelay: oCustomData ? oCustomData.AUTOACCEPTANCEDELAY : 0
+          // operator: oCustomData ? oCustomData.OPERATOR || ''
+        };
+
+        oModel.setProperty(sPath, oData);
       }
     });
 
