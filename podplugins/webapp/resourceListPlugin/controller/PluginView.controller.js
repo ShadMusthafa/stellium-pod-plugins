@@ -1,156 +1,158 @@
-sap.ui.define(
-  ['sap/ui/model/json/JSONModel', 'sap/dm/dme/podfoundation/controller/PluginViewController', 'sap/base/Log'],
-  function(JSONModel, PluginViewController, Log) {
-    'use strict';
+sap.ui.define(['sap/ui/model/json/JSONModel', 'sap/dm/dme/podfoundation/controller/PluginViewController', 'sap/base/Log'], function(
+  JSONModel,
+  PluginViewController,
+  Log
+) {
+  'use strict';
 
-    var oLogger = Log.getLogger('resourceListPlugin', Log.Level.INFO);
+  var oLogger = Log.getLogger('resourceListPlugin', Log.Level.INFO);
 
-    var oPluginViewController = PluginViewController.extend(
-      'stellium.ext.podplugins.resourceListPlugin.controller.PluginView',
-      {
-        metadata: {
-          properties: {}
-        },
+  var oPluginViewController = PluginViewController.extend('stellium.ext.podplugins.resourceListPlugin.controller.PluginView', {
+    metadata: {
+      properties: {}
+    },
 
-        onInit: function() {
-          if (PluginViewController.prototype.onInit) {
-            PluginViewController.prototype.onInit.apply(this, arguments);
-          }
-
-          var oModel = new JSONModel();
-          this.getView().setModel(oModel, 'data');
-        },
-
-        /**
-         * @see PluginViewController.onBeforeRenderingPlugin()
-         */
-        onBeforeRenderingPlugin: function() {
-          this.subscribe('PodSelectionChangeEvent', this.onPodSelectionChangeEvent, this);
-          this.subscribe('OperationListSelectEvent', this.onOperationChangeEvent, this);
-          this.subscribe('WorklistSelectEvent', this.onWorkListSelectEvent, this);
-
-          this.subscribe('PageChangeEvent', this.onPageChangeEvent, this);
-
-          var oConfig = this.getConfiguration();
-          this.configureNavigationButtons(oConfig);
-
-          this._loadResourceData();
-        },
-
-        onExit: function() {
-          if (PluginViewController.prototype.onExit) {
-            PluginViewController.prototype.onExit.apply(this, arguments);
-          }
-          this.unsubscribe('PodSelectionChangeEvent', this.onPodSelectionChangeEvent, this);
-          this.unsubscribe('OperationListSelectEvent', this.onOperationChangeEvent, this);
-          this.unsubscribe('WorklistSelectEvent', this.onWorkListSelectEvent, this);
-          this.unsubscribe('PageChangeEvent', this.onPageChangeEvent, this);
-        },
-
-        onBeforeRendering: function() {},
-
-        onAfterRendering: function() {},
-
-        onPodSelectionChangeEvent: function(sChannelId, sEventId, oData) {
-          // don't process if same object firing event
-          if (this.isEventFiredByThisPlugin(oData)) {
-            return;
-          }
-        },
-
-        onOperationChangeEvent: function(sChannelId, sEventId, oData) {
-          // don't process if same object firing event
-          if (this.isEventFiredByThisPlugin(oData)) {
-            return;
-          }
-        },
-
-        onWorkListSelectEvent: function(sChannelId, sEventId, oData) {
-          // don't process if same object firing event
-          if (this.isEventFiredByThisPlugin(oData)) {
-            return;
-          }
-        },
-
-        configureNavigationButtons: function(oConfiguration) {
-          if (!this.isPopup() && !this.isDefaultPlugin()) {
-            this.byId('closeButton').setVisible(oConfiguration.closeButtonVisible);
-          }
-        },
-
-        onPageChangeEvent: function() {
-          if (oData.page == 'MainPage' && !this.isResourceSelectionEvent) {
-            let sHashPart = window.location.hash;
-            let nHashIndex = sHashPart.indexOf('?');
-
-            if (nHashIndex !== -1) {
-              let sBeforeQueryParams = sHashPart.substring(0, nHashIndex);
-              let sQueryParams = sHashPart.substring(nHashIndex + 1);
-
-              let oSearchParams = new URLSearchParams(sQueryParams);
-              oSearchParams.delete('RESOURCESELECTION');
-
-              let sNewHash = `${sBeforeQueryParams}?${oSearchParams.toString()}`;
-              window.location.hash = sNewHash;
-            }
-          }
-
-          // Reset the flag after the selection event is handled to ensure that the flag is not already set when the user selects another resource.
-          if (this.isResourceSelectionEvent) {
-            this.isResourceSelectionEvent = false;
-          }
-        },
-
-        onResourceItemPress: function(oEvent) {
-          var oSource = oEvent.getSource(),
-            oBindingContext = oSource.getBindingContext('data'),
-            oSelectedResourceData = oBindingContext.getObject();
-
-          var oPodSelectionModel = this.getPodSelectionModel();
-          oPodSelectionModel.stelSelectedResourceData = oSelectedResourceData;
-
-          this.navigateToPage('RESOURCEGRAPH');
-        },
-
-        _loadResourceData: function() {
-          var that = this,
-            sUrl = this.getPublicApiRestDataSourceUri() + '/resource/v2/resources';
-          var oParameters = {
-            plant: this.getPodController().getUserPlant()
-          };
-
-          this.ajaxGetRequest(
-            sUrl,
-            oParameters,
-            function(oResponseData) {
-              that._handleResourceResponse(oResponseData);
-            },
-            function(oError, sHttpErrorMessage) {
-              that.handleErrorMessage(oError, sHttpErrorMessage);
-            }
-          );
-        },
-
-        _handleResourceResponse: function(oResponseData) {
-          var oModel = this.getView().getModel('data');
-
-          console.log('Data received', oResponseData);
-
-          //Convert custom value array to object for data binding
-          for (var i = 0; i < oResponseData.length; i++) {
-            var oCustomData = oResponseData[i].customValues.reduce((acc, val) => {
-              acc[val.attribute] = val.value;
-              return acc;
-            }, {});
-            oResponseData[i].customData = oCustomData;
-          }
-          oModel.setProperty('/resources', oResponseData);
-
-          console.log('Data set in model:', oModel.getData());
-        }
+    onInit: function() {
+      if (PluginViewController.prototype.onInit) {
+        PluginViewController.prototype.onInit.apply(this, arguments);
       }
-    );
 
-    return oPluginViewController;
-  }
-);
+      var oView = this.getView();
+      oView.setModel(new JSONModel(), 'resourceData');
+      oView.setModel(new JSONModel(), 'workCenterData');
+      oView.setModel(new JSONModel(), 'data');
+    },
+
+    /**
+     * @see PluginViewController.onBeforeRenderingPlugin()
+     */
+    onBeforeRenderingPlugin: function() {},
+
+    onExit: function() {
+      if (PluginViewController.prototype.onExit) {
+        PluginViewController.prototype.onExit.apply(this, arguments);
+      }
+    },
+
+    onBeforeRendering: function() {
+      this._getWorkCenterAssignments();
+    },
+
+    onAfterRendering: function() {},
+
+    resourceStatusTextFormatter: function(sStatus) {
+      if (!sStatus) return;
+      switch (sStatus) {
+        case 'ENABLED':
+          return this.getI18nText('enum.resource.status.enabled');
+        case 'UNKNOWN':
+          return this.getI18nText('enum.resource.status.unknown');
+        case 'PRODUCTIVE':
+          return this.getI18nText('enum.resource.status.productive');
+        case 'SCHEDULED_DOWN':
+          return this.getI18nText('enum.resource.status.scheduledDown');
+        case 'UNSCHEDULED_DOWN':
+          return this.getI18nText('enum.resource.status.unscheduledDown');
+        case 'DISABLED':
+          return this.getI18nText('enum.resource.status.disabled');
+      }
+    },
+
+    resourceStatusIconFormatter: function(sStatus) {
+      if (!sStatus) return;
+      switch (sStatus) {
+        case 'ENABLED':
+          return 'sap-icon://sys-enter-2';
+        case 'UNKNOWN':
+        case 'PRODUCTIVE':
+        case 'SCHEDULED_DOWN':
+        case 'UNSCHEDULED_DOWN':
+        case 'DISABLED':
+          return 'sap-icon://error';
+      }
+    },
+
+    resourceStatusStatusFormatter: function(sStatus) {
+      if (!sStatus) return;
+      switch (sStatus) {
+        case 'ENABLED':
+          return 'Success';
+        case 'UNKNOWN':
+        case 'PRODUCTIVE':
+        case 'SCHEDULED_DOWN':
+        case 'UNSCHEDULED_DOWN':
+        case 'DISABLED':
+          return 'Error';
+      }
+    },
+
+    _getWorkCenterAssignments: async function() {
+      //Get resource data
+      var aResources = await this._getResourceData().then(aResources => {
+        return this._createCustomDataObject(aResources);
+      });
+
+      this.getView().getModel('resourceData', aResources);
+
+      //Get Workcenter data
+      var aWorkCenters = await this._getWorkCenterData();
+      this.getView().getModel('workCenterData', aWorkCenters);
+
+      var aLineItems = [];
+      for (var i = 0; i < aWorkCenters.length; i++) {
+        var oWorkCenter = aWorkCenters[i];
+        oWorkCenter.members.forEach(oMember => {
+          if (!oMember.resource && !oMember.resource.resource) return;
+
+          oMember.resource = aResources.find(oResource => oResource.resource === oMember.resource.resource);
+          var oCustomData = oMember.resource.customData;
+          aLineItems.push({
+            workCenter: oWorkCenter.workCenter,
+            workCenterDesc: oWorkCenter.description,
+            resource: oMember.resource.resource,
+            resourceType: oMember.resource.types,
+            resourceStatus: oMember.resource.status,
+            operator: oCustomData ? oCustomData.OPERATOR : '',
+            order: oCustomData ? oCustomData.ORDER : '',
+            component: oCustomData ? oCustomData.MATERIAL : '',
+            componentDesc: oCustomData ? oCustomData.MATERIAL_DESC : ''
+          });
+        });
+      }
+      this.getView().getModel('data').setProperty('/lineItems', aLineItems);
+    },
+
+    _getResourceData: function() {
+      var sUrl = this.getPublicApiRestDataSourceUri() + '/resource/v2/resources';
+      var oParamters = {
+        plant: this.getPodController().getUserPlant()
+      };
+      return new Promise((resolve, reject) => {
+        this.ajaxGetRequest(sUrl, oParamters, resolve, reject);
+      });
+    },
+
+    _getWorkCenterData: function() {
+      var sUrl = this.getPublicApiRestDataSourceUri() + 'workcenter/v2/workcenters';
+      var oParameters = {
+        plant: this.getPodController().getUserPlant()
+      };
+      return new Promise((resolve, reject) => {
+        this.ajaxGetRequest(sUrl, oParameters, resolve, reject);
+      });
+    },
+
+    _createCustomDataObject: function(aData) {
+      return aData.map(oItem => {
+        var oCustomData = oItem.customValues.reduce((acc, val) => {
+          acc[val.attribute] = val.value;
+          return acc;
+        }, {});
+        oItem.customData = oCustomData;
+        return oItem;
+      });
+    }
+  });
+
+  return oPluginViewController;
+});

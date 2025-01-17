@@ -8,20 +8,46 @@
     <Panel id="podModelPluginPanel" width="100%" height="100%" expandable="false" expanded="true" accessibleRole="Region" backgroundDesign="Transparent">
         <content>
            <Table id="idResourceListTable"
-                items="{data>/resources}">
+                items="{
+                    path: 'data>/lineItems',
+                    sorter: { path: 'workCenter', group: true }
+                }">
                 <columns>
-                    <Column id="idRLT-Plant"><Text text="Plant" /></Column>
-                    <Column id="idRLT-Resource"><Text text="Resource" /></Column>
-                    <Column id="idRLT-Description"><Text text="Description" /></Column>
-                    <Column id="idRLT-Status"><Text text="Status" /></Column>
+                    <Column mergeDuplicates="true"><Text text="Workcenter"/></Column>
+                    <Column><Text text="Resource"/></Column>
+                    <Column><Text text="Resource Type"/></Column>
+                    <Column><Text text="Resource Status"/></Column>
+                    <Column><Text text="Operator"/></Column>
+                    <Column><Text text="Order"/></Column>
+                    <Column><Text text="Component"/></Column>
+                    <Column><Text text="Description"/></Column>
                 </columns>
                 <items>
-                    <ColumnListItem type="Navigation" press=".onResourceItemPress">
+                    <ColumnListItem>
                         <cells>
-                            <Text text="{data>plant}"/>
+                            <Text text="{data>workCenter}"/>
                             <Text text="{data>resource}"/>
-                            <Text text="{data>description}"/>
-                            <Text text="{data>status}"/>
+                            <HBox items="{data>resourceType}">
+                                <Text text="{data>type}"/>
+                            </HBox>
+                            <ObjectStatus
+                                text="{
+                                    path: 'data>resourceStatus',
+                                    formatter: '.resourceStatusTextFormatter'
+                                }"
+                                inverted="true"
+                                icon="{
+                                    path: 'data>resourceStatus',
+                                    formatter: '.resourceStatusIconFormatter'
+                                }"
+                                state="{
+                                    path: 'data>resourceStatus',
+                                    formatter: '.resourceStatusStatusFormatter'
+                                }" />
+                            <Text text="{data>operator}"/>
+                            <Text text="{data>order}"/>
+                            <Text text="{data>component}"/>
+                            <Text text="{data>componentDesc}"/>
                         </cells>
                     </ColumnListItem>
                 </items>
