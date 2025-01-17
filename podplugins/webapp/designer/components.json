@@ -70,5 +70,17 @@
       "productionProcessEnabled": false,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     }
+  ],
+  "extensions":[
+    {
+      "provider": "stellium/ext/podplugins/orderPodSelectionExtensionProvider/ExtensionProvider",
+      "controller": "sap.dm.dme.plugins.orderPodSelectionPlugin",
+      "inclusions": [
+          {
+              "pods": ["SMDEV_EXTENSION*"],
+              "plants": ["M206"]
+          }
+      ]
+   }
   ]
 }
