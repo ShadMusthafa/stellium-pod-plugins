@@ -145,6 +145,17 @@ sap.ui.define(
           oResourceData = oSelectedItem.getBindingContext('resourceData').getObject();
 
         this._markItemAsDirty(oSelectedContext);
+        ErrorHandler.clearErrorState(oControl, 'selectedKey');
+
+        var aAllowedStatuses = this.getConfiguration().allowedResourceStatusesForAssignment.reduce((acc, val) => {
+          if (val.value) acc.push(val.key);
+          return acc;
+        }, []);
+
+        if (!aAllowedStatuses.includes(oResourceData.status)) {
+          ErrorHandler.setErrorState(oControl, this.getI18nText('resourceStatusInvalidErrMsg', [oResourceData.status]), 'selectedKey');
+          return;
+        }
 
         if (oResourceData.customData.ORDER) {
           ErrorHandler.setErrorState(
