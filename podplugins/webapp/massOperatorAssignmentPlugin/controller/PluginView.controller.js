@@ -193,14 +193,14 @@ sap.ui.define(
 
         ErrorHandler.clearErrorState(oControl);
 
-        if (!sOperatorId) {
+        //If resource selection is made and no operator id is set, show error
+        if (!sOperatorId && oLineItemData.resource) {
           ErrorHandler.setErrorState(oControl, this.getI18nText('requiredFieldErrMsg'));
           return;
         }
 
         //Check if operator is available in workcenter
         var oOperator = oLineItemData.userAssignments.find(oItem => oItem.userId === sOperatorId);
-
         if (!oOperator) {
           ErrorHandler.setErrorState(oControl, this.getI18nText('userNotFoundInWorkCenter', [sOperatorId, oLineItemData.workCenter]));
           return;
@@ -289,6 +289,11 @@ sap.ui.define(
           lastModified: ''
         };
 
+        //Delete any existing assignment data from item
+        if (oNewRowItem.existingAssignment) {
+          delete oNewRowItem.existingAssignment;
+        }
+
         var oViewModel = this.getView().getModel('viewModel'),
           aTableItems = oViewModel.getProperty('/lineItems');
         aTableItems.push(oNewRowItem);
@@ -313,12 +318,17 @@ sap.ui.define(
           return MessageBox.error(this.getI18nText('fixErrorsBeforeSaveErrMsg'));
         }
 
+        //Validate table items
         var oTable = this.getView().byId('idMassOpAsmtTable');
         oTable.getItems().forEach(oItem => {
           var oData = oItem.getBindingContext('viewModel').getObject(),
             aCells = oItem.getCells();
 
           if (!oData.isDirty && !oData.isNew) {
+            return;
+          }
+
+          if (!oData.resource && !oData.operator) {
             return;
           }
 
@@ -590,14 +600,13 @@ sap.ui.define(
               oLineItem.asset = oResource.asset.name;
             }
 
-            if (!oResource.customData) {
-              aLineItems.push(oLineItem);
-              return;
+            if (oResource.customData) {
+              oLineItem.autoAcceptance = oResource.customData.USE_AUTO_ACCEPTANCE === 'true';
+              oLineItem.acceptanceDelay = oResource.customData.AUTOACCEPTANCEDELAY;
+              oLineItem.operator = oResource.customData.OPERATOR;
             }
 
-            oLineItem.autoAcceptance = oResource.customData.USE_AUTO_ACCEPTANCE === 'true';
-            oLineItem.acceptanceDelay = oResource.customData.AUTOACCEPTANCEDELAY;
-            oLineItem.operator = oResource.customData.OPERATOR;
+            oLineItem.existingAssignment = { ...oLineItem };
             aLineItems.push(oLineItem);
           });
         });
@@ -609,14 +618,31 @@ sap.ui.define(
       _saveResourceAssignments: function(aItems) {
         var aPromises = [];
 
-        aPromises = aItems.map(oItem => {
+        var aRequestItems = [];
+        for (var i = 0; i < aItems.length; i++) {
+          var oItem = aItems[i];
+
+          //If assigned resource has been changed, revoke original assignment
+          if (oItem.existingAssignment && oItem.existingAssignment.resource !== oItem.resource) {
+            var oRevokeRequestBody = {
+              plant: this.getPodController().getUserPlant(),
+              resource: oItem.existingAssignment.resource,
+              customValues: this._createCustomValuesForResource(oItem.existingAssignment, true),
+              modifiedDateTime: oItem.existingAssignment.resourceLastModifiedAt
+            };
+            aRequestItems.push(oRevokeRequestBody);
+          }
+
           var oRequestBody = {
             plant: this.getPodController().getUserPlant(),
             resource: oItem.resource,
             customValues: this._createCustomValuesForResource(oItem),
             modifiedDateTime: oItem.resourceLastModifiedAt
           };
+          aRequestItems.push(oRequestBody);
+        }
 
+        var aPromises = aRequestItems.map(oRequestBody => {
           return this._patchResourceServiceCall(oRequestBody);
         });
 

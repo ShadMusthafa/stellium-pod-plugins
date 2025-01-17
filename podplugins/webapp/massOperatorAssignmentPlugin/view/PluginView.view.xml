@@ -97,7 +97,6 @@
                             showSecondaryValues="true"
                             columnRatio="2:3"
                             items="{resourceData>/}"
-                            editable="{viewModel>isNew}"
                             selectedKey="{viewModel>resource}"
                             change=".onAssignedResourceChanged">
                             <!-- <core:Item key="{resourceData>resource}" text="{resourceData>resource} {resourceData>description}"/> -->
@@ -112,24 +111,14 @@
                         <Input 
                             showSuggestion="true"
                             suggestionItems="{viewModel>userAssignments}"
-                            editable="{viewModel>isNew}" 
                             value="{viewModel>operator}" 
                             change=".onAssignedOperatorIdChange">
                             <suggestionItems>
                                 <core:ListItem key="{viewModel>userId}" text="{viewModel>userId}"/>
                             </suggestionItems>
                         </Input>
-                        <!-- <Select 
-                            selectedKey="{
-                                path: 'viewModel>autoAcceptance',
-                                formatter:'.autoAcceptanceFormatter'
-                            }">
-                            <core:Item key="auto" text="Automatic" />
-                            <core:Item key="manual" text="Manual" />
-                        </Select> -->
                         <SegmentedButton  
                             selectionChange=".onAutoAcceptanceModeChange"
-                            enabled="{viewModel>isNew}"
                             selectedKey="{
                                 path: 'viewModel>autoAcceptance',
                                 formatter:'.autoAcceptanceFormatter'
@@ -147,7 +136,7 @@
                                     minimum: 1
                                 }
                             }" 
-                            editable="{= ${viewModel>autoAcceptance} &amp;&amp; ${viewModel>isNew}}"
+                            editable="{viewModel>autoAcceptance}"
                             change=".onAutoAcceptanceDelayChange"/>
                         <Text />
                         <Text 
