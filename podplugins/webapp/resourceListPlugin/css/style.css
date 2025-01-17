@@ -1,1 +1,8 @@
 /* Enter your custom styles here */
+
+[data-style-class='ENABLED']{
+    background-color: #4caf50 !important;
+}
+div[data-style-class]:not([data-style-class='ENABLED']) {
+    background-color: #f44336 !important;
+}

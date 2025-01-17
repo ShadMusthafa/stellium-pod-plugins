@@ -1,13 +1,16 @@
 <mvc:View 
+    controllerName="stellium.ext.podplugins.resourceListPlugin.controller.PluginView" 
     xmlns:l="sap.ui.layout" 
     xmlns:mvc="sap.ui.core.mvc" 
     xmlns="sap.m" 
-    controllerName="stellium.ext.podplugins.resourceListPlugin.controller.PluginView" 
+    xmlns:f="sap.f"
+    xmlns:card="sap.f.cards"
+    xmlns:core="sap.ui.core"
     width="100%" 
     height="100%">
     <Panel id="podModelPluginPanel" width="100%" height="100%" expandable="false" expanded="true" accessibleRole="Region" backgroundDesign="Transparent">
         <content>
-           <Table id="idResourceListTable"
+           <!-- <Table id="idResourceListTable"
                 items="{
                     path: 'data>/lineItems',
                     sorter: { path: 'workCenter', group: true }
@@ -51,7 +54,52 @@
                         </cells>
                     </ColumnListItem>
                 </items>
-            </Table>
+            </Table> -->
+            <VBox id="tileContainer" items="{data>/items}">
+                <Panel width="100%" content="{data>resources}">
+                    <headerToolbar>
+                        <Toolbar>
+                            <Title text="{ path: 'data>workCenter', formatter: '.panelHeaderFormatter' }"/>
+                            <ToolbarSpacer id="_IDGenToolbarSpacer"/>
+                        </Toolbar>
+                    </headerToolbar>
+                    <content>
+                        <f:Card id="_IDGenCard1" class="sapUiMediumMargin" width="350px">
+                            <f:header>
+                                <card:Header id="_IDGenHeader" press=".onCardTitlePress">
+                                    <card:customData>
+                                        <core:CustomData key="style-class" value="{data>status}" writeToDom="true"/>
+                                    </card:customData>
+                                </card:Header>
+                            </f:header>
+                            <f:content>
+                                <VBox id="_IDGenVBox" class="sapUiSmallMargin" height="auto">
+                                <HBox id="_IDGenHBox" alignItems="Center" justifyContent="SpaceBetween" width="100%">
+                                    <Text id="_IDGenText1" text="{i18n>card-resourceLab}:"/>
+                                    <Text id="_IDGenText2" text="{data>resource}"/>
+                                </HBox>
+                                <HBox id="_IDGenHBox1" alignItems="Center" justifyContent="SpaceBetween" width="100%">
+                                    <Text id="_IDGenText3" text="{i18n>card-operatorLab}:"/>
+                                    <Text id="_IDGenText4" text="{data>customData/OPERATOR}"/>
+                                </HBox>
+                                <HBox id="_IDGenHBox2" alignItems="Center" justifyContent="SpaceBetween" width="100%">
+                                    <Text id="_IDGenText5" text="{i18n>card-orderLab}:"/>
+                                    <Text id="_IDGenText6" text="{data>customData/ORDER}"/>
+                                </HBox>
+                                <HBox id="_IDGenHBox3" alignItems="Center" justifyContent="SpaceBetween" width="100%">
+                                    <Text id="_IDGenText7" text="{i18n>card-Component}:"/>
+                                    <Text id="_IDGenText8" text="{data>customData/MATERIAL}"/>
+                                </HBox>
+                                <HBox id="_IDGenHBox4" alignItems="Center" justifyContent="SpaceBetween" width="100%">
+                                    <Text id="_IDGenText9" text="{i18n>card-target}:"/>
+                                    <Text id="_IDGenText10" text="{data>DESCRIPTION}"/>
+                                </HBox>
+                                </VBox>
+                            </f:content>
+                        </f:Card>
+                    </content>
+                </Panel>
+            </VBox>
         </content>
     </Panel>
 </mvc:View>

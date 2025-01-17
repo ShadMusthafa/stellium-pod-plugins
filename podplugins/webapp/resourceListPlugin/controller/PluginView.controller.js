@@ -92,34 +92,14 @@ sap.ui.define(['sap/ui/model/json/JSONModel', 'sap/dm/dme/podfoundation/controll
         return this._createCustomDataObject(aResources);
       });
 
-      this.getView().getModel('resourceData', aResources);
+      this.getView().getModel('resourceData').setData(aResources);
 
       //Get Workcenter data
       var aWorkCenters = await this._getWorkCenterData();
-      this.getView().getModel('workCenterData', aWorkCenters);
+      this.getView().getModel('workCenterData').setData(aWorkCenters);
 
-      var aLineItems = [];
-      for (var i = 0; i < aWorkCenters.length; i++) {
-        var oWorkCenter = aWorkCenters[i];
-        oWorkCenter.members.forEach(oMember => {
-          if (!oMember.resource && !oMember.resource.resource) return;
-
-          oMember.resource = aResources.find(oResource => oResource.resource === oMember.resource.resource);
-          var oCustomData = oMember.resource.customData;
-          aLineItems.push({
-            workCenter: oWorkCenter.workCenter,
-            workCenterDesc: oWorkCenter.description,
-            resource: oMember.resource.resource,
-            resourceType: oMember.resource.types,
-            resourceStatus: oMember.resource.status,
-            operator: oCustomData ? oCustomData.OPERATOR : '',
-            order: oCustomData ? oCustomData.ORDER : '',
-            component: oCustomData ? oCustomData.MATERIAL : '',
-            componentDesc: oCustomData ? oCustomData.MATERIAL_DESC : ''
-          });
-        });
-      }
-      this.getView().getModel('data').setProperty('/lineItems', aLineItems);
+      // this._createTableLineItems(aWorkCenters, aResources);
+      this._createPanelLineItems(aWorkCenters, aResources);
     },
 
     _getResourceData: function() {
@@ -151,6 +131,82 @@ sap.ui.define(['sap/ui/model/json/JSONModel', 'sap/dm/dme/podfoundation/controll
         oItem.customData = oCustomData;
         return oItem;
       });
+    },
+
+    _createTableLineItems: function(aWorkCenters, aResources) {
+      var aLineItems = [];
+      for (var i = 0; i < aWorkCenters.length; i++) {
+        var oWorkCenter = aWorkCenters[i];
+        oWorkCenter.members.forEach(oMember => {
+          if (!oMember.resource && !oMember.resource.resource) return;
+
+          oMember.resource = aResources.find(oResource => oResource.resource === oMember.resource.resource);
+          var oCustomData = oMember.resource.customData;
+          aLineItems.push({
+            workCenter: oWorkCenter.workCenter,
+            workCenterDesc: oWorkCenter.description,
+            resource: oMember.resource.resource,
+            resourceType: oMember.resource.types,
+            resourceStatus: oMember.resource.status,
+            operator: oCustomData ? oCustomData.OPERATOR : '',
+            order: oCustomData ? oCustomData.ORDER : '',
+            component: oCustomData ? oCustomData.MATERIAL : '',
+            componentDesc: oCustomData ? oCustomData.MATERIAL_DESC : ''
+          });
+        });
+      }
+      this.getView().getModel('data').setProperty('/lineItems', aLineItems);
+      return aLineItems;
+    },
+
+    _createPanelLineItems: function(aWorkCenters, aResources) {
+      var oResourceByWorkCenter = {};
+
+      for (var i = 0; i < aWorkCenters.length; i++) {
+        var oWorkCenter = aWorkCenters[i];
+        oWorkCenter.members.forEach(oMember => {
+          if (!oMember.resource && !oMember.resource.resource) return;
+
+          oMember.resource = aResources.find(oResource => oResource.resource === oMember.resource.resource);
+
+          // Ignore resource if not of type PORTIONING or FORMULATION
+          if (!oMember.resource.types.find(value => value.type === 'PORTIONING' || value.type === 'FORMULATION')) {
+            return;
+          }
+
+          if (!oResourceByWorkCenter[oWorkCenter.workCenter]) {
+            oResourceByWorkCenter[oWorkCenter.workCenter] = {
+              workCenter: oWorkCenter.workCenter,
+              workCenterDesc: oWorkCenter.description,
+              resources: []
+            };
+          }
+
+          oResourceByWorkCenter[oWorkCenter.workCenter].resources.push(oMember.resource);
+        });
+      }
+
+      var aResourceList = Object.values(oResourceByWorkCenter);
+
+      var aResourceItems = aResourceList.reduce((acc, val) => {
+        acc = acc.concat(val.resources.map(oItem => oItem.resource));
+        return acc;
+      }, []);
+
+      var aResourcesWithoutWorkcenter = aResources.filter(oResource => {
+        var oValidItem = oResource.types.find(value => value.type === 'PORTIONING' || value.type === 'FORMULATION');
+        if (!oValidItem) return false;
+        return !aResourceItems.includes(oResource.resource);
+      });
+
+      aResourceList.push({
+        workCenter: 'Not Assigned',
+        workCenterDesc: 'Not Assigned',
+        resources: aResourcesWithoutWorkcenter
+      });
+
+      this.getView().getModel('data').setProperty('/items', aResourceList);
+      return aResourceList;
     }
   });
 
