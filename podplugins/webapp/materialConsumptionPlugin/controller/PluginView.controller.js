@@ -4525,6 +4525,16 @@ sap.ui.define(
           return;
         }
 
+        if (!this.getConfiguration().allowWeighWithoutTolerance) {
+          var oLineItem = oEvent.getSource().getBindingContext().getObject(),
+            upperThresholdValue = parseFloat(oLineItem.upperThresholdValue),
+            lowerThresholdValue = parseFloat(oLineItem.lowerThresholdValue);
+          if (isNaN(upperThresholdValue) || isNaN(lowerThresholdValue)) {
+            MessageBox.error(this.getI18nText('weighNotAllowedWithoutThresholdErrMsg'));
+            return;
+          }
+        }
+
         // Init Functions
         this.getWorkCenters();
 
@@ -5218,7 +5228,7 @@ sap.ui.define(
           }
 
           //If the consumed quantity is equal to target quantity, then no validation requirement
-          if(aLineItems[i].consumedQuantity.value === aLineItems[i].targetQuantity.value){
+          if (aLineItems[i].consumedQuantity.value === aLineItems[i].targetQuantity.value) {
             continue;
           }
 
