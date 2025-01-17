@@ -36,10 +36,13 @@ sap.ui.define(
             remove: {
               enabled: false
             }
-          }
+          },
+          lineItems: [],
+          workCenters: []
         };
 
         this.materialsList = {};
+        this.workCenters = {};
 
         this.getView().setModel(new JSONModel(oViewData), 'viewModel');
         this.getView().setModel(new JSONModel([]), 'resourceData');
@@ -89,6 +92,8 @@ sap.ui.define(
               acc[val.workCenter] = val;
               return acc;
             }, {});
+
+            this._getWorkCenterData(this.workCenters);
 
             this.getView().getModel('orderData').setData(oOrderData);
           }.bind(this)
@@ -193,12 +198,19 @@ sap.ui.define(
           return;
         }
 
+        //Check if operator is available in workcenter
+        var oOperator = oLineItemData.userAssignments.find(oItem => oItem.userId === sOperatorId);
+
+        if (!oOperator) {
+          ErrorHandler.setErrorState(oControl, this.getI18nText('userNotFoundInWorkCenter', [sOperatorId, oLineItemData.workCenter]));
+          return;
+        }
+
         //Check if operator is assigned to other resource or not
         var oResourceForOperator = aResourceList.find(oItem => oItem.customData && oItem.customData.OPERATOR === sOperatorId);
         if (oResourceForOperator) {
           ErrorHandler.setErrorState(oControl, this.getI18nText('operatorAlreadyAssignedErrMsg', [oResourceForOperator.resource]));
-        } else {
-          ErrorHandler.clearErrorState(oControl);
+          return;
         }
       },
 
@@ -430,6 +442,26 @@ sap.ui.define(
         );
       },
 
+      _getWorkCenterData: function(oWorkCenters) {
+        var aWorkCenters = Object.keys(oWorkCenters);
+        var aPromises = aWorkCenters.map(oWorkCenter => {
+          return new Promise((resolve, reject) => {
+            var sUrl = this.getPublicApiRestDataSourceUri() + 'workcenter/v2/workcenters';
+            var oParameters = {
+              plant: this.getPodController().getUserPlant(),
+              workCenter: oWorkCenter
+            };
+            this.ajaxGetRequest(sUrl, oParameters, resolve, reject);
+          });
+        });
+
+        Promise.all(aPromises).then(aResponse => {
+          aResponse.map(oResponse => {
+            this.workCenters[oResponse[0].workCenter] = oResponse[0];
+          });
+        });
+      },
+
       _getAssignmentData: async function() {
         var aResourceList = await this._getResourceData();
         var aResources = this._createCustomDataObject(aResourceList);
@@ -529,7 +561,8 @@ sap.ui.define(
               lastModified: '',
               operationActivity: phase.recipeOperation.operationActivity.operationActivity,
               bom: component.bomComponent.bom.bom,
-              bomVersion: component.bomComponent.bom.version
+              bomVersion: component.bomComponent.bom.version,
+              userAssignments: this.workCenters[phase.workCenter].userAssignments
             }))
           )
         );

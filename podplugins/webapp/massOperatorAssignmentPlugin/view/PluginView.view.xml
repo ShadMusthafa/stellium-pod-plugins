@@ -109,7 +109,16 @@
                         <VBox items="{viewModel>resourceType}">
                             <Text text="{viewModel>type}"/>
                         </VBox>
-                        <Input value="{viewModel>operator}" editable="{viewModel>isNew}" change=".onAssignedOperatorIdChange"/>
+                        <Input 
+                            showSuggestion="true"
+                            suggestionItems="{viewModel>userAssignments}"
+                            editable="{viewModel>isNew}" 
+                            value="{viewModel>operator}" 
+                            change=".onAssignedOperatorIdChange">
+                            <suggestionItems>
+                                <core:ListItem key="{viewModel>userId}" text="{viewModel>userId}"/>
+                            </suggestionItems>
+                        </Input>
                         <!-- <Select 
                             selectedKey="{
                                 path: 'viewModel>autoAcceptance',
