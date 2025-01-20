@@ -138,7 +138,16 @@
                             }" 
                             editable="{viewModel>autoAcceptance}"
                             change=".onAutoAcceptanceDelayChange"/>
-                        <Text />
+                        <Input 
+                            value="{
+                                path: 'viewModel>acceptanceDelay',
+                                type: 'sap.ui.model.type.Integer',
+                                constraints: {
+                                    minimum: 1
+                                }
+                            }"
+                            editable="{viewModel>autoAcceptance}"
+                            change=".onCorrectionTimeInputChange" />
                         <Text 
                             text="{
                                 path: 'viewModel>lastModified',

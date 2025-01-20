@@ -236,17 +236,11 @@ sap.ui.define(
       onAutoAcceptanceDelayChange: function(oEvent) {
         var oContext = oEvent.getSource().getBindingContext('viewModel');
         this._markItemAsDirty(oContext);
+      },
 
-        // var oInput = oEvent.getSource(),
-        //   iAcceptanceDelay = oEvent.getParameter('newValue');
-
-        // //Check if the entered value is a positive non-zero integer
-        // var regex = /^0*[1-9]\d*$/;
-        // if (!regex.test(iAcceptanceDelay)) {
-        //   ErrorHandler.setErrorState(oInput, this.getI18nText('inputPositiveNonZeroErrMsg'));
-        // } else {
-        //   ErrorHandler.clearValueState(oInput);
-        // }
+      onCorrectionTimeInputChange: function(oEvent) {
+        var oContext = oEvent.getSource().getBindingContext('viewModel');
+        this._markItemAsDirty(oContext);
       },
 
       onRevokeResouceBtnPress: function(oEvent) {
