@@ -199,12 +199,13 @@ sap.ui.define(
           return;
         }
 
+        //No operator text validation. Operator can be some generic text as well
         //Check if operator is available in workcenter
-        var oOperator = oLineItemData.userAssignments.find(oItem => oItem.userId === sOperatorId);
-        if (!oOperator) {
-          ErrorHandler.setErrorState(oControl, this.getI18nText('userNotFoundInWorkCenter', [sOperatorId, oLineItemData.workCenter]));
-          return;
-        }
+        // var oOperator = oLineItemData.userAssignments.find(oItem => oItem.userId === sOperatorId);
+        // if (!oOperator) {
+        //   ErrorHandler.setErrorState(oControl, this.getI18nText('userNotFoundInWorkCenter', [sOperatorId, oLineItemData.workCenter]));
+        //   return;
+        // }
 
         //Check if operator is assigned to other resource or not
         var oResourceForOperator = aResourceList.find(oItem => oItem.customData && oItem.customData.OPERATOR === sOperatorId);
