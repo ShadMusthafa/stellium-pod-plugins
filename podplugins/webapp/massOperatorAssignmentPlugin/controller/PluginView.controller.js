@@ -475,7 +475,11 @@ sap.ui.define(
 
       _getAssignmentData: async function() {
         var aResourceList = await this._getResourceData();
-        var aResources = this._createCustomDataObject(aResourceList);
+        //Consider only resources of type PORTIONING or FORMULATION
+        var aValidResources = aResourceList.filter(oResource =>
+          oResource.types.find(oType => oType.type === 'PORTIONING' || oType.type === 'FORMULATION')
+        );
+        var aResources = this._createCustomDataObject(aValidResources);
         this.getView().getModel('resourceData').setData(aResources);
 
         ErrorHandler.clearAllErrors();
