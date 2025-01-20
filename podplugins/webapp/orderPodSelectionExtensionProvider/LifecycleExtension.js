@@ -65,8 +65,14 @@ sap.ui.define([
             setTimeout(function() {
                 // that._oExtensionUtility.loadOverflowToolbar(that.onHelpPress, that);
                 that._oExtensionUtility.loadFilterBar(that.onCustomFilterPress, that);
-                //Publish the event to update the sfc status filter
+
+                //Set values to original sfcStatusFilter control and publish events 
+                that.getController().byId('sfcStatusFilter').setSelectedKeys(['404']);
+                that.getController().byId('sfcStatusFilter').fireChange()
+                that.getController().byId('sfcStatusFilter').fireChangeEvent()
                 that.getController().publishChangeEvent("sfcStatusFilterChangeEvent",{"source": this, "selectedStatuses": ['404']});
+                
+                //Create and load the custom SFC status filter
                 that._oExtensionUtility.loadCustomChargeStatusFilter(that.onCustomFilterPress, that);
             }, 1000);
         },
