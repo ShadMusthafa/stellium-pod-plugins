@@ -96,6 +96,7 @@
                             forceSelection="false"
                             showSecondaryValues="true"
                             columnRatio="2:3"
+                            enabled="{viewModel>isNew}"
                             items="{resourceData>/}"
                             selectedKey="{viewModel>resource}"
                             change=".onAssignedResourceChanged">
@@ -111,6 +112,7 @@
                         <Input 
                             showSuggestion="true"
                             suggestionItems="{viewModel>userAssignments}"
+                            enabled="{viewModel>isNew}"
                             value="{viewModel>operator}" 
                             change=".onAssignedOperatorIdChange">
                             <suggestionItems>
@@ -119,6 +121,7 @@
                         </Input>
                         <SegmentedButton  
                             selectionChange=".onAutoAcceptanceModeChange"
+                            enabled="{viewModel>isNew}"
                             selectedKey="{
                                 path: 'viewModel>autoAcceptance',
                                 formatter:'.autoAcceptanceFormatter'
@@ -136,7 +139,7 @@
                                     minimum: 1
                                 }
                             }" 
-                            editable="{viewModel>autoAcceptance}"
+                            editable="{= ${viewModel>autoAcceptance} &amp;&amp; ${viewModel>isNew}}"
                             change=".onAutoAcceptanceDelayChange"/>
                         <Input 
                             value="{
@@ -146,7 +149,7 @@
                                     minimum: 1
                                 }
                             }"
-                            editable="{viewModel>autoAcceptance}"
+                            editable="{= ${viewModel>autoAcceptance} &amp;&amp; ${viewModel>isNew}}"
                             change=".onCorrectionTimeInputChange" />
                         <Text 
                             text="{
