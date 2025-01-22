@@ -40,6 +40,17 @@ sap.ui.define(['sap/dm/dme/constants/DMCConstants', 'sap/dm/dme/formatter/Number
       return formattedQty;
     },
 
+    formatQty: function(quantity) {
+      if (isNaN(quantity)) return;
+      var NumInstance = NumberFormat.getFloatInstance(
+        {
+          decimals: 3
+        },
+        sap.ui.getCore().getConfiguration().getLocale()
+      );
+      return NumInstance.format(quantity);
+    },
+
     getActualValue: function(consumedQuantity, consumedQtyEntryUom) {
       var consumedQuantity = this.oFormatter.getValidConsumedQty(consumedQuantity, consumedQtyEntryUom);
       var actualValue = this.oFormatter.formatQtyWithDecimals(consumedQuantity.value, consumedQuantity.unitOfMeasure.uom);

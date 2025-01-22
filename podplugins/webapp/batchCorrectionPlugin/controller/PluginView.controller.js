@@ -133,6 +133,8 @@ sap.ui.define(
                 }
               };
 
+              oLineItem.batchCorrectionWeightCalc = { ...oLineItem.batchCorrectionWeight };
+
               oLineItem.issueWeight = {
                 value: oItem.calcqty - oLineItem.consumedQuantity.value,
                 unitOfMeasure: {
@@ -142,6 +144,7 @@ sap.ui.define(
             });
             oGiModel.setProperty('/lineItems', aLineItems);
             this._setScaleFactorEnabled(true);
+            this.getView().getModel('viewModel').setProperty('/scaleFactor/value', 1);
           }.bind(this)
         );
       },

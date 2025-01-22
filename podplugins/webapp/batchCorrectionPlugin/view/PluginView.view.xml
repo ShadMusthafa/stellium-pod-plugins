@@ -33,6 +33,7 @@
                     <Column><Text text="{i18n>measureColLab}"/></Column>
                     <Column><Text text="{i18n>statusColLab}"/></Column>
                     <Column><Text text="{i18n>correctionColLab}"/></Column>
+                    <Column><Text text="{i18n>correctionInputColLab}"/></Column>
                     <Column><Text text="{i18n>issueColLab}"/></Column>
                 </columns>
                 <items>
@@ -71,14 +72,26 @@
                                 }" />
                             <ObjectNumber
                                 number="{
-                                    parts: ['giData>batchCorrectionWeight/value', 'giData>batchCorrectionWeight/unitOfMeasure/uom'],
-                                    formatter:'oFormatter.formatQtyWithDecimals'
-                                }"
-                                unit="{giData>batchCorrectionWeight/unitOfMeasure/uom}" />
+                                    path:'giData>batchCorrectionWeightCalc/value',
+                                    formatter:'oFormatter.formatQty'
+                                }" 
+                                unit="{giData>batchCorrectionWeight/unitOfMeasure/uom}"/>
+                            <HBox alignItems="Center" >
+                                <Input value="{giData>batchCorrectionWeight/value}">
+                                    <layoutData>
+                                        <FlexItemData growFactor="2" />
+                                    </layoutData>
+                                </Input>
+                                <Text text="{giData>batchCorrectionWeight/unitOfMeasure/uom}" textAlign="Center" width="2rem">
+                                    <layoutData>
+                                        <FlexItemData growFactor="1" />
+                                    </layoutData>
+                                </Text>
+                            </HBox>
                             <ObjectNumber
                                 number="{
-                                    parts: ['giData>issueWeight/value', 'giData>issueWeight/unitOfMeasure/uom'],
-                                    formatter:'oFormatter.formatQtyWithDecimals'
+                                    path: 'giData>issueWeight/value',
+                                    formatter:'oFormatter.formatQty'
                                 }"
                                 unit="{giData>issueWeight/unitOfMeasure/uom}" />
                         </cells>
