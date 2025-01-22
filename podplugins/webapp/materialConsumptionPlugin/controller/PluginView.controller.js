@@ -61,6 +61,8 @@ sap.ui.define(
       oFormatter: Formatter,
       GRPostController: GRPostController,
       oCoBiProduct: {},
+      parkedItemList: [],
+
       onInit: function() {
         if (ListPluginViewController.prototype.onInit) {
           ListPluginViewController.prototype.onInit.apply(this, arguments);
@@ -1921,6 +1923,11 @@ sap.ui.define(
         }
 
         var selectedMaterial = oEvent.getSource().getBindingContext().getObject().materialId.material;
+        if (this._hasParkedItems() && !this._checkIfItemIsParked(selectedMaterial)) {
+          MessageBox.error(this.getI18nText('processParkedItemsErrMsg', [this._getParkedMaterialList(), selectedMaterial]));
+          return;
+        }
+
         var selectedMaterialRef = oEvent.getSource().getBindingContext().getObject().materialId.ref;
         var selectedMaterialVersion = oEvent.getSource().getBindingContext().getObject().materialId.version;
         var selectedMaterialDesc = oEvent.getSource().getBindingContext().getObject().description;
@@ -5207,9 +5214,9 @@ sap.ui.define(
       },
 
       /**
-           * If any of the table items have bom components meeting the 'Park' or 'Batch Correction' criteria,
-           * show error message and navigate user back to order selection screen
-           */
+       * If any of the table items have bom components meeting the 'Park' or 'Batch Correction' criteria,
+       * show error message and navigate user back to order selection screen
+       */
       _checkBatchCorrectionCondition: function() {
         if (!this.giModel) return;
 
@@ -5257,6 +5264,8 @@ sap.ui.define(
           return;
         }
 
+        this.parkedItemList = aParkedItems;
+
         if (aParkedItems && aParkedItems.length > 0) {
           var sWarningMsg = this.getI18nText('parkWarningMessage', [aParkedItems[0].materialId.material, sShopOrder]);
           MessageBox.warning(sWarningMsg);
@@ -5266,6 +5275,22 @@ sap.ui.define(
       _validatePhaseStatus: function() {
         if (this.selectedDataInList.status === 'ACTIVE') return true;
         return false;
+      },
+
+      _hasParkedItems: function() {
+        return this.parkedItemList && this.parkedItemList.length > 0;
+      },
+
+      _checkIfItemIsParked: function(sMaterial) {
+        return this.parkedItemList.find(oItem => oItem.materialId.material === sMaterial) ? true : false;
+      },
+
+      _getParkedMaterialList: function() {
+        if (!this.parkedItemList && this.parkedItemList.length === 0) {
+          return '';
+        }
+
+        return this.parkedItemList.map(oItem => oItem.materialId.material).join(',');
       }
     });
   }
