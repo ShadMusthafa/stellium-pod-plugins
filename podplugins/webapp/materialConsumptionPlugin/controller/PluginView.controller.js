@@ -5258,8 +5258,9 @@ sap.ui.define(
           var sErrorMessage = this.getI18nText('batchCorrectionRequiredErrorMessage', [sShopOrder]);
           MessageBox.error(sErrorMessage, {
             onClose: function() {
+              this._setSfcHoldStatus();
               window.history.go(-1);
-            }
+            }.bind(this)
           });
           return;
         }
@@ -5270,6 +5271,18 @@ sap.ui.define(
           var sWarningMsg = this.getI18nText('parkWarningMessage', [aParkedItems[0].materialId.material, sShopOrder]);
           MessageBox.warning(sWarningMsg);
         }
+      },
+
+      _setSfcHoldStatus: function() {
+        var sUrl = this.getPublicApiRestDataSourceUri() + 'sfc/v1/sfcs/hold';
+        var oRequestBody = {
+          plant: this.getPodController().getUserPlant(),
+          sfcs: [this.selectedDataInList.selectedSfc],
+          comments: 'On hold for batch correction',
+          expectedReleaseDateTime: moment().add(1, 'days')
+        };
+
+        this.ajaxPostRequest(sUrl, oRequestBody);
       },
 
       _validatePhaseStatus: function() {
