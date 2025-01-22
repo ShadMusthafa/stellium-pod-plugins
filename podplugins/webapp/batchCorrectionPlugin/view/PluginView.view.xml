@@ -1,0 +1,98 @@
+<mvc:View 
+    controllerName="stellium.ext.podplugins.batchCorrectionPlugin.controller.PluginView" 
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns="sap.m" 
+    width="100%" 
+    height="100%">
+    <!-- <Panel id="podModelPluginPanel" width="100%" height="100%" expandable="false" expanded="true" accessibleRole="Region" backgroundDesign="Transparent"> -->
+    <Page showFooter="true">
+        <content>
+            <Table id="idBatchTable" items="{giData>/lineItems}" visible="true" class="sapUiSmallMargin" popinLayout="GridLarge" >
+                <headerToolbar>
+                    <Toolbar width="100%">
+                        <Title id="idBatchtitleText" level="H2" text="{= 'Batch Summary (' + ${masterListBatch>/}.length + ')'}" />
+                        <ToolbarSpacer/>
+                        <Label text="{i18n>scaleFactor}" class="sapUiTinyMarginEnd"/>
+                        <StepInput 
+                            id="idStepInput"
+                            value="{viewModel>/scaleFactor/value}"
+                            min="{viewModel>/scaleFactor/min}"
+                            max="{viewModel>/scaleFactor/max}"
+                            step="{viewModel>/scaleFactor/stepSize}"
+                            displayValuePrecision="{viewModel>/scaleFactor/precision}"
+                            change="onStepInputChange" 
+                            width="10rem"
+                            class="sapUiTinyMarginEnd" />
+                        <Button text="Calculate Correction" press=".onCalculateBatchCorrectionBtnPress"/>
+                        <Text text="" />
+                    </Toolbar>
+                </headerToolbar>
+                <columns>
+                    <Column><Text text="{i18n>componentColLab}"/></Column>
+                    <Column><Text text="{i18n>bomTargetColLab}"/></Column>
+                    <Column><Text text="{i18n>measureColLab}"/></Column>
+                    <Column><Text text="{i18n>statusColLab}"/></Column>
+                    <Column><Text text="{i18n>correctionColLab}"/></Column>
+                    <Column><Text text="{i18n>issueColLab}"/></Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <ObjectIdentifier 
+                                title="{giData>materialId/material}" 
+                                text="{giData>description}"/>
+                            <ObjectNumber
+                                number="{
+                                    parts:[
+                                        {path:'giData>totalQtyEntryUom'},
+                                        {path:'giData>totalQtyBaseUom'},
+                                        {path:'giData>targetQuantity'}
+                                    ],
+                                    formatter:'.oFormatter.getValidTargetValues'
+                                }" 
+                                unit="{giData>targetQuantity/unitOfMeasure/uom}"/>
+                            <ObjectNumber
+                                number="{
+                                    parts:['giData>consumedQuantity/value','giData>consumedQuantity/unitOfMeasure/uom'],
+                                    formatter: '.oFormatter.formatQtyWithDecimals'
+                                }"
+                                unit="{giData>consumedQuantity/unitOfMeasure/uom}"/>
+                            <ObjectStatus
+                                text="{
+                                    path: 'giData>status',
+                                    formatter: 'oFormatter.statusTextFormatter'
+                                }"
+                                inverted="true"
+                                icon="sap-icon://alert"
+                                visible="{= ${giData>status} !== ''}"
+                                state="{
+                                    path:'giData>status',
+                                    formatter: '.oFormatter.stateFormatter'
+                                }" />
+                            <ObjectNumber
+                                number="{
+                                    parts: ['giData>batchCorrectionWeight/value', 'giData>batchCorrectionWeight/unitOfMeasure/uom'],
+                                    formatter:'oFormatter.formatQtyWithDecimals'
+                                }"
+                                unit="{giData>batchCorrectionWeight/unitOfMeasure/uom}" />
+                            <ObjectNumber
+                                number="{
+                                    parts: ['giData>issueWeight/value', 'giData>issueWeight/unitOfMeasure/uom'],
+                                    formatter:'oFormatter.formatQtyWithDecimals'
+                                }"
+                                unit="{giData>issueWeight/unitOfMeasure/uom}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button text="{i18n>approve}" type="Accept" press="onApprove"/>
+                <Button text="{i18n>reject}" type="Reject" press="onReject"/>
+            </Toolbar>
+        </footer>
+    </Page>
+    <!-- </Panel> -->
+</mvc:View>
