@@ -77,7 +77,7 @@
                                 }" 
                                 unit="{giData>batchCorrectionWeight/unitOfMeasure/uom}"/>
                             <HBox alignItems="Center" >
-                                <Input value="{giData>batchCorrectionWeight/value}">
+                                <Input value="{giData>batchCorrectionWeight/value}" change=".onBatchCorrectionWtChange">
                                     <layoutData>
                                         <FlexItemData growFactor="2" />
                                     </layoutData>

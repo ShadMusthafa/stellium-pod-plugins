@@ -4,9 +4,10 @@ sap.ui.define(
     'sap/dm/dme/podfoundation/controller/PluginViewController',
     'sap/base/Log',
     '../utils/formatter',
-    'sap/m/MessageBox'
+    'sap/m/MessageBox',
+    'sap/m/MessageToast'
   ],
-  function(JSONModel, PluginViewController, Log, formatter, MessageBox) {
+  function(JSONModel, PluginViewController, Log, formatter, MessageBox, MessageToast) {
     'use strict';
 
     var oLogger = Log.getLogger('batchCorrectionPlugin', Log.Level.INFO);
@@ -156,11 +157,32 @@ sap.ui.define(
 
         aLineItems.forEach(oItem => {
           oItem.batchCorrectionWeight.value = oItem.batchCorrectionWeight.value / this.currentScaleFactor * newValue;
+          oItem.batchCorrectionWeightCalc.value = oItem.batchCorrectionWeightCalc.value / this.currentScaleFactor * newValue;
           oItem.issueWeight.value = oItem.batchCorrectionWeight.value - oItem.consumedQuantity.value;
         });
 
         oGiModel.setProperty('/lineItems', aLineItems);
         this.currentScaleFactor = newValue;
+      },
+
+      onBatchCorrectionWtChange: function(oEvent) {
+        var fNewValue = parseFloat(oEvent.getSource().getValue());
+        if (isNaN(fNewValue)) {
+          return;
+        }
+
+        var oContext = oEvent.getSource().getBindingContext('giData'),
+          oItem = oContext.getObject();
+        oItem.issueWeight.value = oItem.batchCorrectionWeight.value - oItem.consumedQuantity.value;
+      },
+
+      onReject: function() {
+        MessageBox.confirm(this.getI18nText('scrapSfcConfirmationMsg', [this.selectedOrder.sfc]), {
+          onClose: function(sAction) {
+            if (sAction !== MessageBox.Action.OK) return;
+            this._postSfcScrap();
+          }.bind(this)
+        });
       },
 
       _getRoutingDetailsForOrder: function(sOrderId) {
@@ -210,6 +232,38 @@ sap.ui.define(
 
       _setScaleFactorEnabled: function(bFlag) {
         this.byId('idStepInput').setEnabled(bFlag);
+      },
+
+      _postSfcScrap: async function() {
+        var oGRSummary = await this._getGoodsReceiptSummary();
+        var sUrl = this.getPublicApiRestDataSourceUri() + 'sfc/v1/sfcs/scrap';
+        var oRequestBody = {
+          plant: this.getPodController().getUserPlant(),
+          sfcs: [this.selectedOrder.sfc],
+          quantity: oGRSummary.quantityInBaseUnit.value
+        };
+
+        this.ajaxPostRequest(
+          sUrl,
+          oRequestBody,
+          function(oResponse) {
+            MessageToast.show(this.getI18nText('sfcScrapped', [this.selectedOrder.sfc]));
+            this.navigateToPage('MainPage');
+            oLogger.info('SFC scrap service response', oResponse);
+          }.bind(this)
+        );
+      },
+
+      _getGoodsReceiptSummary: function() {
+        var sUrl = this.getPublicApiRestDataSourceUri() + 'inventory/v1/inventory/goodsReceipts/summarize';
+        var oParams = {
+          plant: this.getPodController().getUserPlant(),
+          sfc: this.selectedOrder.sfc,
+          order: this.selectedOrder.order
+        };
+        return new Promise((resolve, reject) => {
+          this.ajaxGetRequest(sUrl, oParams, resolve, reject);
+        });
       }
     });
 
