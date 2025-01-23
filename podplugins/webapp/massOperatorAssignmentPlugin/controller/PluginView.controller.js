@@ -53,7 +53,9 @@ sap.ui.define(
       /**
      * @see PluginViewController.onBeforeRenderingPlugin()
      */
-      onBeforeRenderingPlugin: function() {},
+      onBeforeRenderingPlugin: function() {
+        this.PPD_BASE_URL = this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?';
+      },
 
       onExit: function() {
         if (PluginViewController.prototype.onExit) {
@@ -142,7 +144,7 @@ sap.ui.define(
         console.log(aSelectedRows);
       },
 
-      onAssignedResourceChanged: function(oEvent) {
+      onAssignedResourceChanged: async function(oEvent) {
         var oControl = oEvent.getSource(),
           oViewModel = this.getView().getModel('viewModel'),
           oSelectedContext = oControl.getBindingContext('viewModel'),
@@ -168,18 +170,29 @@ sap.ui.define(
           return;
         }
 
-        //Validate resource assignment
-        if (oResourceData.customData.ORDER) {
-          ErrorHandler.setErrorState(
-            oControl,
-            this.getI18nText('ResourceAssignedToOtherOrderErrMsg', [oResourceData.customData.ORDER]),
-            'selectedKey'
-          );
-          return;
-        }
+        // //Validate resource assignment
+        // if (oResourceData.customData.ORDER) {
+        //   ErrorHandler.setErrorState(
+        //     oControl,
+        //     this.getI18nText('ResourceAssignedToOtherOrderErrMsg', [oResourceData.customData.ORDER]),
+        //     'selectedKey'
+        //   );
+        //   return;
+        // }
 
-        //Set selected resource to line item
-        this._setLineItemResourceData(oViewModel, oSelectedContext.getPath(), oResourceData);
+        this._getResourceOccupancy(oResourceData.resource).then(oResourceOccupancy => {
+          if (oResourceOccupancy['State_Signal'] !== 0) {
+            ErrorHandler.setErrorState(
+              oControl,
+              this.getI18nText('resourceHasExistingOperatorAssignmentErrMsg', [oResourceData.resource, oResourceOccupancy.OperatorName]),
+              'selectedKey'
+            );
+            return;
+          }
+
+          //Set selected resource to line item
+          this._setLineItemResourceData(oViewModel, oSelectedContext.getPath(), oResourceData);
+        });
       },
 
       onAssignedOperatorIdChange: function(oEvent) {
@@ -199,20 +212,16 @@ sap.ui.define(
           return;
         }
 
-        //No operator text validation. Operator can be some generic text as well
-        //Check if operator is available in workcenter
-        // var oOperator = oLineItemData.userAssignments.find(oItem => oItem.userId === sOperatorId);
-        // if (!oOperator) {
-        //   ErrorHandler.setErrorState(oControl, this.getI18nText('userNotFoundInWorkCenter', [sOperatorId, oLineItemData.workCenter]));
-        //   return;
-        // }
+        this._getOperatorOccupancy(sOperatorId).then(function(oResponse) {
+          if (!oResponse.outOperator.length) {
+            return;
+          }
 
-        //Check if operator is assigned to other resource or not
-        var oResourceForOperator = aResourceList.find(oItem => oItem.customData && oItem.customData.OPERATOR === sOperatorId);
-        if (oResourceForOperator) {
-          ErrorHandler.setErrorState(oControl, this.getI18nText('operatorAlreadyAssignedErrMsg', [oResourceForOperator.resource]));
-          return;
-        }
+          ErrorHandler.setErrorState(
+            oControl,
+            this.getI18nText('operatorAssignedToOtherResourceErrMsg', [sOperatorId, oResponse.outOperator[0].RESOURCE])
+          );
+        });
       },
 
       onAutoAcceptanceModeChange: function(oEvent) {
@@ -249,20 +258,20 @@ sap.ui.define(
 
         var aPromises = aSelectedItems.map(
           function(oItem) {
+            var oViewModel = this.getView().getModel('viewModel');
             var oSelectedRowData = oItem.getBindingContext('viewModel').getObject();
-            var oRequestBody = {
-              plant: this.getPodController().getUserPlant(),
-              resource: oSelectedRowData.resource,
-              modifiedDateTime: oSelectedRowData.resourceLastModifiedAt
-            };
-            oRequestBody.customValues = this._createCustomValuesForResource(oSelectedRowData, true);
-            return this._patchResourceServiceCall(oRequestBody);
+            var sPath = oItem.getBindingContext('viewModel').getPath;
+            return this._revokeResource(oSelectedRowData.resource).then(
+              function() {
+                this._setLineItemResourceData(oViewModel, sPath, null, true);
+              }.bind(this)
+            );
           }.bind(this)
         );
 
         Promise.allSettled(aPromises).then(
           function() {
-            this._getAssignmentData();
+            // this._getAssignmentData();
             oTable.removeSelections(true);
           }.bind(this)
         );
@@ -560,6 +569,7 @@ sap.ui.define(
               phaseId: phase.phaseId,
               component: component.bomComponent.material.material,
               componentDesc: '',
+              componentVersion: component.bomComponent.material.version,
               asset: '',
               resource: '',
               resourceType: '',
@@ -620,33 +630,11 @@ sap.ui.define(
         var aRequestItems = [];
         for (var i = 0; i < aItems.length; i++) {
           var oItem = aItems[i];
-
-          //If assigned resource has been changed, revoke original assignment
-          if (oItem.existingAssignment && oItem.existingAssignment.resource !== oItem.resource) {
-            var oRevokeRequestBody = {
-              plant: this.getPodController().getUserPlant(),
-              resource: oItem.existingAssignment.resource,
-              customValues: this._createCustomValuesForResource(oItem.existingAssignment, true),
-              modifiedDateTime: oItem.existingAssignment.resourceLastModifiedAt
-            };
-            aRequestItems.push(oRevokeRequestBody);
-          }
-
-          var oRequestBody = {
-            plant: this.getPodController().getUserPlant(),
-            resource: oItem.resource,
-            customValues: this._createCustomValuesForResource(oItem),
-            modifiedDateTime: oItem.resourceLastModifiedAt
-          };
-          aRequestItems.push(oRequestBody);
+          aPromises.push(this._assignResource(oItem));
         }
 
-        var aPromises = aRequestItems.map(oRequestBody => {
-          return this._patchResourceServiceCall(oRequestBody);
-        });
-
         Promise.allSettled(aPromises).then(
-          function(aData) {
+          function() {
             this._getAssignmentData(this.selectedOrder.order);
             this.getView().getModel('viewModel').setProperty('/isDirty', false);
           }.bind(this)
@@ -807,6 +795,75 @@ sap.ui.define(
         return customValues;
       },
 
+      _getResourceOccupancy: function(sResourceId) {
+        var sUrl = this.PPD_BASE_URL + 'key=REG_f22f235e-1e89-4553-b952-7ac229b79065&async=false';
+        var oPayload = {
+          InPlant: this.getPodController().getUserPlant(),
+          InResource: sResourceId
+        };
+
+        return new Promise((resolve, reject) => {
+          this.ajaxPostRequest(sUrl, oPayload, resolve, reject);
+        }).then(function(oResponse) {
+          return oResponse.indicatorOutput.reduce((acc, val) => {
+            acc[val.referenceName] = val.value;
+            return acc;
+          }, {});
+        });
+      },
+
+      _getOperatorOccupancy: function(sOperatorId) {
+        var sUrl = this.PPD_BASE_URL + 'key=REG_8f3da8b6-8b63-49a6-a45c-f13a029f7812&async=false';
+        var oPayload = {
+          InOperator: sOperatorId
+        };
+
+        return new Promise((resolve, reject) => {
+          this.ajaxPostRequest(sUrl, oPayload, resolve, reject);
+        });
+      },
+
+      _revokeResource: function(sResourceId) {
+        var sUrl = this.PPD_BASE_URL + 'key=REG_c245216f-4e25-4b85-8593-ed44db51a531&async=false';
+        var oPayload = {
+          InPlant: this.getPodController().getUserPlant(),
+          InResource: sResourceId
+        };
+
+        return new Promise((resolve, reject) => {
+          this.ajaxPostRequest(sUrl, oPayload, resolve, reject);
+        });
+      },
+
+      _assignResource: function(oItem) {
+        var sUrl = this.PPD_BASE_URL + 'REG_e64981d3-2a78-4751-8e86-f796485f1db5&async=false';
+        var oPayload = {
+          InOrderStatus: this.selectedOrder.executionStatus,
+          InHeaderMaterialDesc: this.selectedOrder.material.description,
+          InHeaderMaterial: this.selectedOrder.material.material,
+          InPlant: this.getPodController().getUserPlant(),
+          InResource: oItem.resource,
+          InMaterial: oItem.component,
+          InWorkCenter: oItem.workCenter,
+          InOperator: oItem.operator,
+          InAutAcceptance: oItem.autoAcceptance,
+          InAutoTimeDelay: oItem.acceptanceDelay,
+          InSubWeighing: oItem.resourceType.find(oType => oType.type === 'PORTIONING') ? true : false,
+          InSFC: this.selectedSFC,
+          InOrderBO: this.selectedOrder.order,
+          InOperationActivity: oItem.operationActivity,
+          InUOM: 'KG', //TBD leave blank for now
+          InERPSequence: '', //TBD leave blank for now
+          InBOM: this.selectedOrder.bom.bom,
+          InMaterialVersion: oItem.componentVersion,
+          InBOMVersion: this.selectedOrder.bom.version
+        };
+
+        return new Promise((resolve, reject) => {
+          this.ajaxPostRequest(sUrl, oPayload, resolve, reject);
+        });
+      },
+
       /**
      * Processes an array of data objects and maps custom values to a `customData` property on each object.
      *
@@ -825,7 +882,7 @@ sap.ui.define(
         });
       },
 
-      _setLineItemResourceData: function(oModel, sPath, oResourceData) {
+      _setLineItemResourceData: function(oModel, sPath, oResourceData, bNew) {
         var oData = oModel.getProperty(sPath);
         var oCustomData = oResourceData.customData;
 
@@ -840,6 +897,10 @@ sap.ui.define(
           // acceptanceDelay: oCustomData ? oCustomData.AUTOACCEPTANCEDELAY : 0
           // operator: oCustomData ? oCustomData.OPERATOR || ''
         };
+
+        if (bNew) {
+          oData.isNew = true;
+        }
 
         oModel.setProperty(sPath, oData);
       }
