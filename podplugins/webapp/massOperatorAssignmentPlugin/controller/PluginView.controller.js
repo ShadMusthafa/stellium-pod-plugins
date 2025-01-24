@@ -212,16 +212,17 @@ sap.ui.define(
           return;
         }
 
-        this._getOperatorOccupancy(sOperatorId).then(function(oResponse) {
-          if (!oResponse.outOperator.length) {
-            return;
-          }
-
-          ErrorHandler.setErrorState(
-            oControl,
-            this.getI18nText('operatorAssignedToOtherResourceErrMsg', [sOperatorId, oResponse.outOperator[0].RESOURCE])
-          );
-        });
+        this._getOperatorOccupancy(sOperatorId).then(
+          function(oResponse) {
+            if (oResponse.outOperator.length === 0) {
+              ErrorHandler.setErrorState(
+                oControl,
+                this.getI18nText('operatorAssignedToOtherResourceErrMsg', [sOperatorId, oResponse.outOperator[0].RESOURCE])
+              );
+              return;
+            }
+          }.bind(this)
+        );
       },
 
       onAutoAcceptanceModeChange: function(oEvent) {
@@ -260,10 +261,10 @@ sap.ui.define(
           function(oItem) {
             var oViewModel = this.getView().getModel('viewModel');
             var oSelectedRowData = oItem.getBindingContext('viewModel').getObject();
-            var sPath = oItem.getBindingContext('viewModel').getPath;
+            var sPath = oItem.getBindingContext('viewModel').getPath();
             return this._revokeResource(oSelectedRowData.resource).then(
               function() {
-                this._setLineItemResourceData(oViewModel, sPath, null, true);
+                this._setLineItemResourceData(oViewModel, sPath, {}, true);
               }.bind(this)
             );
           }.bind(this)
@@ -575,8 +576,8 @@ sap.ui.define(
               resourceType: '',
               operator: '',
               autoAcceptance: false,
-              acceptanceDelay: 0,
-              correctionTime: '',
+              acceptanceDelay: 3000,
+              correctionTime: 0,
               lastModified: '',
               operationActivity: phase.recipeOperation.operationActivity.operationActivity,
               bom: component.bomComponent.bom.bom,
@@ -613,6 +614,7 @@ sap.ui.define(
               oLineItem.autoAcceptance = oResource.customData.USE_AUTO_ACCEPTANCE === 'true';
               oLineItem.acceptanceDelay = oResource.customData.AUTOACCEPTANCEDELAY;
               oLineItem.operator = oResource.customData.OPERATOR;
+              oLineItem.correctionTime = oResource.customData.CORRECTION_TIME;
             }
 
             oLineItem.existingAssignment = { ...oLineItem };
@@ -836,7 +838,7 @@ sap.ui.define(
       },
 
       _assignResource: function(oItem) {
-        var sUrl = this.PPD_BASE_URL + 'REG_e64981d3-2a78-4751-8e86-f796485f1db5&async=false';
+        var sUrl = this.PPD_BASE_URL + 'key=REG_e64981d3-2a78-4751-8e86-f796485f1db5&async=false';
         var oPayload = {
           InOrderStatus: this.selectedOrder.executionStatus,
           InHeaderMaterialDesc: this.selectedOrder.material.description,
@@ -884,7 +886,7 @@ sap.ui.define(
 
       _setLineItemResourceData: function(oModel, sPath, oResourceData, bNew) {
         var oData = oModel.getProperty(sPath);
-        var oCustomData = oResourceData.customData;
+        // var oCustomData = oResourceData.customData;
 
         oData = {
           ...oData,
@@ -900,6 +902,10 @@ sap.ui.define(
 
         if (bNew) {
           oData.isNew = true;
+          oData.operator = '';
+          oData.autoAcceptance = false;
+          oData.acceptanceDelay = 0;
+          oData.correctionTime = 0;
         }
 
         oModel.setProperty(sPath, oData);
