@@ -83,6 +83,8 @@ sap.ui.define(
               oItem.status = 'PARKED';
             } else if (oItem.consumedQuantity.value > oItem.targetQuantity.value) {
               oItem.status = 'BATCH_CORRECTION';
+            } else {
+              oItem.status = 'ACCEPTED';
             }
           }
         });
@@ -211,6 +213,8 @@ sap.ui.define(
         var sUrl = this.getPodController().getAssemblyDataSourceUri() + 'order/goodsIssue/summary';
         var aPromises = aRoutingSteps.map(oStep => {
           var sOperationActivity = oStep.routingOperation.operationActivity.operationActivity;
+          var sWorkCenter = oStep.workCenter.workCenter;
+
           var oParams = {
             shopOrder: this.selectedOrder.order,
             batchId: this.selectedOrder.sfc,
@@ -220,12 +224,27 @@ sap.ui.define(
 
           //Raise get request for gi summary for phase and step
           return new Promise((resolve, reject) => {
-            this.ajaxGetRequest(sUrl, oParams, resolve, reject);
+            this.ajaxGetRequest(
+              sUrl,
+              oParams,
+              function(oResponse) {
+                resolve(
+                  oResponse.lineItems.map(oItem => {
+                    return {
+                      ...oItem,
+                      workCenter: sWorkCenter,
+                      operationActivity: sOperationActivity
+                    };
+                  })
+                );
+              },
+              reject
+            );
           });
         });
 
         return Promise.all(aPromises).then(function(aResponses) {
-          var aLineItems = aResponses.flatMap(oResponse => oResponse.lineItems).filter(oItem => oItem.componentType === 'N');
+          var aLineItems = aResponses.flatMap(oResponse => oResponse).filter(oItem => oItem.componentType === 'N');
           return aLineItems;
         });
       },
@@ -237,10 +256,16 @@ sap.ui.define(
       _postSfcScrap: async function() {
         var oGRSummary = await this._getGoodsReceiptSummary();
         var sUrl = this.getPublicApiRestDataSourceUri() + 'sfc/v1/sfcs/scrap';
+        var oBatchCorrectionItem = this._getBatchCorrectionItem();
+        if (!oBatchCorrectionItem) {
+          return;
+        }
+
         var oRequestBody = {
           plant: this.getPodController().getUserPlant(),
           sfcs: [this.selectedOrder.sfc],
-          quantity: oGRSummary.quantityInBaseUnit.value
+          resource: oBatchCorrectionItem.workCenter,
+          quantity: oGRSummary.targetQuantityInProductionUnit.value
         };
 
         this.ajaxPostRequest(
@@ -264,6 +289,14 @@ sap.ui.define(
         return new Promise((resolve, reject) => {
           this.ajaxGetRequest(sUrl, oParams, resolve, reject);
         });
+      },
+
+      _getBatchCorrectionItem: function() {
+        var oView = this.getView(),
+          oGiDataModel = oView.getModel('giData'),
+          aLineItems = oGiDataModel.getProperty('/lineItems');
+
+        return aLineItems.find(oItem => oItem.status === 'BATCH_CORRECTION');
       }
     });
 

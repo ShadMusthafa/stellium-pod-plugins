@@ -63,6 +63,8 @@ sap.ui.define(['sap/dm/dme/constants/DMCConstants', 'sap/dm/dme/formatter/Number
           return 'Warning';
         case 'BATCH_CORRECTION':
           return 'Error';
+        case 'ACCEPTED':
+          return 'Success';
         default:
           return 'None';
       }
@@ -74,6 +76,21 @@ sap.ui.define(['sap/dm/dme/constants/DMCConstants', 'sap/dm/dme/formatter/Number
           return 'Parked';
         case 'BATCH_CORRECTION':
           return 'Batch Correction';
+        case 'ACCEPTED':
+            return 'Accepted';
+        default:
+          return '';
+      }
+    },
+
+    statusIconFormatter: function(sStatus){
+      switch (sStatus) {
+        case 'PARKED':
+          return 'sap-icon://alert';
+        case 'BATCH_CORRECTION':
+          return 'sap-icon://error';
+        case 'ACCEPTED':
+            return 'sap-icon://sys-enter-2';
         default:
           return '';
       }
