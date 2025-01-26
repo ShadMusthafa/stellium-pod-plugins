@@ -59,10 +59,7 @@
                                 }"
                                 unit="{giData>consumedQuantity/unitOfMeasure/uom}"/>
                             <ObjectStatus
-                                text="{
-                                    path: 'giData>status',
-                                    formatter: 'oFormatter.statusTextFormatter'
-                                }"
+                                text="{giData>statusText}"
                                 inverted="true"
                                 icon="{
                                     path: 'giData>status',
@@ -83,7 +80,7 @@
                                 <Input 
                                     value="{
                                         path: 'giData>batchCorrectionWeight/value',
-                                        type: 'sap.ui.model.type.Integer'
+                                        type: 'sap.ui.model.type.Float'
                                     }" 
                                     change=".onBatchCorrectionWtChange">
                                     <layoutData>
