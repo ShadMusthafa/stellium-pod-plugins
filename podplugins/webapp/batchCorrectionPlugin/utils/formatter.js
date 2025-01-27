@@ -70,19 +70,6 @@ sap.ui.define(['sap/dm/dme/constants/DMCConstants', 'sap/dm/dme/formatter/Number
       }
     },
 
-    statusTextFormatter: function(sStatus) {
-      switch (sStatus) {
-        case 'PARKED':
-          return 'Parked';
-        case 'BATCH_CORRECTION':
-          return 'Batch Correction';
-        case 'ACCEPTED':
-            return 'Accepted';
-        default:
-          return '';
-      }
-    },
-
     statusIconFormatter: function(sStatus){
       switch (sStatus) {
         case 'PARKED':

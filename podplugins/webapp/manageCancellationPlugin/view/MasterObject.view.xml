@@ -187,7 +187,7 @@
                     </Table>
                 </uxap:ObjectPageSubSection>
             </uxap:ObjectPageSection>
-            <uxap:ObjectPageSection id="goodsIssue" titleUppercase="false">
+            <!-- <uxap:ObjectPageSection id="goodsIssue" titleUppercase="false">
                 <uxap:ObjectPageSubSection titleUppercase="false" title="{i18n>goodsIssueTitle}">
                     <core:Fragment 
                         fragmentName="stellium.ext.podplugins.manageCancellationPlugin.view.fragments.GoodsIssueTable" 
@@ -218,7 +218,7 @@
                         </uxap:blocks>
                     </uxap:ObjectPageSubSection>
                 </uxap:subSections>
-            </uxap:ObjectPageSection>
+            </uxap:ObjectPageSection> -->
         </uxap:sections>
     </uxap:ObjectPageLayout>
 </mvc:View> 

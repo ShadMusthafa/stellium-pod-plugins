@@ -194,11 +194,15 @@ sap.ui.define(
       },
 
       onCreatePackingUnitPressed: function() {
-        if (!this.oDialog) {
-          this.oDialog = this.createPackDialog();
-        }
+        // if (!this.oDialog) {
+        //   this.oDialog = this.createPackDialog();
+        // }
 
-        this.oDialog.open();
+        // this.oDialog.open();
+        window.open(
+          'https://djn-s4dev.daajan.com:44300/sap/bc/ui2/flp?sap-system-login-oninputprocessing=onProceed&sap-urlscheme=http&sap-client=110&sap-language=EN#ZHU02-create?sap-ui-tech-hint=GUI?',
+          '_blank'
+        );
       },
 
       /**
@@ -337,9 +341,7 @@ sap.ui.define(
         }
 
         if (this.sMaterialFilterRef && sResource) {
-          return `?$filter=contains(material,'${encodeURIComponent(
-            sMaterialRef
-          )}') and resource eq '${encodeURIComponent(sResource)}'`;
+          return `?$filter=contains(material,'${encodeURIComponent(sMaterialRef)}') and resource eq '${encodeURIComponent(sResource)}'`;
         }
       },
 
@@ -390,10 +392,7 @@ sap.ui.define(
           ` com.sap.mes.odata.MaterialType'RETURNABLE_PACKAGING') and currentVersion eq true`;
 
         return this.oServiceClient.get(sUrl, sQuery).then(oResponse => {
-          if (
-            oResponse.value.length > 0 &&
-            oResponse.value[0].material.toUpperCase() === sMaterialInputValue.toUpperCase()
-          ) {
+          if (oResponse.value.length > 0 && oResponse.value[0].material.toUpperCase() === sMaterialInputValue.toUpperCase()) {
             return oResponse.value[0];
           } else {
             return null;

@@ -81,10 +81,13 @@ sap.ui.define(
           if (oItem.consumedQuantity.value) {
             if (oItem.consumedQuantity.value < oItem.targetQuantity.value) {
               oItem.status = 'PARKED';
+              oItem.statusText = 'Parked'
             } else if (oItem.consumedQuantity.value > oItem.targetQuantity.value) {
               oItem.status = 'BATCH_CORRECTION';
+              oItem.statusText = 'Batch Correction'
             } else {
               oItem.status = 'ACCEPTED';
+              oItem.statusText = 'Accepted'
             }
           }
         });
@@ -175,6 +178,12 @@ sap.ui.define(
 
         var oContext = oEvent.getSource().getBindingContext('giData'),
           oItem = oContext.getObject();
+
+        if (oItem.batchCorrectionWeight.value < oItem.consumedQuantity.value) {
+          MessageToast.show('Correction value cannot be less than measured quantity');
+          oEvent.getSource().setValue(oItem.consumedQuantity.value);
+        }
+
         oItem.issueWeight.value = oItem.batchCorrectionWeight.value - oItem.consumedQuantity.value;
       },
 
@@ -185,6 +194,10 @@ sap.ui.define(
             this._postSfcScrap();
           }.bind(this)
         });
+      },
+
+      onApprove:function(){
+        this._releaseSfcHold();
       },
 
       _getRoutingDetailsForOrder: function(sOrderId) {
@@ -277,6 +290,17 @@ sap.ui.define(
             oLogger.info('SFC scrap service response', oResponse);
           }.bind(this)
         );
+      },
+
+      _releaseSfcHold: function() {
+        var sUrl = this.getPublicApiRestDataSourceUri() + 'sfc/v1/sfcs/release';
+        var oRequestBody = {
+          plant: this.getPodController().getUserPlant(),
+          sfcs: [this.selectedOrder.sfc],
+          releaseComments: 'Batch correction approved'
+        };
+
+        this.ajaxPostRequest(sUrl, oRequestBody);
       },
 
       _getGoodsReceiptSummary: function() {
