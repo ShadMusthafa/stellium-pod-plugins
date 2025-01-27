@@ -1,0 +1,93 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:fb="sap.ui.comp.filterbar">
+    <Dialog id="materialVHDia" title="{i18n-material>materialBrowse.title}" afterClose="onClose" contentHeight="2000px">
+        <dependents>
+            <SearchField id="searchField" showSearchButton="false" liveChange="onSearchLiveChange" maxLength="200" />
+        </dependents>
+        <fb:FilterBar id="filterBar" showGoOnFB="false" showClearOnFB="true" showFilterConfiguration="false"
+            filterBarExpanded="false" filterContainerWidth="225px" clear="onFilterBarClear" basicSearch="searchField">
+            <fb:filterGroupItems>
+                <fb:FilterGroupItem groupName="basic" name="procurementType"
+                    label="{i18n-objectType>common.procurementType.lbl}" visibleInFilterBar="true">
+                    <fb:control>
+                        <Select id="typeFilter" selectedKey="ALL" items="{procurementTypeItems>/}"
+                            change="onFilterBarChange">
+                            <items>
+                                <core:Item key="{procurementTypeItems>key}" text="{procurementTypeItems>text}" />
+                            </items>
+                        </Select>
+                    </fb:control>
+                </fb:FilterGroupItem>
+                <fb:FilterGroupItem groupName="basic" name="status" label="{i18n-status>common.status.lbl}"
+                    visibleInFilterBar="true">
+                    <fb:control>
+                        <Select id="statusFilter" selectedKey="ALL" items="{materialStatusItems>/}"
+                            change="onFilterBarChange">
+                            <items>
+                                <core:Item key="{materialStatusItems>key}" text="{materialStatusItems>text}" />
+                            </items>
+                        </Select>
+                    </fb:control>
+                </fb:FilterGroupItem>
+                <fb:FilterGroupItem groupName="basic" name="currentVersion"
+                    label="{i18n-global>common.currentVersionOnly.lbl}" visibleInFilterBar="true">
+                    <fb:control>
+                        <Switch id="currentVersionFilter" customTextOn="{i18n-global>common.yes.switch}"
+                            customTextOff="{i18n-global>common.no.switch}" change="onFilterBarChange" />
+                    </fb:control>
+                </fb:FilterGroupItem>
+            </fb:filterGroupItems>
+        </fb:FilterBar>
+        <Table id="resultTable"
+            items="{ path: '/Materials', parameters: { $select: ['ref,material,version,description,currentVersion,status,materialType,procurementType'], $orderby: 'createdDateTime desc', $count: true } }"
+            class="sapUIMarginMedium" sticky="ColumnHeaders" mode="SingleSelectMaster" selectionChange="onSelect"
+            growing="true" growingThreshold="20" growingScrollToLoad="true" updateFinished="onListUpdate">
+            <headerToolbar>
+                <Toolbar>
+                    <Title id="materialListTitle"
+                        text="{ parts: ['i18n>materialBrowse.materialList.title', 'materialBrowseModel>/listLength'], formatter: 'jQuery.sap.formatMessage' }" />
+                    <ToolbarSpacer />
+                </Toolbar>
+            </headerToolbar>
+            <columns>
+                <Column width="13em">
+                    <Text text="{i18n-material>common.material.lbl}" />
+                </Column>
+                <Column width="5em" minScreenWidth="Tablet" demandPopin="true">
+                    <Text text="{i18n-global>common.version.lbl}" />
+                </Column>
+                <Column minScreenWidth="Desktop" demandPopin="true">
+                    <Text text="{i18n-global>common.description.lbl}" />
+                </Column>
+                <Column minScreenWidth="Desktop" demandPopin="true">
+                    <Text text="{i18n-status>common.status.lbl}" />
+                </Column>
+                <Column minScreenWidth="Desktop" demandPopin="true">
+                    <Text text="{i18n-objectType>common.materialType.lbl}" />
+                </Column>
+                <Column minScreenWidth="Desktop" demandPopin="true">
+                    <Text text="{i18n-objectType>common.procurementType.lbl}" />
+                </Column>
+                <Column width="5em" minScreenWidth="Desktop" demandPopin="true">
+                    <Text text="{i18n-global>common.currentVersion.lbl}" />
+                </Column>
+            </columns>
+            <items>
+                <ColumnListItem>
+                    <Text text="{material}" />
+                    <Text text="{version}" />
+                    <Text text="{description}" />
+                    <Text
+                        text="{ path: 'status', type: 'sap.ui.model.odata.type.String', formatter: '.statusFormatter.getStatusText' }" />
+                    <Text
+                        text="{ path: 'materialType', type: 'sap.ui.model.odata.type.String', formatter: '.objectTypeFormatter.getMaterialTypeText' }" />
+                    <Text
+                        text="{ path: 'procurementType', type: 'sap.ui.model.odata.type.String', formatter: '.objectTypeFormatter.getProcurementTypeText' }" />
+                    <Text text="{currentVersion}" />
+                </ColumnListItem>
+            </items>
+        </Table>
+        <beginButton>
+            <Button id="closeButton" text="{i18n-global>cancel}" tooltip="{i18n-global>cancel}" press="onCancel" />
+        </beginButton>
+    </Dialog>
+</core:FragmentDefinition>

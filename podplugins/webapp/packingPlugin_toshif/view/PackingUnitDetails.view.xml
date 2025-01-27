@@ -1,0 +1,68 @@
+<mvc:View xmlns:core="sap.ui.core" xmlns:f="sap.f" xmlns:layout="sap.ui.layout" xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m" controllerName="stellium.ext.podplugins.packingPluginToshif.controller.PackingUnitDetails"
+    busy="{viewModel>/unitsListViewBusy}" height="100%">
+    <f:DynamicPage headerExpanded="true" preserveHeaderStateOnScroll="true" toggleHeaderOnTitleClick="false">
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="{i18n>packing.packingUnitId.lbl}: {auxData>/number}" />
+                </f:heading>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:header>
+            <f:DynamicPageHeader>
+                <HBox renderType="Bare" fitContainer="true" justifyContent="SpaceBetween" height="100%" width="auto"
+                    class="sapUiLargeMarginBegin">
+                    <layout:VerticalLayout class="sapUiSmallMarginBottom">
+                        <ObjectAttribute title="{i18n>packing.packagingMaterial.lbl}"
+                            text="{auxData>/material/material}" />
+                        <ObjectAttribute title="{i18n>packing.packagingMaterialDescription.col}"
+                            text="{auxData>/material/description}" />
+                        <ObjectAttribute title="{i18n>packingPlugin.carrierId.lbl}"
+                            text="{auxData>/carrier/carrierNumber}" visible="{= !!${auxData>/carrier}}" />
+                        <ObjectAttribute title="{i18n>packingPlugin.createUnit.currentLocation.lbl}"
+                            text="{auxData>/currentLocation/resource}" visible="{= !!${auxData>/currentLocation}}" />
+                        <ObjectAttribute title="{i18n>packingPlugin.createUnit.currentLocation.lbl}"
+                            text="{auxData>/workCenterLocation/workcenter}"
+                            visible="{= !!${auxData>/workCenterLocation}}" />
+                        <ObjectAttribute title="{i18n>packingPlugin.createUnit.currentLocation.lbl}"
+                            text="{auxData>/storageLocation/storageLocation}"
+                            visible="{= !!${auxData>/storageLocation}}" />
+                        <ObjectStatus title="{i18n>packingPlugin.createUnit.packagingType.lbl}"
+                            text="{ path: 'auxData>/packingType', type: 'sap.ui.model.odata.type.String', formatter: '.packingPluginFormatter.getPackingTypeText' }"
+                            visible="{= !!${auxData>/packingType}}" />
+                        <ObjectStatus title="{i18n>packing.status.lbl}"
+                            text="{ path: 'auxData>/status', formatter: '.statusFormatter.getStatusText' }"
+                            state="{ path: 'auxData>/status', type: 'sap.ui.model.odata.type.String', formatter: '.statusFormatter.getStatusState' }" />
+                        <layout:layoutData>
+                            <FlexItemData growFactor="3" />
+                        </layout:layoutData>
+                    </layout:VerticalLayout>
+                    <core:Fragment fragmentName="stellium.ext.podplugins.packingPluginToshif.view.fragment.UnitCapacityData"
+                        type="XML" />
+                </HBox>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <HBox id="packingUnitDetails" fitContainer="true" renderType="Bare" height="100%">
+                <VBox fitContainer="true" renderType="Bare" height="100%" class="sapUiTinyMarginEnd" width="170%">
+                    <IconTabBar id="availableObjectsTabBar" stretchContentHeight="true" expandable="false"
+                        applyContentPadding="false" selectedKey="{viewModel>/availableObjectsSelectedTab}">
+                        <items>
+                            <IconTabFilter text="{i18n>packing.sfcQty.col}" key="availableSfcsTab">
+                                <mvc:XMLView
+                                    viewName="stellium.ext.podplugins.packingPluginToshif.view.AvailableSfcsList" />
+                            </IconTabFilter>
+                            <IconTabFilter text="{i18n>packing.packingUnits.tab.lbl}" key="availableUnitsTab">
+                                <mvc:XMLView
+                                    viewName="stellium.ext.podplugins.packingPluginToshif.view.AvailableUnitsList" />
+                            </IconTabFilter>
+                        </items>
+                    </IconTabBar>
+                </VBox>
+                <core:Fragment fragmentName="stellium.ext.podplugins.packingPluginToshif.view.fragment.SelectedItems"
+                    type="XML" />
+            </HBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>
