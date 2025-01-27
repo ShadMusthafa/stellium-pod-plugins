@@ -2,67 +2,23 @@
     height="100%"
     xmlns:mvc="sap.ui.core.mvc" 
     xmlns:fb="sap.ui.comp.filterbar"
-    xmlns:l="sap.ui.layout"
     xmlns:f="sap.f"
     xmlns="sap.m">
     <Page id="packingPlugin" showHeader="false" enableScrolling="true">
-        <f:DynamicPage>
-            <f:header>
-                <f:DynamicPageHeader>
-                    <f:content>
-                        <fb:FilterBar id="packingUnitsListFilterBar" 
-                            basicSearch="unitsListSearchField"
-                            search="onFilterBarValueChange" 
-                            clear="onUnitsListFilterBarClear" 
-                            useToolbar="false"
-                            showClearOnFB="true" 
-                            showFilterConfiguration="false" 
-                            filterContainerWidth="16rem"
-                            visible="{= !${global>/creationInProgress}}" 
-                            class="sapUiSmallMarginBegin">
-                            <fb:filterGroupItems>
-                                <fb:FilterGroupItem id="materialFilterItem" 
-                                    name="materialFilterItem" 
-                                    groupName="basic"
-                                    label="{i18n-material>common.material.lbl}" 
-                                    visibleInFilterBar="true">
-                                    <fb:control>
-                                        <Input id="unitsListMaterialFilter" 
-                                            class="mesUpperCaseTransform"
-                                            showValueHelp="true" 
-                                            valueHelpRequest="onMaterialBrowse"
-                                            change="onMaterialSelectionChange" />
-                                    </fb:control>
-                                </fb:FilterGroupItem>
-                            </fb:filterGroupItems>
-                        </fb:FilterBar>
-                    </f:content>
-                </f:DynamicPageHeader>
-            </f:header>
-            <f:content>
-                <ScrollContainer vertical="true" height="100%">
-                    <Table id="packingUnitsList" 
-                        mode="SingleSelectMaster" 
-                        growing="true" 
-                        growingThreshold="20"
-                        growingScrollToLoad="true" 
-                        itemPress="onPackingUnitPressed"
-                        updateFinished="onPackingUnitsListUpdate" 
-                        sticky="ColumnHeaders,HeaderToolbar">
+        
+                  
                         <headerToolbar>
                             <Toolbar>
                                 <Title
                                     text="{ parts: ['i18n>common.packingUnits.title', 'viewModel>/packingUnitsLength'], formatter: 'jQuery.sap.formatMessage' }" />
                                 <ToolbarSpacer />
+                              
                                 <Button id="createPackingUnitButton" 
                                     text="{i18n>packing.createPackingUnit.btn}"
                                     type="Ghost" 
                                     press="onCreatePackingUnitPressed" />
                             </Toolbar>
                         </headerToolbar>
-                    </Table>
-                </ScrollContainer>
-            </f:content>
-        </f:DynamicPage>
+          
     </Page>
 </mvc:View>
