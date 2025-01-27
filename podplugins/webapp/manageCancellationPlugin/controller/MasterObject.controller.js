@@ -538,6 +538,10 @@ sap.ui.define(
         this.oSubmitDialog.open();
       },
 
+      wait:function(iMilliSeconds){
+        return new Promise(resolve=> setTimeout(resolve, iMilliSeconds));
+      },
+
       cancelActQtyConfItems: async function(sCancelationText) {
         var oPayloads = this.createActQtyCancellationPayloads(sCancelationText),
           aPromises = [];
@@ -548,6 +552,7 @@ sap.ui.define(
         }
 
         if (Object.keys(oPayloads.quantityCancellation).length > 0) {
+          await wait(1000);
           await this.cancelQuantityConfirmationItem(oPayloads.quantityCancellation);
           // aPromises.push(this.cancelQuantityConfirmationItem(oPayloads.quantityCancellation));
         }
