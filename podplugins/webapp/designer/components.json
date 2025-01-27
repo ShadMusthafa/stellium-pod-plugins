@@ -41,6 +41,16 @@
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
+      "id": "stelliumPackingPlugin_1",
+      "type": "VIEW_PLUGIN",
+      "allowMultipleInstances": false,
+      "name": "stellium.ext.podplugins.packingPluginToshif",
+      "propertyEditor": "stellium.ext.podplugins.packingPluginToshif.builder.PropertyEditor",
+      "i18n": "stellium.ext.podplugins.packingPluginToshif.i18n.i18n",
+      "productionProcessEnabled": false,
+      "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
+    },
+    {
       "id": "stelliumCancelConfirmationPlugin",
       "type": "VIEW_PLUGIN",
       "allowMultipleInstances": false,

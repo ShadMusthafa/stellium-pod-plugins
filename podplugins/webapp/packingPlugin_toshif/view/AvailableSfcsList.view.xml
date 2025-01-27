@@ -1,0 +1,126 @@
+<mvc:View xmlns:core="sap.ui.core" xmlns:f="sap.f" xmlns:fb="sap.ui.comp.filterbar" xmlns:l="sap.ui.layout"
+    xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m"
+    controllerName="stellium.ext.podplugins.packingPluginToshif.controller.AvailableSfcsList" height="100%">
+    <f:DynamicPage id="availableSfcsPage" headerExpanded="true" headerPinned="true" toggleHeaderOnTitleClick="false">
+        <f:header>
+            <f:DynamicPageHeader id="availableObjectsFilters" pinnable="true">
+                <fb:FilterBar id="availableSfcsPageFilterBar" basicSearch="availableObjectsSearch"
+                    search="onAvailableSfcsFilterValueChange" clear="_availableObjectsTableFiltersCleanup"
+                    showClearOnFB="true" showGoOnFB="false" useToolbar="false" showFilterConfiguration="false"
+                    filterContainerWidth="16rem" class="sapUiMediumMarginBegin sapUiSmallMarginBottom">
+                    <fb:filterGroupItems>
+                        <fb:FilterGroupItem id="availableSfcsSearch" groupName="basic" name="availableSfcs"
+                            label="{i18n-sfc>common.sfc.lbl}" visibleInAdvancedArea="true">
+                            <fb:control>
+                                <SearchField id="availableObjectsSearch" liveChange="onAvailableSfcsLiveSearch"
+                                    placeholder="{i18n>unitDetails.availableSfcsList.filterBar.search.placeholder}"
+                                    value="{viewModel>/availableSfcsSearchValue}" />
+                            </fb:control>
+                        </fb:FilterGroupItem>
+                        <fb:FilterGroupItem id="availableSfcsShopOrderFilterItem" groupName="basic"
+                            name="availableSfcsShopOrderFilterItem" label="{i18n-shopOrder>common.shopOrder.lbl}"
+                            visibleInAdvancedArea="true">
+                            <fb:control>
+                                <Input id="availableSfcsShopOrderFilter" change="onAvailableSfcsFilterValueChange"
+                                    value="{viewModel>/availableSfcsShopOrder}" showValueHelp="true" editable="false"
+                                    valueHelpRequest="onFilterAvailableSfcsByOrder" />
+                            </fb:control>
+                        </fb:FilterGroupItem>
+                        <fb:FilterGroupItem id="availableSfcsMaterialFilterItem" groupName="basic"
+                            name="availableSfcsMaterialFilterItem" label="{i18n-material>common.material.lbl}"
+                            visibleInAdvancedArea="true">
+                            <fb:control>
+                                <Input id="availableSfcsMaterialFilter" change="onAvailableSfcsFilterValueChange"
+                                    value="{viewModel>/availableSfcsMaterial}" showValueHelp="true"
+                                    valueHelpRequest="onFilterAvailableSfcsByMaterial" />
+                            </fb:control>
+                        </fb:FilterGroupItem>
+                        <fb:FilterGroupItem id="availableSfcsStatusFilterItem" groupName="basic"
+                            name="availableSfcsStatusFilterItem" label="{i18n-global>common.status.col}"
+                            visibleInAdvancedArea="true">
+                            <fb:control>
+                                <Select id="availableSfcsStatusFilter" change="onAvailableSfcsFilterValueChange"
+                                    forceSelection="true" items="{viewModel>/allowedSfcStatuses}" selectedKey="ALL">
+                                    <items>
+                                        <core:Item key="{viewModel>key}"
+                                            text="{ path: 'viewModel>', formatter: '.sfcStatusTranslation' }" />
+                                    </items>
+                                </Select>
+                            </fb:control>
+                        </fb:FilterGroupItem>
+                    </fb:filterGroupItems>
+                </fb:FilterBar>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <ScrollContainer vertical="true" height="100%">
+                <Table id="availableObjects" items="{ path: 'packing>/GetSfcList()' }"
+                    mode="{= ${auxData>/status} !== 'CLOSED' ? 'MultiSelect' : 'None'}" includeItemInSelection="true"
+                    growing="true" growingThreshold="20" growingScrollToLoad="true"
+                    updateFinished="onAvailableObjectsListUpdate" sticky="ColumnHeaders,HeaderToolbar"
+                    select=".onSfcItemSelected">
+                    <headerToolbar>
+                        <Toolbar>
+                            <Title id="sfcsListTitle"
+                                text="{ parts: ['i18n>packingUnitDetails.sfcs.title', 'viewModel>/availableSfcsListLength'], formatter: 'jQuery.sap.formatMessage' }" />
+                            <ToolbarSpacer />
+                            <Button id="btnAddToPackingUnit" text="{i18n>packingUnitDetails.moveToSelected.btn}"
+                                tooltip="{i18n>packingUnitDetails.addToPackingUnit.tooltip}" press="onMoveToAssigned"
+                                enabled="{= ${auxData>/status} !== 'CLOSED' &amp;&amp; ${viewModel>/availableSfcsSelectedAndValid}}" />
+                        </Toolbar>
+                    </headerToolbar>
+                    <columns>
+                        <Column minScreenWidth="XXLarge" width="20%" popinDisplay="Inline">
+                            <Text text="{i18n-sfc>common.sfc.lbl}" />
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="XXLarge" width="20%" popinDisplay="Inline">
+                            <Text text="{i18n-shopOrder>common.shopOrder.lbl}" />
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="XXLarge" width="20%" popinDisplay="Inline">
+                            <Text text="{i18n-material>common.material.lbl}" />
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="XXLarge" width="30%" popinDisplay="Inline">
+                            <Text text="{i18n>packing.materialDescription.col}" />
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="XXLarge" width="10%" popinDisplay="Inline"
+                            hAlign="End">
+                            <Text text="{i18n>packing.availableQuantityAndUom.col}" />
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="XXLarge" width="10%" popinDisplay="Inline"
+                            hAlign="End">
+                            <Text text="{i18n>packing.partialQty.col}" />
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="XXLarge" width="10%" popinDisplay="Inline"
+                            hAlign="Center">
+                            <Text text="{i18n-global>common.status.col}" />
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem type="Inactive" vAlign="Middle"
+                            highlight="{ path: 'packing>status', type: 'sap.ui.model.odata.type.String', formatter: '.statusFormatter.getStatusHighlight' }">
+                            <cells>
+                                <ObjectIdentifier
+                                    title="{ path: 'packing>sfc', type: 'sap.ui.model.odata.type.String', formatter: '.generalFormatter.getTitle' }" />
+                                <Text text="{ path: 'packing>shopOrder', type: 'sap.ui.model.odata.type.String' }" />
+                                <Text text="{ path: 'packing>material', type: 'sap.ui.model.odata.type.String' }" />
+                                <Text
+                                    text="{ path: 'packing>materialDescription', type: 'sap.ui.model.odata.type.String' }" />
+                                <Text
+                                    text="{ parts: [ 'packing>availableQuantity', 'packing>materialUnitOfMeasure', 'packing>shopOrderUnitOfMeasure', 'packing>shopOrderERPUnitOfMeasure' ], formatter: '.packingPluginFormatter.getSfcQtyWithUom', type:'.types.quantity' }" />
+                                <Input id="partialQuantityNumber"
+                                    value="{ parts: [ 'packing>availableQuantity', 'packing>ref', 'packing>materialUnitOfMeasure', 'packing>shopOrderUnitOfMeasure', 'packing>shopOrderERPUnitOfMeasure' ], formatter: '.partialQtyFormatter', type:'.types.quantity' }"
+                                    valueState="{ parts: [ 'packing>quantity', 'packing>ref' ], formatter: '.partialQtyValidator' }"
+                                    change=".partialQuantityChange" />
+                                <core:Icon
+                                    tooltip="{ path: 'packing>status', type: 'sap.ui.model.odata.type.String', formatter: '.statusFormatter.getStatusText' }"
+                                    color="{ path: 'packing>status', type: 'sap.ui.model.odata.type.String', formatter: '.packingPluginFormatter.getIconColor' }"
+                                    src="{ path: 'packing>status', type: 'sap.ui.model.odata.type.String', formatter: '.packingPluginFormatter.getStatusState' }"
+                                    alt="{ path: 'packing>status', type: 'sap.ui.model.odata.type.String' }" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </ScrollContainer>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>
