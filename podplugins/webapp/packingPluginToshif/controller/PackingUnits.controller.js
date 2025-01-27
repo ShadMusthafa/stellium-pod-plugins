@@ -194,7 +194,10 @@ sap.ui.define(
       },
 
       onCreatePackingUnitPressed: function() {
-        window.open("https://djn-s4dev.daajan.com:44300/sap/bc/ui2/flp?sap-system-login-oninputprocessing=onProceed&sap-urlscheme=http&sap-client=110&sap-language=EN#ZHU02-create?sap-ui-tech-hint=GUI?Order=029999321&Operation=operation1&Username=Lohith&SFC=SFC1&Phase=0001", "_blank");
+        const Order = this.getPodSelectionModel().getSelection().getShopOrder().shopOrder;
+        const Operation = this.getPodSelectionModel().getSelection().getSfcData().operation;
+        const SFC = this.getPodSelectionModel().getSelection().getSfcData().sfc;
+        window.open(`https://djn-s4dev.daajan.com:44300/sap/bc/ui2/flp?sap-system-login-oninputprocessing=onProceed&sap-urlscheme=http&sap-client=110&sap-language=EN#ZHU02-create?sap-ui-tech-hint=GUI?Order=${Order}&Operation=${Operation}&Username=Lohith&SFC=${SFC}&Phase=0001`, "_blank");
 
         // if (!this.oDialog) {
         //   this.oDialog = this.createPackDialog();
