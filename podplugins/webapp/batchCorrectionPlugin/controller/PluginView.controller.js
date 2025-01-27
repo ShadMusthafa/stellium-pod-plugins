@@ -196,6 +196,10 @@ sap.ui.define(
         });
       },
 
+      onApprove:function(){
+        this._releaseSfcHold();
+      },
+
       _getRoutingDetailsForOrder: function(sOrderId) {
         var sUrl = this.getPublicApiRestDataSourceUri() + 'routing/v1/routings';
         var oParams = {
@@ -286,6 +290,17 @@ sap.ui.define(
             oLogger.info('SFC scrap service response', oResponse);
           }.bind(this)
         );
+      },
+
+      _releaseSfcHold: function() {
+        var sUrl = this.getPublicApiRestDataSourceUri() + 'sfc/v1/sfcs/release';
+        var oRequestBody = {
+          plant: this.getPodController().getUserPlant(),
+          sfcs: [this.selectedOrder.sfc],
+          releaseComments: 'Batch correction approved'
+        };
+
+        this.ajaxPostRequest(sUrl, oRequestBody);
       },
 
       _getGoodsReceiptSummary: function() {
