@@ -3626,7 +3626,7 @@ sap.ui.define(
         try {
           var oMaterialInput = that.getCurrentInputMaterialControl();
           var oMatParsed = JSON.parse(oMaterialInput.getValue());
-          scannedMat = oMatParsed.material;
+          scannedMat = oMatParsed.Material;
           oMaterialInput.setValue(scannedMat);
           this.scannedMaterial = oMatParsed;
         } catch (e) {}
@@ -3756,8 +3756,8 @@ sap.ui.define(
           //  Extend WeighingScreen
           var oInStorageLocation = this.getCurrentStorageLocationInput();
           if (isBatchManaged) {
-            if (this.scannedMaterial && this.scannedMaterial.stockId) {
-              defaultBatchId = this.scannedMaterial.stockId;
+            if (this.scannedMaterial && this.scannedMaterial.StockID) {
+              defaultBatchId = this.scannedMaterial.StockID;
             } else {
               defaultBatchId = bomItem.plannedBatchNumber || '';
             }
@@ -5129,7 +5129,7 @@ sap.ui.define(
         }
 
         //Fetch batch data if model is not set
-        if (!this.batchDetailsModel || (this.scannedMaterial && this.scannedMaterial.stockId)) {
+        if (!this.batchDetailsModel || (this.scannedMaterial && this.scannedMaterial.StockID)) {
           var { sUrl, oParameters } = this._createBatchDetailsServiceCall();
           await this.getBatchDetails(sUrl, oParameters);
         }
