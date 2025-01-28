@@ -251,102 +251,12 @@ sap.ui.define(
         return oResource;
       },
 
-      loadPackingUnitsList: function(sSearchValue) {
-        let oPodSelectionModel = this.getPodSelectionModel();
+     
 
-        let sResource = this.getResourceFromPodSelectionModel(oPodSelectionModel);
-        let sQuery = sSearchValue || this.byId('packingUnitsSearch').getValue();
+  
 
-        const sFilter = this.createFilterArgumentParam(sResource);
 
-        let oUnitsList = this.byId('packingUnitsList');
-        let oUnitsListItem = this.byId('unitsListItem');
-        let sErrorMessage = this.getI18nText('error.packingUnitsFetchFail.msg');
-
-        // resource in function call should be empty and its value should be in filter
-        let sUrl = `packing>/GetPackingsList(resource='',number='${sQuery}',order='',material='')`;
-
-        const oBindParams = {
-          path: sUrl,
-          template: oUnitsListItem,
-          events: {
-            dataRequested: function() {
-              oUnitsList.setBusy(true);
-            },
-            dataReceived: function(oResponse) {
-              oUnitsList.setNoDataText(oResponse.getParameter('error') ? sErrorMessage : null);
-              oUnitsList.setBusy(false);
-            }
-          },
-          sorter: new sap.ui.model.Sorter('modifiedDateTime', true)
-        };
-
-        if (sFilter) {
-          oBindParams.parameters = { $filter: sFilter };
-        }
-        oUnitsList.bindItems(oBindParams);
-      },
-
-      onPackingUnitsListUpdate: function() {
-        let oPodSelectionModel = this.getPodSelectionModel();
-        let sResource = this.getResourceFromPodSelectionModel(oPodSelectionModel);
-        let sQuery = this.byId('packingUnitsSearch').getValue();
-
-        const sFilter = this.createFilterArgument(sResource);
-
-        // resource in function call should be empty and its value should be in filter
-        let sUrl = `${this.getPackingODataSourceUri()}GetPackingsList(resource='',number='${sQuery}',order='',material='')/$count${sFilter}`;
-
-        return this.oServiceClient.get(sUrl, null).then(oResponse => {
-          this.getView().getModel('viewModel').setProperty('/packingUnitsLength', oResponse);
-        });
-      },
-
-      onMaterialBrowse: function(oEvent) {
-        let oMaterialField = oEvent.getSource();
-        let oModel = this.getOwnerComponent().getModel('product');
-        const sFilterQuery =
-          "(materialType eq com.sap.mes.odata.MaterialType'PACKAGING' or materialType eq" +
-          " com.sap.mes.odata.MaterialType'RETURNABLE_PACKAGING') and currentVersion eq true";
-        PuMaterialBrowse.open(
-          this.getView(),
-          oMaterialField.getValue(),
-          oSelectedObject => {
-            this.sMaterialFilterRef = oSelectedObject.ref;
-            oMaterialField.setValue(oSelectedObject.name);
-            oMaterialField.setValueState(sap.ui.core.ValueState.None);
-            this.loadPackingUnitsList();
-          },
-          oModel,
-          sFilterQuery
-        );
-      },
-
-      /**
-       * Create full Filter statement for the OData request
-       * @param sResource
-       * @returns {string} full filter with material or resource in filter statements. The values are encoded.
-       */
-      createFilterArgument: function(sResource) {
-        const sMaterialRef = this.sMaterialFilterRef;
-        if (!sResource && !sMaterialRef) {
-          return '';
-        }
-
-        if (this.sMaterialFilterRef && !sResource) {
-          return `?$filter=contains(material,'${encodeURIComponent(sMaterialRef)}')`;
-        }
-
-        if (!this.sMaterialFilterRef && sResource) {
-          return `?$filter=resource eq '${encodeURIComponent(sResource)}'`;
-        }
-
-        if (this.sMaterialFilterRef && sResource) {
-          return `?$filter=contains(material,'${encodeURIComponent(
-            sMaterialRef
-          )}') and resource eq '${encodeURIComponent(sResource)}'`;
-        }
-      },
+   
 
       /**
        * Creates a filter parameter for bindItems function call.
@@ -373,12 +283,7 @@ sap.ui.define(
         }
       },
 
-      onUnitsListFilterBarClear: function() {
-        const oMaterialField = this.byId('unitsListMaterialFilter');
-        oMaterialField.setValue('');
-        this.sMaterialFilterRef = '';
-        this.loadPackingUnitsList();
-      },
+      
 
       /**
        * Uses sMaterialInputValue as an input for search via production service
