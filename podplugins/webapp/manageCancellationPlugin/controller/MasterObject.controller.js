@@ -552,7 +552,7 @@ sap.ui.define(
         }
 
         if (Object.keys(oPayloads.quantityCancellation).length > 0) {
-          await wait(1000);
+          await this.wait(1000);
           await this.cancelQuantityConfirmationItem(oPayloads.quantityCancellation);
           // aPromises.push(this.cancelQuantityConfirmationItem(oPayloads.quantityCancellation));
         }
