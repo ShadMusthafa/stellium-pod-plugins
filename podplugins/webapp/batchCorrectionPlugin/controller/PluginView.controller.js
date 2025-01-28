@@ -81,13 +81,13 @@ sap.ui.define(
           if (oItem.consumedQuantity.value) {
             if (oItem.consumedQuantity.value < oItem.targetQuantity.value) {
               oItem.status = 'PARKED';
-              oItem.statusText = 'Parked'
+              oItem.statusText = 'Parked';
             } else if (oItem.consumedQuantity.value > oItem.targetQuantity.value) {
               oItem.status = 'BATCH_CORRECTION';
-              oItem.statusText = 'Batch Correction'
+              oItem.statusText = 'Batch Correction';
             } else {
               oItem.status = 'ACCEPTED';
-              oItem.statusText = 'Accepted'
+              oItem.statusText = 'Accepted';
             }
           }
         });
@@ -196,8 +196,13 @@ sap.ui.define(
         });
       },
 
-      onApprove:function(){
+      onApprove: function() {
+        //Send batch correction details to S4
+        this._sendBatchCorrectionToS4();
+        //Release the SFC
         this._releaseSfcHold();
+        //Navigate back to order selection
+        window.history.go(-1);
       },
 
       _getRoutingDetailsForOrder: function(sOrderId) {
@@ -226,6 +231,7 @@ sap.ui.define(
         var sUrl = this.getPodController().getAssemblyDataSourceUri() + 'order/goodsIssue/summary';
         var aPromises = aRoutingSteps.map(oStep => {
           var sOperationActivity = oStep.routingOperation.operationActivity.operationActivity;
+          var sStepId = oStep.stepId;
           var sWorkCenter = oStep.workCenter.workCenter;
 
           var oParams = {
@@ -246,7 +252,8 @@ sap.ui.define(
                     return {
                       ...oItem,
                       workCenter: sWorkCenter,
-                      operationActivity: sOperationActivity
+                      operationActivity: sOperationActivity,
+                      stepId: sStepId
                     };
                   })
                 );
@@ -321,6 +328,54 @@ sap.ui.define(
           aLineItems = oGiDataModel.getProperty('/lineItems');
 
         return aLineItems.find(oItem => oItem.status === 'BATCH_CORRECTION');
+      },
+
+      _sendBatchCorrectionToS4: function() {
+        var sUrl =
+          this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_602cf830-1ee2-4756-bd82-e306ef25940a';
+
+        var oRequestBody = {
+          orderNumber: this.selectedOrder.order,
+          sfc: this.selectedOrder.sfc,
+          material: this.selectedOrder.materialName,
+          materialDescription: this.selectedOrder.materialDescription,
+          phase: '',
+          component: '',
+          componentDescription: '',
+          workCenter: '',
+          bomTarget: 0,
+          bomTUpper: 0,
+          bomTLower: 0,
+          measure: 0,
+          approvedQuantity: 0,
+          approvedTUpper: 0,
+          approvedTLower: 0
+        };
+
+        //Get the array of component items for service call
+        var oGiModel = this.getView().getModel('giData'),
+          aLineItems = oGiModel.getProperty('/lineItems');
+
+        var aPayload = aLineItems.map(oItem => {
+          return {
+            ...oRequestBody,
+            phase: oItem.stepId,
+            component: oItem.materialId.material,
+            componentDescription: oItem.description,
+            workCenter: oItem.workCenter,
+            bomTarget: oItem.targetQuantity.value,
+            bomTUpper: oItem.recipeComponentToleranceOver || 0,
+            bomTLower: oItem.recipeComponentToleranceUnder || 0,
+            measure: oItem.consumedQuantity.value,
+            approvedQuantity: oItem.batchCorrectionWeight.value,
+            approvedTUpper: oItem.recipeComponentToleranceOver || 0,
+            approvedTLower: oItem.recipeComponentToleranceUnder || 0
+          };
+        });
+
+        return new Promise((resolve, reject) => {
+          this.ajaxPostRequest(sUrl, { Body: aPayload }, resolve, reject);
+        });
       }
     });
 
