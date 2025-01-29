@@ -1,19 +1,50 @@
 <mvc:View 
     controllerName="stellium.ext.podplugins.batchCorrectionPlugin.controller.PluginView" 
     xmlns:mvc="sap.ui.core.mvc" 
+    xmlns:form="sap.ui.layout.form"
     xmlns="sap.m" 
     width="100%" 
     height="100%">
     <!-- <Panel id="podModelPluginPanel" width="100%" height="100%" expandable="false" expanded="true" accessibleRole="Region" backgroundDesign="Transparent"> -->
     <Page showFooter="true">
         <content>
+            <form:SimpleForm 
+                id="idOrderHeaderForm" 
+                title="Order Details" 
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="3"
+                labelSpanL="3"
+                labelSpanM="3"
+                labelSpanS="12"
+                adjustLabelSpan="false"
+                emptySpanXL="4"
+                emptySpanL="4"
+                emptySpanM="4"
+                emptySpanS="0"
+                columnsXL="1"
+                columnsL="1"
+                columnsM="1"
+                singleContainerFullSize="false" >
+                <Label text="Calculated GR Quantity"/>
+                <StepInput 
+                    id="idStepInput"
+                    value="{viewModel>/scaleFactor/value}"
+                    min="{viewModel>/scaleFactor/min}"
+                    max="{viewModel>/scaleFactor/max}"
+                    step="{viewModel>/scaleFactor/stepSize}"
+                    displayValuePrecision="{viewModel>/scaleFactor/precision}"
+                    change="onStepInputChange" 
+                    width="10rem"
+                    class="sapUiTinyMarginEnd" />
+            </form:SimpleForm>
             <Table id="idBatchTable" items="{giData>/lineItems}" visible="true" class="sapUiSmallMargin" popinLayout="GridLarge" >
                 <headerToolbar>
                     <Toolbar width="100%">
-                        <Title id="idBatchtitleText" level="H2" text="{= 'Batch Summary (' + ${masterListBatch>/}.length + ')'}" />
+                        <Title id="idBatchtitleText" level="H2" text="Components" />
                         <ToolbarSpacer/>
-                        <Label text="{i18n>scaleFactor}" class="sapUiTinyMarginEnd"/>
-                        <StepInput 
+                        <!-- <Label text="{i18n>scaleFactor}" class="sapUiTinyMarginEnd"/> -->
+                        <!-- <StepInput 
                             id="idStepInput"
                             value="{viewModel>/scaleFactor/value}"
                             min="{viewModel>/scaleFactor/min}"
@@ -22,7 +53,7 @@
                             displayValuePrecision="{viewModel>/scaleFactor/precision}"
                             change="onStepInputChange" 
                             width="10rem"
-                            class="sapUiTinyMarginEnd" />
+                            class="sapUiTinyMarginEnd" /> -->
                         <Button text="Calculate Correction" press=".onCalculateBatchCorrectionBtnPress"/>
                         <Text text="" />
                     </Toolbar>
@@ -33,7 +64,7 @@
                     <Column><Text text="{i18n>measureColLab}"/></Column>
                     <Column><Text text="{i18n>statusColLab}"/></Column>
                     <Column><Text text="{i18n>correctionColLab}"/></Column>
-                    <Column><Text text="{i18n>correctionInputColLab}"/></Column>
+                    <!-- <Column><Text text="{i18n>correctionInputColLab}"/></Column> -->
                     <Column><Text text="{i18n>issueColLab}"/></Column>
                 </columns>
                 <items>
@@ -76,7 +107,7 @@
                                     formatter:'oFormatter.formatQty'
                                 }" 
                                 unit="{giData>batchCorrectionWeight/unitOfMeasure/uom}"/>
-                            <HBox alignItems="Center" >
+                            <!-- <HBox alignItems="Center" >
                                 <Input 
                                     value="{
                                         path: 'giData>batchCorrectionWeight/value',
@@ -92,7 +123,7 @@
                                         <FlexItemData growFactor="1" />
                                     </layoutData>
                                 </Text>
-                            </HBox>
+                            </HBox> -->
                             <ObjectNumber
                                 number="{
                                     path: 'giData>issueWeight/value',

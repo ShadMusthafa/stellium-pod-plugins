@@ -31,7 +31,7 @@ sap.ui.define(
           scaleFactor: {
             value: 1,
             min: 1,
-            max: 15,
+            // max: 15,
             stepSize: 1,
             precision: 0
           }
@@ -94,6 +94,30 @@ sap.ui.define(
         oView.getModel('giData').setProperty('/lineItems', aLineItems);
         console.log('GI Summary Data: ', aLineItems);
         this._setScaleFactorEnabled(false);
+
+        this._getGoodsReceiptSummary().then(
+          function(oGRSummary) {
+            this.grSummary = oGRSummary;
+          }.bind(this)
+        );
+
+        //Get header material details
+        var sMaterial = this.selectedOrder.material.material,
+          sVersion = this.selectedOrder.material.version;
+        this._getMaterialDetails(sMaterial, sVersion).then(oMaterial => {
+          this.materialDetail = oMaterial;
+
+          switch (oMaterial.quantityRestriction) {
+            case 'ANY_NUMBER':
+              this.getView().getModel('viewModel').setProperty('/scaleFactor/stepSize', 0.05);
+              this.getView().getModel('viewModel').setProperty('/scaleFactor/precision', 2);
+              break;
+            case 'WHOLE_NUMBER':
+            default:
+              this.getView().getModel('viewModel').setProperty('/scaleFactor/stepSize', 1);
+              this.getView().getModel('viewModel').setProperty('/scaleFactor/precision', 0);
+          }
+        });
       },
 
       onCalculateBatchCorrectionBtnPress: function(oEvent) {
@@ -149,8 +173,21 @@ sap.ui.define(
               };
             });
             oGiModel.setProperty('/lineItems', aLineItems);
-            this._setScaleFactorEnabled(true);
+
+            //Reset the scaleFactor input value
             this.getView().getModel('viewModel').setProperty('/scaleFactor/value', 1);
+
+            var oItem = this._getBatchCorrectionItem();
+            if (!oItem) return;
+
+            var fScaleFactor = oItem.batchCorrectionWeightCalc.value / oItem.targetQuantity.value;
+
+            //Update the step input based on batch correction data
+            var oViewModel = this.getView().getModel('viewModel');
+            oViewModel.setProperty('/scaleFactor/value', fScaleFactor * this.grSummary.targetQuantityInProductionUnit.value);
+            oViewModel.setProperty('/scaleFactor/min', fScaleFactor * this.grSummary.targetQuantityInProductionUnit.value);
+
+            this._setScaleFactorEnabled(true);
           }.bind(this)
         );
       },
@@ -158,13 +195,24 @@ sap.ui.define(
       onStepInputChange: function(oEvent) {
         var oGiModel = this.getView().getModel('giData'),
           aLineItems = oGiModel.getProperty('/lineItems'),
-          newValue = oEvent.getSource().getValue();
+          newValue = oEvent.getSource().getValue(),
+          fTotalGRQty = this.grSummary.targetQuantityInProductionUnit.value;
+
+        var oFloatInstance = (oInstance = sap.ui.core.format.NumberFormat.getFloatInstance({
+          maxFractionDigits: 3
+        }));
 
         aLineItems.forEach(oItem => {
-          oItem.batchCorrectionWeight.value = oItem.batchCorrectionWeight.value / this.currentScaleFactor * newValue;
-          oItem.batchCorrectionWeightCalc.value = oItem.batchCorrectionWeightCalc.value / this.currentScaleFactor * newValue;
-          oItem.issueWeight.value = oItem.batchCorrectionWeight.value - oItem.consumedQuantity.value;
+          oItem.batchCorrectionWeight.value = oFloatInstance.format(oItem.targetQuantity.value / fTotalGRQty * newValue);
+          oItem.batchCorrectionWeightCalc.value = oFloatInstance.format(oItem.targetQuantity.value / fTotalGRQty * newValue);
+          oItem.issueWeight.value = oFloatInstance.format(oItem.batchCorrectionWeight.value - oItem.consumedQuantity.value);
         });
+
+        // aLineItems.forEach(oItem => {
+        //   oItem.batchCorrectionWeight.value = oItem.batchCorrectionWeight.value / this.currentScaleFactor * newValue;
+        //   oItem.batchCorrectionWeightCalc.value = oItem.batchCorrectionWeightCalc.value / this.currentScaleFactor * newValue;
+        //   oItem.issueWeight.value = oItem.batchCorrectionWeight.value - oItem.consumedQuantity.value;
+        // });
 
         oGiModel.setProperty('/lineItems', aLineItems);
         this.currentScaleFactor = newValue;
@@ -273,8 +321,25 @@ sap.ui.define(
         this.byId('idStepInput').setEnabled(bFlag);
       },
 
+      _getMaterialDetails: function(sMaterial, sVersion) {
+        var sUrl = this.getProductDataSourceUri();
+        sUrl =
+          sUrl +
+          "Materials('ItemBO%3a" +
+          this.getPodController().getUserPlant() +
+          '%2c' +
+          encodeURIComponent(sMaterial) +
+          '%2c' +
+          sVersion +
+          "')";
+        return new Promise((resolve, reject) => {
+          this.ajaxGetRequest(sUrl, null, resolve, reject);
+        });
+      },
+
       _postSfcScrap: async function() {
-        var oGRSummary = await this._getGoodsReceiptSummary();
+        // var oGRSummary = await this._getGoodsReceiptSummary();
+        var oGRSummary = this.grSummary;
         var sUrl = this.getPublicApiRestDataSourceUri() + 'sfc/v1/sfcs/scrap';
         var oBatchCorrectionItem = this._getBatchCorrectionItem();
         if (!oBatchCorrectionItem) {
@@ -364,12 +429,12 @@ sap.ui.define(
             componentDescription: oItem.description,
             workCenter: oItem.workCenter,
             bomTarget: oItem.targetQuantity.value,
-            bomTUpper: oItem.recipeComponentToleranceOver || 0,
-            bomTLower: oItem.recipeComponentToleranceUnder || 0,
+            bomTUpper: oItem.toleranceOver || 0,
+            bomTLower: oItem.toleranceUnder || 0,
             measure: oItem.consumedQuantity.value,
             approvedQuantity: oItem.batchCorrectionWeight.value,
-            approvedTUpper: oItem.recipeComponentToleranceOver || 0,
-            approvedTLower: oItem.recipeComponentToleranceUnder || 0
+            approvedTUpper: oItem.toleranceOver || 0,
+            approvedTLower: oItem.toleranceUnder || 0
           };
         });
 

@@ -44,7 +44,8 @@ sap.ui.define(['sap/dm/dme/constants/DMCConstants', 'sap/dm/dme/formatter/Number
       if (isNaN(quantity)) return;
       var NumInstance = NumberFormat.getFloatInstance(
         {
-          decimals: 3
+          decimals: 3,
+          maxFractionDigits: 3
         },
         sap.ui.getCore().getConfiguration().getLocale()
       );
