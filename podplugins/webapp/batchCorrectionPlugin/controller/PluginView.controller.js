@@ -198,9 +198,9 @@ sap.ui.define(
           newValue = oEvent.getSource().getValue(),
           fTotalGRQty = this.grSummary.targetQuantityInProductionUnit.value;
 
-        var oFloatInstance = (oInstance = sap.ui.core.format.NumberFormat.getFloatInstance({
+        var oFloatInstance = sap.ui.core.format.NumberFormat.getFloatInstance({
           maxFractionDigits: 3
-        }));
+        });
 
         aLineItems.forEach(oItem => {
           oItem.batchCorrectionWeight.value = oFloatInstance.format(oItem.targetQuantity.value / fTotalGRQty * newValue);
@@ -245,6 +245,11 @@ sap.ui.define(
       },
 
       onApprove: function() {
+        var oStepInput = this.getView().byId('idStepInput');
+        if (oStepInput.getValueState() === sap.ui.core.ValueState.Error) {
+          return MessageBox.error(this.getI18nText('fixErrorsBeforeProceedErrMsg'));
+        }
+
         //Send batch correction details to S4
         this._sendBatchCorrectionToS4();
         //Release the SFC
