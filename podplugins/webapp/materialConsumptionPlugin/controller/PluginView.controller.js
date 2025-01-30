@@ -2802,7 +2802,7 @@ sap.ui.define(
         }
       },
 
-      fetchGiMaterialData: function(sUrl, oParameters) {
+      fetchGiMaterialData: async function(sUrl, oParameters) {
         var that = this;
         this.allWorkInstructionsLoaded = false;
         this.allAlternateComponentsLoaded = false;
@@ -3606,7 +3606,7 @@ sap.ui.define(
         return isValidInput;
       },
 
-      handleLiveChangeScan: function(oEvent) {
+      handleLiveChangeScan: async function(oEvent) {
         var that = this;
         var flag = true;
         //  Extend WeighingScreen
@@ -3621,15 +3621,45 @@ sap.ui.define(
         var scannedMat = that.getCurrentInputMaterialControl().getValue();
         var oDialogSelected = this.getCurrentDialogId();
         var scannedMatDetails;
+        var oMaterialInput = that.getCurrentInputMaterialControl();
 
-        //QR code scan for material
+        // if (!(scannedMat instanceof Object)) {
+        //   var oMaterial = await this._getMaterialForEAN(scannedMat);
+        //   oMaterialInput.setValue(oMaterial.material);
+        // }
+
+        // //QR code scan for material
+        // try {
+        //   var oMatParsed = JSON.parse(oMaterialInput.getValue());
+        //   scannedMat = oMatParsed.Material;
+        //   oMaterialInput.setValue(scannedMat);
+        //   this.scannedMaterial = oMatParsed;
+        // } catch (e) {}
+
+        var oScannedValue;
+        //Try to parse the scanned value to get JSON
         try {
-          var oMaterialInput = that.getCurrentInputMaterialControl();
-          var oMatParsed = JSON.parse(oMaterialInput.getValue());
-          scannedMat = oMatParsed.Material;
-          oMaterialInput.setValue(scannedMat);
-          this.scannedMaterial = oMatParsed;
+          oScannedValue = JSON.parse(oMaterialInput.getValue());
         } catch (e) {}
+
+        //If scanned value is JSON and not a number, extract material details
+        //else scanned value is vendor material. Perform EAN to material conversion
+        if (oScannedValue && isNaN(oScannedValue)) {
+          scannedMat = oScannedValue.Material;
+          oMaterialInput.setValue(scannedMat);
+          this.scannedMaterial = oScannedValue;
+        } else {
+          this.scannedMaterial = {};
+          var oMaterial = await this._getMaterialForEAN(scannedMat).catch((e)=>{});
+          if(!oMaterial){
+            this.showErrorMessage(that.getI18nText('INVALID_MATERIAL'));
+            oMaterialInput.setValue('');
+            oCurrentDialog.setBusy(false);
+            return;
+          }
+          oMaterialInput.setValue(oMaterial.material);
+          scannedMat = oMaterial.material;
+        }
 
         if (!that.validateMaterialInputRegEx(scannedMat)) {
           flag = false;
@@ -5304,6 +5334,19 @@ sap.ui.define(
         }
 
         return this.parkedItemList.map(oItem => oItem.materialId.material).join(',');
+      },
+
+      _getMaterialForEAN: function(sEAN) {
+        var sUrl =
+          this.getPublicApiRestDataSourceUri() +
+          '/pe/api/v1/process/processDefinitions/start?key=REG_35d60bbd-14c1-443d-b7a2-c724261d94ef&async=false';
+        var oPayload = {
+          ean: sEAN
+        };
+
+        return new Promise((resolve, reject) => {
+          this.ajaxPostRequest(sUrl, oPayload, resolve, reject);
+        });
       }
     });
   }
