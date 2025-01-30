@@ -2808,6 +2808,18 @@ sap.ui.define(
         this.allAlternateComponentsLoaded = false;
         var i, lineItem;
         oLogger.info('----->Executing fetchGiMaterialData');
+
+        var oBatchCorrectionInfo = await that._getBatchCorrectionData().catch(oError => {
+          return [];
+        });
+
+        //If batch correction items exist, then get the items applicable for selected phase
+        this.batchCorrItems = [];
+        if (oBatchCorrectionInfo.content.length > 0) {
+          var sStepId = this.getPodSelectionModel().selectedPhaseData.stepId;
+          this.batchCorrItems = oBatchCorrectionInfo.content.filter(oItem => oItem.phase === sStepId);
+        }
+
         AjaxUtil.get(
           sUrl,
           oParameters,
@@ -2823,9 +2835,26 @@ sap.ui.define(
                 that.coAndByProducts.push(lineItem[0].materialId.material);
               }
             }
+
             //Set the GI Model.
             that.giModel = that.giModel || new JSONModel();
             that.giModel.setSizeLimit(that.itemList.lineItems.length);
+
+            //Apply the correction entries
+            if (that.batchCorrItems.length > 0) {
+              that.itemList.lineItems.forEach(oItem => {
+                var oCorrItem = that.batchCorrItems.find(val => val.component === oItem.materialId.material);
+                if (!oCorrItem) return;
+
+                // oItem.toleranceOver = oCorrItem.approvedTUpper;
+                // oItem.toleranceUnder = oCorrItem.approvedTLower;
+                oItem.recipeComponentToleranceOver = oCorrItem.approvedTUpper;
+                oItem.recipeComponentToleranceUnder = oCorrItem.approvedTLower;
+                oItem.targetQuantity.value = oCorrItem.approvedQuantity;
+                oItem.totalQtyEntryUom.value = oCorrItem.approvedQuantity;
+                oItem.totalQtyBaseUom.value = oCorrItem.approvedQuantity;
+              });
+            }
 
             that.itemList.lineItems.forEach(e => {
               var thresholdValuesToBeDisplayed = that.getUpperAndLowerThresholdValues(
@@ -5346,6 +5375,20 @@ sap.ui.define(
 
         return new Promise((resolve, reject) => {
           this.ajaxPostRequest(sUrl, oPayload, resolve, reject);
+        });
+      },
+
+      _getBatchCorrectionData: function() {
+        var sUrl =
+          this.getPublicApiRestDataSourceUri() +
+          '/pe/api/v1/process/processDefinitions/start?key=REG_04527345-c48f-44c1-9424-5b65503c18ed&async=false';
+        var oSelection = this.getPodSelectionModel().getSelection();
+        var oParams = {
+          order: oSelection.getShopOrder().shopOrder,
+          sfc: oSelection.getSfc()
+        };
+        return new Promise((resolve, reject) => {
+          this.ajaxPostRequest(sUrl, oParams, resolve, reject);
         });
       }
     });
