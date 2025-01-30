@@ -38,7 +38,13 @@
                     width="10rem"
                     class="sapUiTinyMarginEnd" />
             </form:SimpleForm>
-            <Table id="idBatchTable" items="{giData>/lineItems}" visible="true" class="sapUiSmallMargin" popinLayout="GridLarge" >
+            <Table id="idBatchTable" visible="true" class="sapUiSmallMargin" popinLayout="GridLarge" 
+                items="{
+                    path: 'giData>/lineItems',
+                    filters : [
+                        { path : 'componentType', operator : 'EQ', value1 : 'N'}
+                    ]
+                }" >
                 <headerToolbar>
                     <Toolbar width="100%">
                         <Title id="idBatchtitleText" level="H2" text="Components" />
@@ -124,6 +130,81 @@
                                     </layoutData>
                                 </Text>
                             </HBox> -->
+                            <ObjectNumber
+                                number="{
+                                    path: 'giData>issueWeight/value',
+                                    formatter:'oFormatter.formatQty'
+                                }"
+                                unit="{giData>issueWeight/unitOfMeasure/uom}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+            <Table id="idByProductTable" 
+                visible="true" 
+                class="sapUiSmallMargin" 
+                popinLayout="GridLarge"
+                items="{
+                    path:'giData>/lineItems',
+                    filters : [
+                        { path : 'componentType', operator : 'NE', value1 : 'N'}
+                    ]}">
+                <headerToolbar>
+                    <Toolbar width="100%">
+                        <Title id="idByProductTableTitleText" level="H2" text="By Products &amp; Co Products" />
+                    </Toolbar>
+                </headerToolbar>
+                <columns>
+                    <Column><Text text="{i18n>componentColLab}"/></Column>
+                    <Column><Text text="{i18n>bomTargetColLab}"/></Column>
+                    <Column><Text text="{i18n>measureColLab}"/></Column>
+                    <Column><Text text="{i18n>statusColLab}"/></Column>
+                    <Column><Text text="{i18n>correctionColLab}"/></Column>
+                    <Column><Text text="{i18n>issueColLab}"/></Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <ObjectIdentifier 
+                                title="{giData>materialId/material}" 
+                                text="{giData>description}"/>
+                            <!-- <ObjectNumber
+                                number="{
+                                    parts:[
+                                        {path:'giData>totalQtyEntryUom'},
+                                        {path:'giData>totalQtyBaseUom'},
+                                        {path:'giData>targetQuantity'}
+                                    ],
+                                    formatter:'.oFormatter.getValidTargetValues'
+                                }" 
+                                unit="{giData>targetQuantity/unitOfMeasure/uom}"/> -->
+                            <ObjectNumber
+                                number="{giData>targetQuantity/value}" 
+                                unit="{giData>targetQuantity/unitOfMeasure/uom}"/>
+                            <ObjectNumber
+                                number="{
+                                    parts:['giData>consumedQuantity/value','giData>consumedQuantity/unitOfMeasure/uom'],
+                                    formatter: '.oFormatter.formatQtyWithDecimals'
+                                }"
+                                unit="{giData>consumedQuantity/unitOfMeasure/uom}"/>
+                            <ObjectStatus
+                                text="{giData>statusText}"
+                                inverted="true"
+                                icon="{
+                                    path: 'giData>status',
+                                    formatter: '.oFormatter.statusIconFormatter'
+                                    }"
+                                visible="{= ${giData>status} !== ''}"
+                                state="{
+                                    path:'giData>status',
+                                    formatter: '.oFormatter.stateFormatter'
+                                }" />
+                            <ObjectNumber
+                                number="{
+                                    path:'giData>batchCorrectionWeightCalc/value',
+                                    formatter:'oFormatter.formatQty'
+                                }" 
+                                unit="{giData>batchCorrectionWeight/unitOfMeasure/uom}"/>
                             <ObjectNumber
                                 number="{
                                     path: 'giData>issueWeight/value',

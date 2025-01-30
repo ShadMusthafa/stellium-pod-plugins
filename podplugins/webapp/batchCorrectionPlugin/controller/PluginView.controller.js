@@ -154,7 +154,9 @@ sap.ui.define(
             aLineItems.forEach(oLineItem => {
               var sComponent = oLineItem.materialId.material;
               var oItem = oResponse.response.find(oResItem => oResItem.componenet === sComponent);
+              
               console.assert(!!oItem, 'Item not found in response object');
+              if(!oItem) return;
 
               oLineItem.batchCorrectionWeight = {
                 value: oItem.calcqty,
@@ -317,7 +319,8 @@ sap.ui.define(
         });
 
         return Promise.all(aPromises).then(function(aResponses) {
-          var aLineItems = aResponses.flatMap(oResponse => oResponse).filter(oItem => oItem.componentType === 'N');
+          var aLineItems = aResponses.flatMap(oResponse => oResponse);
+          // .filter(oItem => oItem.componentType === 'N');
           return aLineItems;
         });
       },
