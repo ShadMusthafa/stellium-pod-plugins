@@ -582,6 +582,7 @@ sap.ui.define(
               operationActivity: phase.recipeOperation.operationActivity.operationActivity,
               bom: component.bomComponent.bom.bom,
               bomVersion: component.bomComponent.bom.version,
+              sequence: component.bomComponent.sequence,
               userAssignments: this.workCenters[phase.workCenter].userAssignments
             }))
           )
@@ -855,10 +856,11 @@ sap.ui.define(
           InOrderBO: this.selectedOrder.order,
           InOperationActivity: oItem.operationActivity,
           InUOM: 'KG', //TBD leave blank for now
-          InERPSequence: '', //TBD leave blank for now
+          InERPSequence: oItem.sequence,
           InBOM: this.selectedOrder.bom.bom,
           InMaterialVersion: oItem.componentVersion,
-          InBOMVersion: this.selectedOrder.bom.version
+          InBOMVersion: this.selectedOrder.bom.version,
+          InCorrectionTime: oItem.correctionTime
         };
 
         return new Promise((resolve, reject) => {
