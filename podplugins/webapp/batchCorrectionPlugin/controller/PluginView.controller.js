@@ -28,6 +28,9 @@ sap.ui.define(
 
         var oView = this.getView();
         var oViewData = {
+          calcGRQty: 0,
+          calcGrUOM: '',
+          isCheckEnabled: false,
           scaleFactor: {
             value: 1,
             min: 1,
@@ -64,6 +67,17 @@ sap.ui.define(
       handleOrderSelectionEvent: async function(sChannelId, sEventId, oData) {
         console.log('Order selection event', oData);
         var oView = this.getView();
+
+        //Reset the scaleFactor and calculated GR quantity
+        var oViewModel = oView.getModel('viewModel');
+        oViewModel.setProperty('/calcGRQty', 0);
+        oViewModel.setProperty('/calcGrUOM', '');
+        oViewModel.setProperty('/scaleFactor', {
+          value: 1,
+          min: 1,
+          stepSize: 1,
+          precision: 0
+        });
 
         this.selectedOrder = oData;
 
@@ -120,10 +134,68 @@ sap.ui.define(
         });
       },
 
+      onCalculateNewBomQty: function(oEvent) {
+        var sUrl =
+          this.getPublicApiRestDataSourceUri() +
+          '/pe/api/v1/process/processDefinitions/start?key=REG_260a0c6a-3f96-4228-b15d-c372ed3e7afd&async=false';
+
+        var fGrQty = this.getView().getModel('viewModel').getProperty('/scaleFactor/value');
+        var oRequestBody = {
+          payload: {
+            plant: this.getPodController().getUserPlant(),
+            hdrmat: this.selectedOrder.materialName,
+            grUom: this.selectedOrder.baseInternalUom,
+            grQty: fGrQty
+          }
+        };
+
+        this.getView().getModel('viewModel').setProperty('/isCheckEnabled', false);
+
+        this.ajaxPostRequest(
+          sUrl,
+          oRequestBody,
+          function(oResponse) {
+            var oViewModel = this.getView().getModel('viewModel');
+            oViewModel.setProperty('/calcGRQty', oResponse.response.grQty);
+            oViewModel.setProperty('/calcGrUOM', oResponse.response.grUom);
+
+            var oGiModel = this.getView().getModel('giData'),
+              aLineItems = oGiModel.getProperty('/lineItems');
+            aLineItems.forEach(oLineItem => {
+              var sComponent = oLineItem.materialId.material;
+              var oItem = oResponse.response.calculatedBom.find(oResItem => oResItem.component === sComponent);
+
+              console.assert(!!oItem, 'Item not found in response object');
+              if (!oItem) return;
+
+              oLineItem.batchCorrectionWeight = {
+                value: oItem.calcComponenetQty,
+                unitOfMeasure: {
+                  uom: oItem.componentUom
+                }
+              };
+
+              oLineItem.batchCorrectionWeightCalc = { ...oLineItem.batchCorrectionWeight };
+
+              oLineItem.issueWeight = {
+                value: oItem.calcComponenetQty - oLineItem.consumedQuantity.value,
+                unitOfMeasure: {
+                  uom: oItem.componentUom
+                }
+              };
+            });
+            oGiModel.setProperty('/lineItems', aLineItems);
+          }.bind(this),
+          function(oError) {
+            this.getView().getModel('viewModel').setProperty('/isCheckEnabled', true);
+          }.bind(this)
+        );
+      },
+
       onCalculateBatchCorrectionBtnPress: function(oEvent) {
         var sUrl =
           this.getPublicApiRestDataSourceUri() +
-          '/pe/api/v1/process/processDefinitions/start?key=REG_0ae51ff6-5158-477f-bdea-546e8f9bffa1&async=false';
+          '/pe/api/v1/process/processDefinitions/start?key=REG_260a0c6a-3f96-4228-b15d-c372ed3e7afd&async=false';
 
         //Get the batch correction item
         var oGiModel = this.getView().getModel('giData'),
@@ -139,55 +211,71 @@ sap.ui.define(
           fConsumedQty = parseFloat(oBatchCorrectionItem.consumedQuantity.value),
           sConsumedQtyUom = oBatchCorrectionItem.consumedQuantity.unitOfMeasure.uom;
 
+        // var oRequestBody = {
+        //   plant: this.getPodController().getUserPlant(),
+        //   headerMaterial: this.selectedOrder.materialName,
+        //   component: sComponent,
+        //   correctionQuantity: fConsumedQty,
+        //   uom: sConsumedQtyUom
+        // };
+
         var oRequestBody = {
-          plant: this.getPodController().getUserPlant(),
-          headerMaterial: this.selectedOrder.materialName,
-          component: sComponent,
-          correctionQuantity: fConsumedQty,
-          uom: sConsumedQtyUom
+          payload: {
+            plant: this.getPodController().getUserPlant(),
+            hdrmat: this.selectedOrder.materialName,
+            grUom: this.selectedOrder.baseInternalUom,
+            componenet: sComponent,
+            comQty: fConsumedQty,
+            comUom: sConsumedQtyUom
+          }
         };
 
         this.ajaxPostRequest(
           sUrl,
           oRequestBody,
           function(oResponse) {
+            var oViewModel = this.getView().getModel('viewModel');
+            oViewModel.setProperty('/calcGRQty', oResponse.response.grQty);
+            oViewModel.setProperty('/calcGrUOM', oResponse.response.grUom);
+
             aLineItems.forEach(oLineItem => {
               var sComponent = oLineItem.materialId.material;
-              var oItem = oResponse.response.find(oResItem => oResItem.componenet === sComponent);
-              
+              var oItem = oResponse.response.calculatedBom.find(oResItem => oResItem.component === sComponent);
+
               console.assert(!!oItem, 'Item not found in response object');
-              if(!oItem) return;
+              if (!oItem) return;
 
               oLineItem.batchCorrectionWeight = {
-                value: oItem.calcqty,
+                value: oItem.calcComponenetQty,
                 unitOfMeasure: {
-                  uom: oItem.cuom
+                  uom: oItem.componentUom
                 }
               };
 
               oLineItem.batchCorrectionWeightCalc = { ...oLineItem.batchCorrectionWeight };
 
               oLineItem.issueWeight = {
-                value: oItem.calcqty - oLineItem.consumedQuantity.value,
+                value: oItem.calcComponenetQty - oLineItem.consumedQuantity.value,
                 unitOfMeasure: {
-                  uom: oItem.cuom
+                  uom: oItem.componentUom
                 }
               };
             });
             oGiModel.setProperty('/lineItems', aLineItems);
 
             //Reset the scaleFactor input value
-            this.getView().getModel('viewModel').setProperty('/scaleFactor/value', 1);
+            this.getView().getModel('viewModel').setProperty('/scaleFactor/value', oResponse.response.grQty);
+            this.getView().getModel('viewModel').setProperty('/scaleFactor/min', oResponse.response.grQty);
 
-            var oItem = this._getBatchCorrectionItem();
-            if (!oItem) return;
+            // var oItem = this._getBatchCorrectionItem();
+            // if (!oItem) return;
 
-            var fScaleFactor = oItem.batchCorrectionWeightCalc.value / oItem.targetQuantity.value;
+            // var fScaleFactor = oItem.batchCorrectionWeightCalc.value / oItem.targetQuantity.value;
 
-            //Update the step input based on batch correction data
-            var oViewModel = this.getView().getModel('viewModel');
-            oViewModel.setProperty('/scaleFactor/value', fScaleFactor * this.grSummary.targetQuantityInProductionUnit.value);
-            oViewModel.setProperty('/scaleFactor/min', fScaleFactor * this.grSummary.targetQuantityInProductionUnit.value);
+            // //Update the step input based on batch correction data
+            // var oViewModel = this.getView().getModel('viewModel');
+            // oViewModel.setProperty('/scaleFactor/value', fScaleFactor * this.grSummary.targetQuantityInProductionUnit.value);
+            // oViewModel.setProperty('/scaleFactor/min', fScaleFactor * this.grSummary.targetQuantityInProductionUnit.value);
 
             this._setScaleFactorEnabled(true);
           }.bind(this)
@@ -195,29 +283,30 @@ sap.ui.define(
       },
 
       onStepInputChange: function(oEvent) {
-        var oGiModel = this.getView().getModel('giData'),
-          aLineItems = oGiModel.getProperty('/lineItems'),
-          newValue = oEvent.getSource().getValue(),
-          fTotalGRQty = this.grSummary.targetQuantityInProductionUnit.value;
+        this.getView().getModel('viewModel').setProperty('/isCheckEnabled', true);
+        // var oGiModel = this.getView().getModel('giData'),
+        //   aLineItems = oGiModel.getProperty('/lineItems'),
+        //   newValue = oEvent.getSource().getValue(),
+        //   fTotalGRQty = this.grSummary.targetQuantityInProductionUnit.value;
 
-        var oFloatInstance = sap.ui.core.format.NumberFormat.getFloatInstance({
-          maxFractionDigits: 3
-        });
-
-        aLineItems.forEach(oItem => {
-          oItem.batchCorrectionWeight.value = oFloatInstance.format(oItem.targetQuantity.value / fTotalGRQty * newValue);
-          oItem.batchCorrectionWeightCalc.value = oFloatInstance.format(oItem.targetQuantity.value / fTotalGRQty * newValue);
-          oItem.issueWeight.value = oFloatInstance.format(oItem.batchCorrectionWeight.value - oItem.consumedQuantity.value);
-        });
-
-        // aLineItems.forEach(oItem => {
-        //   oItem.batchCorrectionWeight.value = oItem.batchCorrectionWeight.value / this.currentScaleFactor * newValue;
-        //   oItem.batchCorrectionWeightCalc.value = oItem.batchCorrectionWeightCalc.value / this.currentScaleFactor * newValue;
-        //   oItem.issueWeight.value = oItem.batchCorrectionWeight.value - oItem.consumedQuantity.value;
+        // var oFloatInstance = sap.ui.core.format.NumberFormat.getFloatInstance({
+        //   maxFractionDigits: 3
         // });
 
-        oGiModel.setProperty('/lineItems', aLineItems);
-        this.currentScaleFactor = newValue;
+        // aLineItems.forEach(oItem => {
+        //   oItem.batchCorrectionWeight.value = oFloatInstance.format(oItem.targetQuantity.value / fTotalGRQty * newValue);
+        //   oItem.batchCorrectionWeightCalc.value = oFloatInstance.format(oItem.targetQuantity.value / fTotalGRQty * newValue);
+        //   oItem.issueWeight.value = oFloatInstance.format(oItem.batchCorrectionWeight.value - oItem.consumedQuantity.value);
+        // });
+
+        // // aLineItems.forEach(oItem => {
+        // //   oItem.batchCorrectionWeight.value = oItem.batchCorrectionWeight.value / this.currentScaleFactor * newValue;
+        // //   oItem.batchCorrectionWeightCalc.value = oItem.batchCorrectionWeightCalc.value / this.currentScaleFactor * newValue;
+        // //   oItem.issueWeight.value = oItem.batchCorrectionWeight.value - oItem.consumedQuantity.value;
+        // // });
+
+        // oGiModel.setProperty('/lineItems', aLineItems);
+        // this.currentScaleFactor = newValue;
       },
 
       onBatchCorrectionWtChange: function(oEvent) {
@@ -252,12 +341,21 @@ sap.ui.define(
           return MessageBox.error(this.getI18nText('fixErrorsBeforeProceedErrMsg'));
         }
 
-        //Send batch correction details to S4
-        this._sendBatchCorrectionToS4();
-        //Release the SFC
-        this._releaseSfcHold();
-        //Navigate back to order selection
-        window.history.go(-1);
+        var oViewModel = this.getView().getModel('viewModel'),
+          fCalcQuantity = oViewModel.getProperty('/calcGRQty'),
+          fCalcQtyUom = oViewModel.getProperty('/calcGrUOM'),
+          sMessage = this.getI18nText('confirmBatchCorrectionApproval', [this.selectedOrder.sfc, fCalcQuantity, fCalcQtyUom]);
+        MessageBox.confirm(sMessage, {
+          onClose: function(oAction) {
+            if (oAction === MessageBox.Action.CANCEL) return;
+            //Send batch correction details to S4
+            this._sendBatchCorrectionToS4();
+            //Release the SFC
+            this._releaseSfcHold();
+            //Navigate back to order selection
+            window.history.go(-1);
+          }.bind(this)
+        });
       },
 
       _getRoutingDetailsForOrder: function(sOrderId) {
@@ -407,11 +505,17 @@ sap.ui.define(
         var sUrl =
           this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_602cf830-1ee2-4756-bd82-e306ef25940a';
 
+        var oViewModel = this.getView().getModel('viewModel'),
+          calcGRQty = oViewModel.getProperty('/calcGRQty'),
+          calcGrUOM = oViewModel.getProperty('/calcGrUOM');
+
         var oRequestBody = {
           orderNumber: this.selectedOrder.order,
           sfc: this.selectedOrder.sfc,
           material: this.selectedOrder.materialName,
           materialDescription: this.selectedOrder.materialDescription,
+          grQty: calcGRQty,
+          grUom: calcGrUOM,
           phase: '',
           component: '',
           componentDescription: '',

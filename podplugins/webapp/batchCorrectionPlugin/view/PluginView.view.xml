@@ -27,16 +27,20 @@
                 columnsM="1"
                 singleContainerFullSize="false" >
                 <Label text="Calculated GR Quantity"/>
-                <StepInput 
-                    id="idStepInput"
-                    value="{viewModel>/scaleFactor/value}"
-                    min="{viewModel>/scaleFactor/min}"
-                    max="{viewModel>/scaleFactor/max}"
-                    step="{viewModel>/scaleFactor/stepSize}"
-                    displayValuePrecision="{viewModel>/scaleFactor/precision}"
-                    change="onStepInputChange" 
-                    width="10rem"
-                    class="sapUiTinyMarginEnd" />
+                <HBox width="20rem">
+                    <StepInput 
+                        id="idStepInput"
+                        value="{viewModel>/scaleFactor/value}"
+                        min="{viewModel>/scaleFactor/min}"
+                        max="{viewModel>/scaleFactor/max}"
+                        step="{viewModel>/scaleFactor/stepSize}"
+                        displayValuePrecision="{viewModel>/scaleFactor/precision}"
+                        change="onStepInputChange" 
+                        width="10rem"
+                        class="sapUiTinyMarginEnd" />
+                    <Label/>
+                    <Button text="Check" enabled="{viewModel>/isCheckEnabled}" press=".onCalculateNewBomQty"/>
+                </HBox>                
             </form:SimpleForm>
             <Table id="idBatchTable" visible="true" class="sapUiSmallMargin" popinLayout="GridLarge" 
                 items="{
