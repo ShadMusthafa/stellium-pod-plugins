@@ -1923,10 +1923,10 @@ sap.ui.define(
         }
 
         var selectedMaterial = oEvent.getSource().getBindingContext().getObject().materialId.material;
-        if (this._hasParkedItems() && !this._checkIfItemIsParked(selectedMaterial)) {
-          MessageBox.error(this.getI18nText('processParkedItemsErrMsg', [this._getParkedMaterialList(), selectedMaterial]));
-          return;
-        }
+        // if (this._hasParkedItems() && !this._checkIfItemIsParked(selectedMaterial)) {
+        //   MessageBox.error(this.getI18nText('processParkedItemsErrMsg', [this._getParkedMaterialList(), selectedMaterial]));
+        //   return;
+        // }
 
         var selectedMaterialRef = oEvent.getSource().getBindingContext().getObject().materialId.ref;
         var selectedMaterialVersion = oEvent.getSource().getBindingContext().getObject().materialId.version;
@@ -2815,7 +2815,7 @@ sap.ui.define(
 
         //If batch correction items exist, then get the items applicable for selected phase
         this.batchCorrItems = [];
-        if (oBatchCorrectionInfo.content.length > 0) {
+        if (oBatchCorrectionInfo && oBatchCorrectionInfo.content && oBatchCorrectionInfo.content.length > 0) {
           var sStepId = this.getPodSelectionModel().selectedPhaseData.stepId;
           this.batchCorrItems = oBatchCorrectionInfo.content.filter(oItem => oItem.phase === sStepId);
         }
