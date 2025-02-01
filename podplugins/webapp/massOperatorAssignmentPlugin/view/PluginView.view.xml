@@ -97,14 +97,14 @@
                             showSecondaryValues="true"
                             columnRatio="2:3"
                             enabled="{viewModel>isNew}"
-                            items="{resourceData>/}"
+                            items="{viewModel>resourceList}"
                             selectedKey="{viewModel>resource}"
                             change=".onAssignedResourceChanged">
                             <!-- <core:Item key="{resourceData>resource}" text="{resourceData>resource} {resourceData>description}"/> -->
                             <core:ListItem 
-                                key="{resourceData>resource}" 
-                                text="{resourceData>resource}" 
-                                additionalText="{resourceData>description}"/>
+                                key="{viewModel>resource}" 
+                                text="{viewModel>resource}" 
+                                additionalText="{viewModel>description}"/>
                         </Select>
                         <VBox items="{viewModel>resourceType}">
                             <Text text="{viewModel>type}"/>

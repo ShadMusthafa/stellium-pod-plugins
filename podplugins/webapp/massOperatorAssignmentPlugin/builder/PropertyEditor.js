@@ -38,6 +38,8 @@ sap.ui.define(['sap/dm/dme/podfoundation/control/PropertyEditor'], function(Prop
   ];
 
   const sAllowedStatusesForAssignment = 'allowedResourceStatusesForAssignment';
+  const sDefaultAcceptanceDelay = 'defaultAcceptanceDelay';
+  const sDefaultCorrectionTime = 'defaultCorrectionTime';
 
   var oPropertyEditor = PropertyEditor.extend('stellium.ext.podplugins.massOperatorAssignmentPlugin.builder.PropertyEditor', {
     constructor: function(sId, mSettings) {
@@ -55,12 +57,17 @@ sap.ui.define(['sap/dm/dme/podfoundation/control/PropertyEditor'], function(Prop
         oData[sAllowedStatusesForAssignment] = this.getDefaultPropertyData()[sAllowedStatusesForAssignment];
       }
       this.addMultiComboBox(oPropertyFormContainer, sAllowedStatusesForAssignment, oData, aResourceStatus, aResourceStatusTexts, true);
+
+      this.addInputField(oPropertyFormContainer, sDefaultAcceptanceDelay, 1);
+      this.addInputField(oPropertyFormContainer, sDefaultCorrectionTime, 1);
     },
 
     getDefaultPropertyData: function() {
       var oData = {
         closeButtonVisible: false,
-        allowedResourceStatusesForAssignment: aResourceStatus
+        allowedResourceStatusesForAssignment: aResourceStatus,
+        defaultAcceptanceDelay: 1,
+        defaultCorrectionTime: 1
       };
 
       return oData;

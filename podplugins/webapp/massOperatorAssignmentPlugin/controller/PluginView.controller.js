@@ -150,7 +150,7 @@ sap.ui.define(
           oSelectedContext = oControl.getBindingContext('viewModel'),
           oSelectedRowData = oSelectedContext.getObject(),
           oSelectedItem = oEvent.getParameter('selectedItem'),
-          oResourceData = oSelectedItem.getBindingContext('resourceData').getObject();
+          oResourceData = oSelectedItem.getBindingContext('viewModel').getObject();
 
         this._markItemAsDirty(oSelectedContext);
         ErrorHandler.clearErrorState(oControl, 'selectedKey');
@@ -169,16 +169,6 @@ sap.ui.define(
           ErrorHandler.setErrorState(oControl, this.getI18nText('resourceStatusInvalidErrMsg', [oResourceData.status]), 'selectedKey');
           return;
         }
-
-        // //Validate resource assignment
-        // if (oResourceData.customData.ORDER) {
-        //   ErrorHandler.setErrorState(
-        //     oControl,
-        //     this.getI18nText('ResourceAssignedToOtherOrderErrMsg', [oResourceData.customData.ORDER]),
-        //     'selectedKey'
-        //   );
-        //   return;
-        // }
 
         this._getResourceOccupancy(oResourceData.resource).then(oResourceOccupancy => {
           if (oResourceOccupancy['State_Signal'] !== 0) {
@@ -214,13 +204,15 @@ sap.ui.define(
 
         this._getOperatorOccupancy(sOperatorId).then(
           function(oResponse) {
+            //If outOperator array is empty, then operator does not have another assignment. No error
             if (oResponse.outOperator.length === 0) {
-              ErrorHandler.setErrorState(
-                oControl,
-                this.getI18nText('operatorAssignedToOtherResourceErrMsg', [sOperatorId, oResponse.outOperator[0].RESOURCE])
-              );
               return;
             }
+            //outOperator array is not empty. Operator is already assigned. Show error
+            ErrorHandler.setErrorState(
+              oControl,
+              this.getI18nText('operatorAssignedToOtherResourceErrMsg', [sOperatorId, oResponse.outOperator[0].RESOURCE])
+            );
           }.bind(this)
         );
       },
@@ -512,6 +504,19 @@ sap.ui.define(
           );
       },
 
+      _getResourceListForWorkCenter: function(aMembers) {
+        var aResourceList = this.getView().getModel('resourceData').getProperty('/');
+        return aResourceList.filter(oResource => {
+          var isValidResource = oResource.types.find(oType => oType.type === 'PORTIONING' || oType.type === 'FORMULATION') ? true : false;
+          if (!isValidResource) return false;
+
+          var isWorkCenterMember = aMembers.find(oMember => oMember.resource.resource === oResource.resource);
+          if (!isWorkCenterMember) return false;
+
+          return true;
+        });
+      },
+
       _handleMaterialDataFetch: function(aMaterials) {
         this.materialsList = aMaterials.reduce((acc, val) => {
           acc[val.material] = val;
@@ -560,6 +565,7 @@ sap.ui.define(
       },
 
       _createTableLineItems: function(aData) {
+        var oConfiguration = this.getConfiguration();
         var aRecipeItems = aData.flatMap(recipe =>
           recipe.phases.flatMap(phase =>
             phase.recipePhaseComponentList.map(component => ({
@@ -576,14 +582,15 @@ sap.ui.define(
               resourceType: '',
               operator: '',
               autoAcceptance: false,
-              acceptanceDelay: 3000,
-              correctionTime: 0,
+              acceptanceDelay: oConfiguration && oConfiguration.defaultAcceptanceDelay ? oConfiguration.defaultAcceptanceDelay : 0,
+              correctionTime: oConfiguration && oConfiguration.defaultCorrectionTime ? oConfiguration.defaultCorrectionTime : 0,
               lastModified: '',
               operationActivity: phase.recipeOperation.operationActivity.operationActivity,
               bom: component.bomComponent.bom.bom,
               bomVersion: component.bomComponent.bom.version,
               sequence: component.bomComponent.sequence,
-              userAssignments: this.workCenters[phase.workCenter].userAssignments
+              userAssignments: this.workCenters[phase.workCenter].userAssignments,
+              resourceList: this._getResourceListForWorkCenter(this.workCenters[phase.workCenter].members)
             }))
           )
         );
