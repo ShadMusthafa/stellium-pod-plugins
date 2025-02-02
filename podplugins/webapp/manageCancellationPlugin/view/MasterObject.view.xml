@@ -173,7 +173,7 @@
                                     <Button text="{i18n>cancelButton}" 
                                         press=".onCancelConfirmationPress"
                                         visible="{
-                                            parts: ['data>/authorizedToCancel', 'confirmationItems>status'],
+                                            parts: ['data>/authorizedToCancel', 'confirmationItems>status', 'confirmationItems>confirmationGroup', 'confirmationItems>confirmationCounter'],
                                             formatter:'.formatter.cancelConfirmationVisiblityFormatter'
                                         }">
                                         <customData>
