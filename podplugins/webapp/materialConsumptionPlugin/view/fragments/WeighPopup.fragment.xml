@@ -48,7 +48,7 @@
                             suggestionItems="{weighingModel>/scaleList}"
                             change="onSelectScale">
                             <suggestionItems>
-                                <core:Item text="{weighingModel>description}" />
+                                <core:Item text="{weighingModel>resource}" />
                             </suggestionItems>
                         </Input>
                         <Label text="" />

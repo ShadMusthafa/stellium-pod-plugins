@@ -3677,10 +3677,17 @@ sap.ui.define(
           scannedMat = oScannedValue.Material;
           oMaterialInput.setValue(scannedMat);
           this.scannedMaterial = oScannedValue;
+
+          //If stock id is not available in the scanned QR code, throw error, dont process further
+          if (!oScannedValue.StockID) {
+            MessageBox.error(this.getI18nText('materialIsNotBatchManagedErrMsg'));
+            oCurrentDialog.setBusy(false);
+            return;
+          }
         } else {
           this.scannedMaterial = {};
-          var oMaterial = await this._getMaterialForEAN(scannedMat).catch((e)=>{});
-          if(!oMaterial){
+          var oMaterial = await this._getMaterialForEAN(scannedMat).catch(e => {});
+          if (!oMaterial) {
             this.showErrorMessage(that.getI18nText('INVALID_MATERIAL'));
             oMaterialInput.setValue('');
             oCurrentDialog.setBusy(false);
@@ -4678,21 +4685,23 @@ sap.ui.define(
 
       onSelectScale: async function(oEvent) {
         var oScaleInput = this.oWeighDispenseHandler.getCurrentWeighScaleList();
-        var selectedScale;
-        try {
-          var oSelectedResource = JSON.parse(oEvent.getParameter('newValue')),
-            sSelectedAsset = oSelectedResource.asset;
+        var sSelectedScale = oScaleInput.getValue();
 
-          selectedScale = oSelectedResource.resource;
-          oScaleInput.setValue(selectedScale);
-        } catch (e) {
-          selectedScale = oEvent.getParameter('newValue');
-        }
+        // var selectedScale;
+        // try {
+        //   var oSelectedResource = JSON.parse(oEvent.getParameter('newValue')),
+        //     sSelectedAsset = oSelectedResource.asset;
+
+        //   selectedScale = oSelectedResource.resource;
+        //   oScaleInput.setValue(selectedScale);
+        // } catch (e) {
+        //   selectedScale = oEvent.getParameter('newValue');
+        // }
 
         //Validate resource
         var oModel = this.getCurrentModel(),
           aScaleList = oModel.getProperty('/scaleList');
-        var oResource = aScaleList.find(oScale => oScale.resource === selectedScale);
+        var oResource = aScaleList.find(oScale => oScale.resource === sSelectedScale);
 
         if (!oResource) {
           oScaleInput.setValueState('Error');
@@ -4703,25 +4712,29 @@ sap.ui.define(
           oScaleInput.setValueStateText('');
         }
 
-        //Validate asset
-        if (!sSelectedAsset) {
-          this.oWeighDispenseHandler.onSelectScale(oEvent);
-          return;
-        }
+        
+        this._assignOperator(sSelectedScale);
+        this.oWeighDispenseHandler.onSelectScale(oEvent);
 
-        this._validateAsset(selectedScale, sSelectedAsset)
-          .then(
-            function(bIsAssetValid) {
-              if (!bIsAssetValid) return;
+        // //Validate asset
+        // if (!sSelectedAsset) {
+        //   this.oWeighDispenseHandler.onSelectScale(oEvent);
+        //   return;
+        // }
 
-              this.oWeighDispenseHandler.onSelectScale(oEvent);
-            }.bind(this)
-          )
-          .catch(
-            function(oError) {
-              this.showErrorMessage('Error occured during asset validation');
-            }.bind(this)
-          );
+        // this._validateAsset(selectedScale, sSelectedAsset)
+        //   .then(
+        //     function(bIsAssetValid) {
+        //       if (!bIsAssetValid) return;
+
+        //       this.oWeighDispenseHandler.onSelectScale(oEvent);
+        //     }.bind(this)
+        //   )
+        //   .catch(
+        //     function(oError) {
+        //       this.showErrorMessage('Error occured during asset validation');
+        //     }.bind(this)
+        //   );
       },
       onSetScaleZero: function(oEvent) {
         var oPluginConfiguration = this.oPluginConfiguration,
@@ -5389,6 +5402,96 @@ sap.ui.define(
         };
         return new Promise((resolve, reject) => {
           this.ajaxPostRequest(sUrl, oParams, resolve, reject);
+        });
+      },
+
+      _getBomInfoForComponent: function(sMaterial) {
+        var oSelectedPhaseData = this.getPodSelectionModel().selectedPhaseData,
+          oComponentData;
+
+        for (let i = 0; i < oSelectedPhaseData.recipeArray.length; i++) {
+          oComponentData = oSelectedPhaseData.recipeArray[i].routingStepComponentList.find(oComponent => {
+            return oComponent.bomComponent.material.material === sMaterial;
+          });
+          if (oComponentData) {
+            break;
+          }
+        }
+
+        return oComponentData;
+      },
+
+      _assignOperator: function(sResource) {
+        var oModel = this.getCurrentModel(),
+          oModelData = oModel.getData(),
+          sMaterial = oModel.getProperty('/material'),
+          oConsumedQty = oModel.getProperty('/ConsumedQuantity'),
+          oTargetQty = oModel.getProperty('/TargetQuantity'),
+          oPodSelectionModel = this.getPodSelectionModel();
+
+        var fRemainingQty = oTargetQty.value,
+          iUpperThreshold = oModelData.tolerance.upperThresholdValue,
+          iUpperTolerance = oModelData.tolerance.upper,
+          iLowerThreshold = oModelData.tolerance.lowerThresholdValue,
+          iLowerTolerance = oModelData.tolerance.lower;
+
+        //If material has been consumed, calculsate the remaining quantity and tolerances
+        if (oConsumedQty.value && oConsumedQty.value > 0) {
+          fRemainingQty = oTargetQty.value - oConsumedQty.value;
+          if (fRemainingQty < 0) {
+            fRemainingQty = 0;
+          }
+
+          if (oModelData.tolerance.upper) {
+            iUpperTolerance = 1 + oModelData.tolerance.upper * 0.01;
+            iUpperThreshold = fRemainingQty * iUpperTolerance;
+          } else if (oModelData.tolerance.upperThresholdValue) {
+            iUpperTolerance = (oModelData.tolerance.upperThresholdValue - oTargetQty.value) / oTargetQty.value;
+            iUpperThreshold = fRemainingQty * (1 + iUpperTolerance);
+          }
+
+          if (oModelData.tolerance.lower) {
+            iLowerTolerance = 1 - oModelData.tolerance.lower * 0.01;
+            iLowerThreshold = fRemainingQty * iLowerTolerance;
+          } else if (oModelData.tolerance.lowerThresholdValue) {
+            iLowerTolerance = (oTargetQty.value - oModelData.tolerance.lowerThresholdValue) / oTargetQty.value;
+            iLowerThreshold = fRemainingQty * (1 - iLowerTolerance);
+          }
+        }
+
+        var oComponentData = this._getBomInfoForComponent(sMaterial);
+
+        var oPayload = {
+          InBOM: oComponentData.bomComponent.bom.bom,
+          InBOMVersion: oComponentData.bomComponent.bom.version,
+          InERPSequence: oComponentData.bomComponent.erpSequence,
+          InHeaderMaterial: this.getPodSelectionModel().selectedOrderData.materialName,
+          InHeaderMaterialDesc: this.getPodSelectionModel().selectedOrderData.materialDescription,
+          InMaterial: oComponentData.bomComponent.material.material,
+          InMaterialVersion: oComponentData.bomComponent.material.version,
+          InMaxTolerance: iUpperThreshold,
+          InMinTolerance: iLowerThreshold,
+          // InMaxTolerance: oModel.getProperty('/tolerance/upperThresholdValue'),
+          // InMinTolerance: oModel.getProperty('/tolerance/lowerThresholdValue'),
+          InOperationActivity: oModel.getProperty('/operationActivity'),
+          InOperator: oModel.getProperty('/userId'),
+          InOrderBO: oModel.getProperty('/shopOrder'),
+          InOrderStatus: oPodSelectionModel.selectedOrderData.orderExecutionStatus,
+          InPlant: this.getPodController().getUserPlant(),
+          InQuantity: fRemainingQty,
+          InResource: sResource,
+          InSFC: oPodSelectionModel.selectedOrderData.sfc,
+          InUOM: oPodSelectionModel.selectedOrderData.baseInternalUom,
+          InWorkCenter: oModel.getProperty('/workCenter'),
+          InSubWeighing: false,
+          InBatch: oModel.getProperty('/batchNumber')
+        };
+
+        var sUrl =
+          this.getPublicApiRestDataSourceUri() +
+          '/pe/api/v1/process/processDefinitions/start?key=REG_f5badcb9-a6df-45dc-bb98-0ee8449cbd2d';
+        this.ajaxPostRequest(sUrl, oPayload, null, function(oError, sErrorMessage) {
+          console.error(oError, sErrorMessage);
         });
       }
     });
