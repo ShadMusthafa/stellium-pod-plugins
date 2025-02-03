@@ -5357,7 +5357,15 @@ sap.ui.define(
         this.ajaxPostRequest(sUrl, oRequestBody);
       },
 
+      /**
+       * Checks the phase status and returns a boolean value
+       *  - If phase is COMPLETED and there are parked items, then true
+       *  - If phase is in ACTIVE status, then true
+       *  - Else false
+       * @returns Boolean
+       */
       _validatePhaseStatus: function() {
+        if (this._hasParkedItems() && this.selectedDataInList.status === 'COMPLETED') return true;
         if (this.selectedDataInList.status === 'ACTIVE') return true;
         return false;
       },
