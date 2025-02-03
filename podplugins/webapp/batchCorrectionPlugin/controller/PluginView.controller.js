@@ -91,12 +91,31 @@ sap.ui.define(
         aLineItems.forEach(oItem => {
           //Update line item status
           oItem.status = '';
-          //TODO: Tolerance checks
+
+          var fToleranceUpper = 0,
+            fToleranceLower = 0,
+            fUpperThreshold = 0,
+            fLowerThreshold = 0;
+
+          if (oItem.recipeComponentToleranceOver && oItem.recipeComponentToleranceUnder) {
+            fToleranceUpper = oItem.recipeComponentToleranceOver / 100;
+            fToleranceLower = oItem.recipeComponentToleranceUnder / 100;
+          } else if (oItem.toleranceOver && oItem.toleranceUnder) {
+            fToleranceUpper = oItem.toleranceOver / 100;
+            fToleranceLower = oItem.toleranceUnder / 100;
+          } else {
+            fToleranceUpper = oItem.targetQuantity.value;
+            fToleranceLower = oItem.targetQuantity.value;
+          }
+
+          fUpperThreshold = oItem.targetQuantity.value * (1 + fToleranceUpper);
+          fLowerThreshold = oItem.targetQuantity.value * (1 - fToleranceLower);
+
           if (oItem.consumedQuantity.value) {
-            if (oItem.consumedQuantity.value < oItem.targetQuantity.value) {
+            if (oItem.consumedQuantity.value < fLowerThreshold) {
               oItem.status = 'PARKED';
               oItem.statusText = 'Parked';
-            } else if (oItem.consumedQuantity.value > oItem.targetQuantity.value) {
+            } else if (oItem.consumedQuantity.value > fUpperThreshold) {
               oItem.status = 'BATCH_CORRECTION';
               oItem.statusText = 'Batch Correction';
             } else {
