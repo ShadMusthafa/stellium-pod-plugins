@@ -13,11 +13,11 @@ sap.ui.define(
       },
 
       getOverrideExecution: function(sOverrideMember) {
-        // if (sOverrideMember === PluginEventConstants.ON_FILTER_CHANGE_EVENT) {
-        //   return OverrideExecution.After;
-        // } else if (sOverrideMember === PluginEventConstants.ON_WORK_CENTER_CHANGE_EVENT) {
-        //   return OverrideExecution.After;
-        // }
+        if (sOverrideMember === PluginEventConstants.ON_FILTER_CHANGE_EVENT) {
+          return OverrideExecution.After;
+        } else if (sOverrideMember === PluginEventConstants.ON_WORK_CENTER_CHANGE_EVENT) {
+          return OverrideExecution.After;
+        }
         return null;
       },
 

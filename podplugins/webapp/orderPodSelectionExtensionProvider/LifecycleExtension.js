@@ -72,6 +72,9 @@ sap.ui.define([
                 that.getController().byId('sfcStatusFilter').fireChangeEvent()
                 that.getController().publishChangeEvent("sfcStatusFilterChangeEvent",{"source": this, "selectedStatuses": ['404']});
                 
+                //Do not show the clear button on FB
+                that.getController().getFilterBar().setShowClearOnFB(false)
+
                 //Create and load the custom SFC status filter
                 that._oExtensionUtility.loadCustomChargeStatusFilter(that.onCustomFilterPress, that);
             }, 1000);
