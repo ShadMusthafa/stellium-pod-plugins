@@ -5328,9 +5328,9 @@ sap.ui.define(
 
         if (bBatchCorrectionFlag) {
           var sErrorMessage = this.getI18nText('batchCorrectionRequiredErrorMessage', [sShopOrder]);
+          this._setSfcHoldStatus();
           MessageBox.error(sErrorMessage, {
             onClose: function() {
-              this._setSfcHoldStatus();
               window.history.go(-1);
             }.bind(this)
           });
