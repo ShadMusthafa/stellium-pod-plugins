@@ -1912,13 +1912,18 @@ sap.ui.define(
         this.getView().byId('userDialog').close();
       },
 
-      showConsumePopup: function(oEvent) {
+      showConsumePopup: async function(oEvent) {
         this.isConsumeDialogOpen = true;
         var oView = this.getView();
         var oBindingObject = oEvent.getSource().getBindingContext().getObject();
 
         if (!this._validatePhaseStatus()) {
           MessageBox.error(this.getI18nText('phaseNotInActiveStatusErrMsg', [this.selectedDataInList.truncatedPhaseId]));
+          return;
+        }
+
+        if (!await this._validateResourceStatus(this.selectedDataInList.resource.resource)) {
+          MessageBox.error(this.getI18nText('resourceStatusInvalid'));
           return;
         }
 
@@ -3388,7 +3393,7 @@ sap.ui.define(
       },
 
       //handleOpenAddDialog: function() {
-      handleOpenAddDialog: function() {
+      handleOpenAddDialog: async function() {
         var oView = this.getView();
         //  Extend WeighingScreen
         var sWorkcenter = oView.getModel('WorkcenterInfo').getProperty('/workcenter');
@@ -3396,6 +3401,11 @@ sap.ui.define(
 
         if (!this._validatePhaseStatus()) {
           MessageBox.error(this.getI18nText('phaseNotInActiveStatusErrMsg', [this.selectedDataInList.truncatedPhaseId]));
+          return;
+        }
+
+        if (!await this._validateResourceStatus(this.selectedDataInList.resource.resource)) {
+          MessageBox.error(this.getI18nText('resourceStatusInvalid'));
           return;
         }
 
@@ -3460,7 +3470,7 @@ sap.ui.define(
       },
 
       //handleOpenScanDialog: function() {
-      handleOpenScanDialog: function() {
+      handleOpenScanDialog: async function() {
         var oView = this.getView();
         //  Extend WeighingScreen
         var sWorkcenter = oView.getModel('WorkcenterInfo').getProperty('/workcenter');
@@ -3468,6 +3478,11 @@ sap.ui.define(
 
         if (!this._validatePhaseStatus()) {
           MessageBox.error(this.getI18nText('phaseNotInActiveStatusErrMsg', [this.selectedDataInList.truncatedPhaseId]));
+          return;
+        }
+
+        if (!await this._validateResourceStatus(this.selectedDataInList.resource.resource)) {
+          MessageBox.error(this.getI18nText('resourceStatusInvalid'));
           return;
         }
 
@@ -4588,13 +4603,18 @@ sap.ui.define(
         this.getView().byId('alternateComponentsDialog').close();
       },
       // C5278086 Adding changes for W&D Start
-      showWeighingPopup: function(oEvent) {
+      showWeighingPopup: async function(oEvent) {
         this.isWeighingDialogOpen = true;
         var oBindingObject = oEvent.getSource().getBindingContext().getObject();
         this._initWeighingHeaderModel(oBindingObject);
 
         if (!this._validatePhaseStatus()) {
           MessageBox.error(this.getI18nText('phaseNotInActiveStatusErrMsg', [this.selectedDataInList.truncatedPhaseId]));
+          return;
+        }
+
+        if (!await this._validateResourceStatus(this.selectedDataInList.resource.resource)) {
+          MessageBox.error(this.getI18nText('resourceStatusInvalid'));
           return;
         }
 
@@ -4712,7 +4732,6 @@ sap.ui.define(
           oScaleInput.setValueStateText('');
         }
 
-        
         this._assignOperator(sSelectedScale);
         this.oWeighDispenseHandler.onSelectScale(oEvent);
 
@@ -5496,11 +5515,28 @@ sap.ui.define(
         };
 
         var sUrl =
-          this.getPublicApiRestDataSourceUri() +
-          '/pe/api/v1/process/processDefinitions/start?key=REG_f5badcb9-a6df-45dc-bb98-0ee8449cbd2d';
+          this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_f5badcb9-a6df-45dc-bb98-0ee8449cbd2d';
         this.ajaxPostRequest(sUrl, oPayload, null, function(oError, sErrorMessage) {
           console.error(oError, sErrorMessage);
         });
+      },
+
+      _validateResourceStatus: function(sResource) {
+        var aValidStatuses = ['PRODUCTIVE', 'ENABLED'];
+        return this._getResourceData(sResource).then(aResource => {
+          if (!aResource || aResource.length < 0) return false;
+          return aResource.find(oResource => aValidStatuses.includes(oResource.status));
+        });
+      },
+
+      _getResourceData: function(sResource) {
+        var sUrl = this.getPublicApiRestDataSourceUri() + '/resource/v2/resources';
+        var oParamters = {
+          plant: this.getPodController().getUserPlant(),
+          resource: sResource
+        };
+
+        return new Promise((resolve, reject) => this.ajaxGetRequest(sUrl, oParamters, resolve, reject));
       }
     });
   }
