@@ -7,7 +7,7 @@
     xmlns="sap.m" 
     width="100%" 
     height="100%">
-    <f:DynamicPage id="idMassOpAsmtPage" showFooter="{viewModel>/isDirty}">
+    <f:DynamicPage id="idMassOpAsmtPage" showFooter="true">
         <f:header>
             <f:DynamicPageHeader id="idMassOpAsmtDynHeader">
                 <filterbar:FilterBar id="idFilterBar" useToolbar="false" search=".onFBSearch">
@@ -71,9 +71,9 @@
                     </Toolbar>
                 </headerToolbar>
                 <columns>
-                    <Column mergeDuplicates="true" mergeFunctionName="getTitle"><Text text="Work Center"/></Column>
-                    <Column mergeDuplicates="true" width="6rem"><Text text="Phase Id"/></Column>
-                    <Column mergeDuplicates="true" mergeFunctionName="getTitle"><Text text="Component"/></Column>
+                    <Column mergeDuplicates="false" mergeFunctionName="getTitle"><Text text="Work Center"/></Column>
+                    <Column mergeDuplicates="false" width="6rem"><Text text="Phase Id"/></Column>
+                    <Column mergeDuplicates="false" mergeFunctionName="getTitle"><Text text="Component"/></Column>
                     <Column><Text text="Asset / Resource"/></Column>
                     <Column><Text text="Resource Type"/></Column>
                     <Column><Text text="Operator"/></Column>
@@ -157,18 +157,23 @@
                                 formatter: '.dateTimeFormatter'
                             }"/>
                         <HBox>
-                            <Button text="Add" press=".onAddResouceBtnPress"/>
+                         <Button text="Add" press=".onAddResouceBtnPress"/>
+                         <ToolbarSpacer width="2px"/>
+                         <Button text="Clear" type="Reject" press=".onClearResourceBtnPress"/>
+                         <ToolbarSpacer width="2px"/>
+                         <Button  icon="sap-icon://delete"  type="Reject" press=".onDeleteResourceBtnPress" visible="{= ${viewModel>isNew} === true}" tooltip="Delete Row"/>
                         </HBox>
                     </ColumnListItem>
                 </items>
             </Table>
         </f:content>
         <f:footer>
-            <Toolbar id="idMassOpAsmtFooter">
-                <ToolbarSpacer />
-                <Button text="Assign" type="Emphasized" press=".onSaveAssignmentsPress"/>
-                <Button text="Cancel" type="Reject" press=".onCancelAssignmentsPress"/>
-            </Toolbar>
+          <Toolbar id="idMassOpAsmtFooter" visible="{viewModel>/isFiltersApplied}">
+           <ToolbarSpacer />
+           <Button text="Assign" type="Emphasized" press=".onSaveAssignmentsPress"/>
+           <ToolbarSpacer width="10px"/>
+           <Button text="Cancel" type="Reject" press=".onCancelAssignmentsPress"/>
+          </Toolbar>
         </f:footer>
     </f:DynamicPage>
 </mvc:View>

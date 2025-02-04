@@ -110,34 +110,40 @@ sap.ui.define(
       },
 
       onFBSearch: function(oEvent) {
-        var oFilterBar = oEvent.getSource(),
-          aMandatoryItems = oFilterBar.getFilterGroupItems().filter(oItem => oItem.getMandatory());
-
-        var aInvalidItems = aMandatoryItems.filter(oItem => {
-          var oControl = oItem.getControl(),
-            bIsValid = false;
-
-          if (oControl.getValue) {
-            bIsValid = oControl.getValue() !== '';
-          } else if (oControl.getSelectedKey) {
-            bIsValid = oControl.getSelectedKey() != '';
-          }
-
-          if (!bIsValid) {
-            oControl.setValueState('Error');
-            oControl.setValueStateText('Please fill required fields');
-          } else {
-            oControl.setValueState('None');
-            oControl.setValueStateText('');
-          }
-
-          return !bIsValid;
-        });
-
-        if (aInvalidItems.length === 0) {
-          this._getAssignmentData();
+        var oFilterBar = oEvent.getSource();
+        var oViewModel = this.getView().getModel('viewModel');
+    
+        
+        var sOrderId = this.getView().byId('idOrderFilterInput').getValue();
+        var sSFC = this.getView().byId('idSFCSelect').getSelectedKey();
+    
+        
+        if (!sOrderId || !sSFC) {
+            
+            if (!sOrderId) {
+                this.getView().byId('idOrderFilterInput').setValueState('Error');
+                this.getView().byId('idOrderFilterInput').setValueStateText('Please enter an Order Number');
+            }
+            if (!sSFC) {
+                this.getView().byId('idSFCSelect').setValueState('Error');
+                this.getView().byId('idSFCSelect').setValueStateText('Please select an SFC');
+            }
+    
+            // Hide the footer
+            oViewModel.setProperty('/isFiltersApplied', false);
+            return;
         }
-      },
+    
+        
+        this.getView().byId('idOrderFilterInput').setValueState('None');
+        this.getView().byId('idSFCSelect').setValueState('None');
+    
+        // Show the footer
+        oViewModel.setProperty('/isFiltersApplied', true);
+    
+        
+        this._getAssignmentData();
+    },
 
       onTableItemsSelectionChange: function(oEvent) {
         var aSelectedRows = oEvent.getParameter('listItems');
@@ -271,31 +277,102 @@ sap.ui.define(
       },
 
       onAddResouceBtnPress: function(oEvent) {
-        var oSelectedRowData = oEvent.getSource().getBindingContext('viewModel').getObject();
+        // Get the context of the selected row from the event
+        var oSelectedRowContext = oEvent.getSource().getBindingContext('viewModel');
+        var oSelectedRowData = oSelectedRowContext.getObject();
+    
+        // Create a new row with the same component details
         var oNewRowItem = {
-          ...oSelectedRowData,
-          isDirty: true,
-          isNew: true,
-          asset: '',
-          resource: '',
-          resourceType: '',
-          operator: '',
-          autoAcceptance: false,
-          acceptanceDelay: 0,
-          correctionTime: '',
-          lastModified: ''
+            ...oSelectedRowData, // Copy the component details
+            isDirty: true,
+            isNew: true,
+            asset: '',
+            resource: '',
+            resourceType: '',
+            operator: '',
+            autoAcceptance: false,
+            acceptanceDelay: 0,
+            correctionTime: '',
+            lastModified: ''
         };
-
-        //Delete any existing assignment data from item
-        if (oNewRowItem.existingAssignment) {
-          delete oNewRowItem.existingAssignment;
-        }
-
-        var oViewModel = this.getView().getModel('viewModel'),
-          aTableItems = oViewModel.getProperty('/lineItems');
-        aTableItems.push(oNewRowItem);
-        oViewModel.setProperty('/lineItems', aTableItems);
+    
+        // Add the new row to the line items
+        var oModel = oSelectedRowContext.getModel();
+        var aLineItems = oModel.getProperty('/lineItems');
+        aLineItems.push(oNewRowItem);
+    
+        // Update the model
+        oModel.setProperty('/lineItems', aLineItems);
+        oModel.refresh(true);
       },
+      onClearResourceBtnPress: function(oEvent) {
+        // Get the context of the selected row from the event
+        var oSelectedRowContext = oEvent.getSource().getBindingContext('viewModel');
+        
+        // Get the row's data object using the binding context
+        var oSelectedRowData = oSelectedRowContext.getObject();
+        
+        // Reset the values of the selected row's fields to their default state
+        Object.assign(oSelectedRowData, {
+            isDirty: false,
+            isNew: true,
+            asset: '',
+            resource: '',
+            resourceType: '',
+            operator: '',
+            autoAcceptance: false,
+            acceptanceDelay: 0,
+            correctionTime: '',
+            lastModified: ''
+        });
+        
+        // Update the model with the cleared data for the selected row
+        var oModel = oSelectedRowContext.getModel();
+        oModel.setProperty(oSelectedRowContext.getPath(), oSelectedRowData);  // Update the model with new cleared values
+        
+        // Refresh the model to ensure the UI is updated
+        oModel.refresh(true);
+    },
+    onDeleteResourceBtnPress: function (oEvent) {
+      // Get the context of the selected row from the event
+      var oSelectedRowContext = oEvent.getSource().getBindingContext("viewModel");
+  
+      // Ensure the context is valid
+      if (!oSelectedRowContext) {
+          console.warn("No row context found for deletion.");
+          return;
+      }
+  
+      var oSelectedRowData = oSelectedRowContext.getObject();
+      var oModel = oSelectedRowContext.getModel();
+      var aLineItems = oModel.getProperty("/lineItems");
+  
+      // Check if the row has existing assignments
+      if (oSelectedRowData.resource || oSelectedRowData.operator) {
+          MessageBox.error("Cannot delete a row with existing assignments. Please revoke the resource first.");
+          return;
+      }
+  
+      // Ensure at least one row per BOM component remains
+      var sComponent = oSelectedRowData.component;
+      var aComponentRows = aLineItems.filter(oRow => oRow.component === sComponent);
+  
+      if (aComponentRows.length <= 1) {
+         sap.m.MessageToast.show("At least one row per BOM component must remain.");
+          return;
+      }
+  
+      // Remove the selected row from the line items
+      var iIndex = aLineItems.findIndex(oRow => oRow === oSelectedRowData);
+      if (iIndex !== -1) {
+          aLineItems.splice(iIndex, 1);
+      }
+  
+      // Update the model and refresh the bindings
+      oModel.setProperty("/lineItems", aLineItems);
+      oModel.updateBindings(true);
+  },
+
 
       autoAcceptanceFormatter: function(bIsAutoAcceptance) {
         if (bIsAutoAcceptance) return 'auto';
