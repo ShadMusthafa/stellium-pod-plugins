@@ -86,8 +86,35 @@ sap.ui.define(
         oView.getModel('routingData').setData(aRoutingData);
         console.log('Routing Data ', aRoutingData);
 
+        var oBatchCorrectionInfo = await this._getBatchCorrectionData().catch(oError => {
+          return [];
+        });
+        
+        //If batch correction items exist, then get the items applicable for selected phase
+        // this.batchCorrItems = [];
+        this.batchCorrItems = oBatchCorrectionInfo.content;
+        // if (oBatchCorrectionInfo && oBatchCorrectionInfo.content && oBatchCorrectionInfo.content.length > 0) {
+        //   var sStepId = this.getPodSelectionModel().selectedPhaseData.stepId;
+        //   this.batchCorrItems = oBatchCorrectionInfo.content.filter(oItem => oItem.phase === sStepId);
+        // }
+
         //Get goods issue summary for the components
         var aLineItems = await this._getGoodsIssueSummaryForOrder(oData.order);
+        //Apply the correction entries
+        if (this.batchCorrItems.length > 0) {
+          aLineItems.forEach(oItem => {
+            var oCorrItem = this.batchCorrItems.find(val => val.component === oItem.materialId.material);
+            if (!oCorrItem) return;
+
+            // oItem.toleranceOver = oCorrItem.approvedTUpper;
+            // oItem.toleranceUnder = oCorrItem.approvedTLower;
+            oItem.recipeComponentToleranceOver = oCorrItem.approvedTUpper;
+            oItem.recipeComponentToleranceUnder = oCorrItem.approvedTLower;
+            oItem.targetQuantity.value = oCorrItem.approvedQuantity;
+            oItem.totalQtyEntryUom.value = oCorrItem.approvedQuantity;
+            oItem.totalQtyBaseUom.value = oCorrItem.approvedQuantity;
+          });
+        }
         aLineItems.forEach(oItem => {
           //Update line item status
           oItem.status = '';
@@ -462,6 +489,19 @@ sap.ui.define(
         });
       },
 
+      _getBatchCorrectionData: function() {
+        var sUrl =
+          this.getPublicApiRestDataSourceUri() +
+          '/pe/api/v1/process/processDefinitions/start?key=REG_04527345-c48f-44c1-9424-5b65503c18ed&async=false';
+        var oParams = {
+          order: this.selectedOrder.order,
+          sfc: this.selectedOrder.sfc
+        };
+        return new Promise((resolve, reject) => {
+          this.ajaxPostRequest(sUrl, oParams, resolve, reject);
+        });
+      },
+
       _postSfcScrap: async function() {
         // var oGRSummary = await this._getGoodsReceiptSummary();
         var oGRSummary = this.grSummary;
@@ -563,7 +603,7 @@ sap.ui.define(
             bomTUpper: oItem.toleranceOver || 0,
             bomTLower: oItem.toleranceUnder || 0,
             measure: oItem.consumedQuantity.value,
-            approvedQuantity: oItem.batchCorrectionWeight.value,
+            approvedQuantity: oItem.batchCorrectionWeight ? oItem.batchCorrectionWeight.value : oItem.targetQuantity.value,
             approvedTUpper: oItem.toleranceOver || 0,
             approvedTLower: oItem.toleranceUnder || 0
           };
