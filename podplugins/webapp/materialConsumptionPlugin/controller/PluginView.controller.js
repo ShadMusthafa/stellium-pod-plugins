@@ -151,6 +151,7 @@ sap.ui.define(
         // const sSelectedScale = oScaleList && oScaleList.getSelectedKey();
         const sSelectedScale = oScaleList && oScaleList.getValue();
         if (oMsg.resource === sSelectedScale) {
+          this.getGiMaterialData(this.selectedDataInList);
           this.oWeighDispenseHandler._initializeScale();
           this.oWeighDispenseHandler.setNewScaleValue((oMsg.quantity && oMsg.quantity.value) || 0);
           this.oWeighDispenseHandler.setNewTareWeightValue((oMsg.tareQuantity && oMsg.tareQuantity.value) || 0);
@@ -2716,6 +2717,23 @@ sap.ui.define(
           return item.componentType === 'C' || item.componentType === 'B';
         });
         var oAllBiCoProducts = that.getView().getModel('coBiProductSummaryList').getData();
+        
+        //Apply the correction entries
+        if (this.batchCorrItems.length > 0) {
+          aBiCoProducts.forEach(oItem => {
+            var oCorrItem = this.batchCorrItems.find(val => val.component === oItem.materialId.material);
+            if (!oCorrItem) return;
+
+            // oItem.toleranceOver = oCorrItem.approvedTUpper;
+            // oItem.toleranceUnder = oCorrItem.approvedTLower;
+            oItem.recipeComponentToleranceOver = oCorrItem.approvedTUpper;
+            oItem.recipeComponentToleranceUnder = oCorrItem.approvedTLower;
+            oItem.targetQuantity.value = oCorrItem.approvedQuantity;
+            oItem.totalQtyEntryUom.value = oCorrItem.approvedQuantity;
+            oItem.totalQtyBaseUom.value = oCorrItem.approvedQuantity;
+          });
+        }
+
         aBiCoProducts.forEach(function(e, i) {
           var thresholdValuesToBeDisplayed = that.oFormatter.getUpperAndLowerThresholdValues(
             e.recipeComponentToleranceOver,
@@ -2740,7 +2758,8 @@ sap.ui.define(
           e.upperThresholdValue = thresholdValuesToBeCalculated.upperValue;
           e.lowerThresholdValue = thresholdValuesToBeCalculated.lowerValue;
           var materialDetails = that.getProductDetailsByComponentType(oAllBiCoProducts, e.materialId.ref, e.componentType);
-          e.targetQuantity = materialDetails[0].targetQuantity;
+          e.targetQuantity = e.targetQuantity || materialDetails[0].targetQuantity;
+          e.targetQuantity.value = Math.abs(e.targetQuantity.value);
           e.consumedQuantity = materialDetails[0].receivedQuantity;
         });
         aBiCoProducts && that.getView().getModel('coBiProductModel').setData(aBiCoProducts);
@@ -5211,6 +5230,7 @@ sap.ui.define(
           bIsBatchManaged = oModel.getProperty('/batchManaged'),
           sDefaultSloc = oModel.getProperty('/storageLocation'),
           sSelectedBatchId = oModel.getProperty('/batchNumber'),
+          sSelectedInventoryId = oModel.getProperty('/inventory'),
           sSelectedMaterial = oModel.getProperty('/material'),
           oInput = this.getCurrentInputBatchIdControl();
 
@@ -5226,7 +5246,9 @@ sap.ui.define(
         }
 
         var aBatchDetails = this.batchDetailsModel.getData(),
-          oSelectedBatch = aBatchDetails.find(oBatch => oBatch.batchNumber === sSelectedBatchId);
+          oSelectedBatch = aBatchDetails.find(
+            oBatch => oBatch.batchNumber === sSelectedBatchId && oBatch.inventoryId === sSelectedInventoryId
+          );
 
         //Check if selected batch exists in the model
         if (!oSelectedBatch) {

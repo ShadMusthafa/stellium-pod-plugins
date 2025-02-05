@@ -43,7 +43,7 @@
                     <suite:BulletMicroChart size="Responsive" class="chartHeight"
                         targetValue="{coBiProductModel>targetQuantity/value}"
                         actualValueLabel="{parts: ['coBiProductModel>consumedQuantity/value', 'coBiProductModel>consumedQuantity/unitOfMeasure/uom'], formatter: '.oFormatter.showValueWithUom'}"
-                        targetValueLabel="{parts: ['coBiProductModel>targetQuantity/value', 'coBiProductModel>consumedQuantity/unitOfMeasure/uom', 'i18n>target'], formatter: '.oFormatter.getRequiredQuantity'}"
+                        targetValueLabel="{parts: ['coBiProductModel>targetQuantity/value', 'coBiProductModel>consumedQuantity/unitOfMeasure/uom', 'i18n>target'], formatter: '.oFormatter.getRequiredQuantityLabel'}"
                         minValue="0">
                         <suite:actual>
                             <suite:BulletMicroChartData value="{coBiProductModel>consumedQuantity/value}"
