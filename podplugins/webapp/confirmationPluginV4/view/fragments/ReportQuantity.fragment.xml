@@ -1,0 +1,136 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form" xmlns:core="sap.ui.core">
+    <Dialog id="reportQuantityDialog" title="Report Confirmation" contentWidth="60%" resizable="true">
+        <f:SimpleForm id="reportQuantityForm" title="Quantity Confirmation" editable="true"
+            layout="ResponsiveGridLayout" labelSpanXL="1" labelSpanL="1" labelSpanM="2" labelSpanS="4"
+            adjustLabelSpan="true" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="1"
+            columnsL="1" columnsM="1" singleContainerFullSize="true">
+            <f:content>
+                <Label id="yieldLabel" text="{i18n>yieldQtyData.Yield} / {i18n>yieldQtyData.unit}" />
+                <!-- <Input id="yieldQuantity" textAlign="Right"
+                    value="{formatOptions : { parseAsString : true, strictGroupingValidation : true },parts:[{path:'qtyPostModel>/yieldQuantity/value'},{path:'qtyPostModel>/yieldQuantity/unitOfMeasure/uom'}], type:'.types.quantity'}"
+                    liveChange="onQuantityLiveChange" /> -->
+                <Input id="yieldQuantity" textAlign="Right" value="{qtyPostModel>/yieldQuantity/value}"
+                    liveChange="onYieldQuantityLiveChange"  />
+                <Select id="uomYield" items="{unitModel>/}" change="selectUom($event, 'yieldQuantity')"
+                    selectedKey="{qtyPostModel>/yieldQuantity/unitOfMeasure/uom}" enabled="true">
+                    <layoutData>
+                        <l:GridData span="XL3 L3 M3 S4" />
+                    </layoutData>
+                    <core:Item key="{unitModel>value}" text="{unitModel>value} - {unitModel>text}" />
+                </Select>
+                <Label id="batchNumberLabel" text="{i18n>BATCH_NUMBER_COLUMN.LABEL}" labelFor="batchNumber" />
+                <Input id="batchNumberFilter" value="{qtyPostModel>/batchNumber}" type="Text" showValueHelp="true"
+                    valueHelpOnly="true" valueHelpRequest="handleValueHelp" />
+                <Label id="storageLocationLabel" text="{i18n>STORAGE_LOCATION_COLUMN.LABEL}"
+                    labelFor="storageLocation" />
+                <Input id="storageLocationFilter" value="{qtyPostModel>/storageLocation}" type="Text"
+                    showValueHelp="true" valueHelpOnly="true" valueHelpRequest="handleValueHelp" />
+                <Label id="scrapLabel" text="{i18n>yieldQtyData.Scrap} / {i18n>yieldQtyData.unit}"
+                    labelFor="scrapQuantity" />
+                <!-- <Input id="scrapQuantity" textAlign="Right"
+                    value="{formatOptions : { parseAsString : true, strictGroupingValidation : true },parts:[{path:'qtyPostModel>/scrapQuantity/value'},{path:'qtyPostModel>/scrapQuantity/unitOfMeasure/uom'}], type:'.types.quantity'}"
+                    liveChange="onQuantityLiveChange" /> -->
+                <Input id="scrapQuantity"  textAlign="Right" value="{qtyPostModel>/scrapQuantity/value}"
+                    liveChange="onScrapQuantityLiveChange" />
+                <Select id="uomScrap" items="{unitModel>/}" change="selectUom($event, 'scrapQuantity')"
+                    selectedKey="{qtyPostModel>/scrapQuantity/unitOfMeasure/uom}" enabled="true">
+                    <layoutData>
+                        <l:GridData span="XL3 L3 M3 S4" />
+                    </layoutData>
+                    <core:Item key="{unitModel>value}" text="{unitModel>value} - {unitModel>text}" />
+                </Select>
+                <Label text="{i18n>reasonCode}" labelFor="reasonCode" />
+                <Input id="reasonCode" showClearIcon="true" type="Text"
+                    enabled="{parts:[{path:'qtyPostModel>/scrapQuantity/value'}], formatter:'.oFormatter.scrapQuantityEnabled'}"
+                    required="{parts:[{path:'qtyPostModel>/scrapQuantity/value'}], formatter:'.oFormatter.scrapQuantityEnabled'}"
+                    liveChange="handleSearchForReasonCodeSearch" value="{qtyPostModel>/reasonCode}"
+                    fieldGroupIds="validated" showValueHelp="true" valueHelpRequest="handleReasonCode" />
+                <Label text="{i18n>description}" visible="{= ${qtyPostModel>/description}.length > 0}" />
+                <Text text="{qtyPostModel>/description}" visible="{= ${qtyPostModel>/description}.length > 0}" />
+                <Label id="postedByLabel" text="{i18n>yieldQtyData.postedBy}" labelFor="postedBy" required="true" />
+                <Input id="postedBy" enabled="false" value="{qtyPostModel>/userId}" />
+                <Label id="customFieldLabel1" text="{customFieldLabelModel>/labelValue}" labelFor="customField1" />
+                <Input id="customField1" liveChange="onCustomFieldLiveChange" value="" valueLiveUpdate="true" />
+                <Label id="postingDateLabel" text="{i18n>yieldQtyData.postingDate}" labelFor="postingDate"
+                    required="true" />
+                <DatePicker id="postingDate" valueFormat="yyyy-MM-dd" displayFormat="long"
+                    class="sapUiSmallMarginBottom" value="{qtyPostModel>/dateTime}" change="onChangePostingDate" />
+            </f:content>
+        </f:SimpleForm>
+        <Table id="activity" items="{ path: '/activitySummary', sorter: { path: 'sequence', descending: false } }"
+            class="sapUiSizeCompact">
+            <headerToolbar id="activityListHeaderToolbar" aria-label="{i18n>headerToolbar}">
+                <Toolbar>
+                    <Title id="title" text="Activity Confirmation" level="H2" />
+                    <ToolbarSpacer />
+                    <!-- <Button id="reportButton" ariaDescribedBy="activityListHeaderToolbar"
+                            ariaLabelledBy="activityListHeaderToolbar" text="{i18n>Report}" tooltip="{i18n>Report}"
+                            type="Emphasized" press="onPressReportButton"
+                            /> -->
+                </Toolbar>
+            </headerToolbar>
+            <columns>
+                <Column hAlign="Left" vAlign="Middle">
+                    <Text text="{i18n>Parameters}" />
+                </Column>
+                <!-- <Column hAlign="End" vAlign="Middle">
+                        <Text text="{i18n>StandardValue}" />
+                    </Column> -->
+                <!-- <Column hAlign="End" vAlign="Middle">
+                    <Text text="{i18n>Reported}" />
+                </Column> -->
+                <Column hAlign="Center" vAlign="Middle">
+                    <Text text="Report Value" />
+                </Column>
+                <Column hAlign="Center" vAlign="Middle">
+                    <Text text="UOM" />
+                </Column>
+                <Column hAlign="Center" vAlign="Middle">
+                    <Text text="Remaining Value" />
+                </Column>
+            </columns>
+            <items>
+                <ColumnListItem>
+                    <cells>
+                        <!-- <Text
+                            text="{parts : ['activityId','activityText'], formatter:'.oFormatter.showActivityIdWithText'}" /> -->
+                        <Text text="{activityText}"/>
+                        <!-- <Text
+                                text="{parts : ['targetQuantity/value','targetQuantity/unitOfMeasure/uom'],formatter:'.oFormatter.showValueWithUom'}" /> -->
+                        <!-- <Text
+                            text="{parts : ['actualQuantity/value','actualQuantity/unitOfMeasure/uom'],formatter:'.oFormatter.showValueWithUom'}" /> -->
+                        <Input required="true"   valueState="None"></Input>
+                        <Select id="uom" items="{uModel>/}" change="selectUom($event, 'targetQuantity')"
+                            selectedKey="{targetQuantity/unitOfMeasure/uom}" enabled="true">
+
+                            <core:Item key="{uModel>uom}" text="{uModel>uom} - {uModel>shortText}" />
+                        </Select>
+                       
+                        <!-- <Text
+                            text="{parts : ['targetQuantity/value','actualQuantity/value'],formatter:'.oFormatter.showValueRemaining'}" /> -->
+                        <Text text="{= ${targetQuantity/value} - ${actualQuantity/value} }" />
+
+                        <!-- <Button text="{i18n>Postings}" tooltip="{i18n>Postings}" class="sapUiSmallMarginBegin"
+                                press="onPressPostingButton"
+                                
+                                /> -->
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+        <CheckBox id="finalConfirmation" text="{i18n>yieldQtyData.finalConfirmation}" select=".onFinalConfirmationSelectionChange">
+            <layoutData>
+                <l:GridData indentL="10" indentM="10" />
+            </layoutData>
+        </CheckBox>
+        <beginButton>
+           <!-- <Button id="quantityConfirmBtn" text="{i18n>yieldQtyData.Confirm}" type="Emphasized" press="onConfPluginSave" /> -->
+            <Button id="quantityConfirmBtn" text="{i18n>yieldQtyData.Confirm}" type="Emphasized" press="onConfirm" />
+            <!-- <Button id="quantityConfirmBtn" text="Save" type="Emphasized" /> -->
+        </beginButton>
+        <endButton>
+            <!-- <Button text="{i18n>yieldQtyData.cancel}" press="onCloseReportQuantityDialog" /> -->
+            <Button text="Clear" press="onCloseReportQuantityDialog" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

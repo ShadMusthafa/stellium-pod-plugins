@@ -1,0 +1,54 @@
+<core:FragmentDefinition 
+    xmlns:table="sap.ui.table" 
+    xmlns:core="sap.ui.core" 
+    xmlns="sap.m">
+    <Dialog id="updateReasonCodeDialog" 
+        busy="true" 
+        busyIndicatorDelay="10" 
+        title="{i18n>assignReasonCodeDialogHeading}"
+        resizable="true" 
+        verticalScrolling="false" 
+        contentWidth="80%" 
+        contentHeight="80%">
+        <subHeader>
+            <Bar>
+                <contentMiddle>
+                    <SearchField id="searchBarUpdateReasonCode" liveChange="handleSearchForReasonCodeUpdateDialog" />
+                </contentMiddle>
+            </Bar>
+        </subHeader>
+        <content>
+            <table:TreeTable id="updateReasonCodeTreeTable" rows="{oReasonCodeModel>/timeElementReasonCodeTree}"
+                selectionMode="Single" rowSelectionChange="onSelectReasonCodeForUpdate" enableSelectAll="false"
+                expandFirstLevel="1" columnHeaderVisible="true" visibleRowCountMode="Auto">
+                <table:columns>
+                    <table:Column>
+                        <Label text="{i18n>description}" />
+                        <table:template>
+                            <Text text="{oReasonCodeModel>description}" />
+                        </table:template>
+                    </table:Column>
+                    <table:Column>
+                        <Label text="{i18n>reasonCodeID}" />
+                        <table:template>
+                            <Text text="{oReasonCodeModel>ID}" />
+                        </table:template>
+                    </table:Column>
+                    <table:Column width="10rem">
+                        <Label text="{i18n>reasonForVariance}" />
+                        <table:template>
+                            <Text text="{oReasonCodeModel>reasonForVariance}" />
+                        </table:template>
+                    </table:Column>
+                </table:columns>
+            </table:TreeTable>
+        </content>
+        <beginButton>
+            <Button id="saveButtonUpdateReasonCode" text="{i18n>select}" press="onClickUpdateReasonCode"
+                enabled="false" />
+        </beginButton>
+        <endButton>
+            <Button text="{i18n-global>cancel}" press="onClickCancel" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

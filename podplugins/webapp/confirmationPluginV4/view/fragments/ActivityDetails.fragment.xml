@@ -1,0 +1,49 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog id="ActivityDetailsDialog" title="{i18n>yieldQtyData.ViewPostings}" class="sapUiContentPadding"
+        contentWidth="60%" resizable="true">
+        <content>
+            <Table id="ActivityDetailsTable" inset="false"
+                items="{ path: 'viewActivityReportModel>/activityDetails', sorter: { path: 'dateTime', descending: true } }">
+                <columns>
+                    <Column hAlign="Center">
+                        <Text id="ActivityTextColumn" text="" />
+                    </Column>
+                    <Column hAlign="Center" demandPopin="true">
+                        <Text text="{i18n>PostedBy}" />
+                    </Column>
+                    <Column hAlign="End" demandPopin="true">
+                        <Text text="{i18n>PostingDate}" />
+                    </Column>
+                    <Column hAlign="End" demandPopin="true">
+                        <Text text="{i18n>CreationDate}" />
+                    </Column>
+                    <Column hAlign="End" demandPopin="true">
+                        <Text text="status" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem id="ActivityDetailsCLItem">
+                        <cells>
+                            <!-- <Text
+                                text="{parts : ['viewActivityReportModel>reportedQuantity/value','viewActivityReportModel>reportedQuantity/unitOfMeasure/uom'],formatter:'.oFormatter.showValueWithUom'}"
+                                textAlign="Right" /> -->
+                                <Text
+                                text="{parts : ['viewActivityReportModel>reportedQuantity/value','viewActivityReportModel>reportedQuantity/unitOfMeasure/uom']}"
+                                textAlign="Right" />
+                            <Text text="{viewActivityReportModel>postedBy}" />
+                            <Text
+                                text="{path : 'viewActivityReportModel>postingDate',formatter:'.oFormatter.getDateTimeInPlantTimeZone'}" />
+                            <Text
+                                text="{path : 'viewActivityReportModel>creationDate',formatter:'.oFormatter.getDateTimeInPlantTimeZone'}" />
+                            <Text
+                                text="{path : 'viewActivityReportModel>status',formatter:'.formatActivityConfirmationStatus'}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <beginButton>
+            <Button text="{i18n>Close}" press="onCloseActivityDetailsDialog" />
+        </beginButton>
+    </Dialog>
+</core:FragmentDefinition>
