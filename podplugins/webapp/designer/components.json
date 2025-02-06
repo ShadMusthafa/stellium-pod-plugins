@@ -1,26 +1,6 @@
 {
   "components": [
     {
-      "id": "stelliumResourceListPlugin",
-      "type": "VIEW_PLUGIN",
-      "allowMultipleInstances": false,
-      "name": "stellium.ext.podplugins.resourceListPlugin",
-      "propertyEditor": "stellium.ext.podplugins.resourceListPlugin.builder.PropertyEditor",
-      "i18n": "stellium.ext.podplugins.resourceListPlugin.i18n.i18n",
-      "productionProcessEnabled": false,
-      "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
-    },
-    {
-      "id": "stelliumResourceGraphPlugin",
-      "type": "VIEW_PLUGIN",
-      "allowMultipleInstances": false,
-      "name": "stellium.ext.podplugins.resourceGraphPlugin",
-      "propertyEditor": "stellium.ext.podplugins.resourceGraphPlugin.builder.PropertyEditor",
-      "i18n": "stellium.ext.podplugins.resourceGraphPlugin.i18n.i18n",
-      "productionProcessEnabled": false,
-      "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
-    },
-    {
       "id": "stelliumConfirmationPlugin",
       "type": "VIEW_PLUGIN",
       "allowMultipleInstances": false,
@@ -37,16 +17,6 @@
       "name": "stellium.ext.podplugins.packingPlugin",
       "propertyEditor": "stellium.ext.podplugins.packingPlugin.builder.PropertyEditor",
       "i18n": "stellium.ext.podplugins.packingPlugin.i18n.i18n",
-      "productionProcessEnabled": false,
-      "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
-    },
-    {
-      "id": "stelliumPackingPlugin_1",
-      "type": "VIEW_PLUGIN",
-      "allowMultipleInstances": false,
-      "name": "stellium.ext.podplugins.packingPluginToshif",
-      "propertyEditor": "stellium.ext.podplugins.packingPluginToshif.builder.PropertyEditor",
-      "i18n": "stellium.ext.podplugins.packingPluginToshif.i18n.i18n",
       "productionProcessEnabled": false,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
