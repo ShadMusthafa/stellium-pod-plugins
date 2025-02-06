@@ -22,6 +22,7 @@ sap.ui.define(
         }
 
         var oViewData = {
+          isFiltersApplied: false,
           isDirty: false,
           tableHeaderBtn: {
             assign: {
@@ -130,8 +131,7 @@ sap.ui.define(
             }
     
             // Hide the footer
-            oViewModel.setProperty('/isFiltersApplied', false);
-            return;
+            oViewModel.setProperty('/isFiltersApplied', !!(sOrderId && sSFC));
         }
     
         
