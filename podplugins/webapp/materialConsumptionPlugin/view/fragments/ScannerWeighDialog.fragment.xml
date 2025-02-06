@@ -161,9 +161,9 @@
         </content>
         <buttons>
             <Button id="btnScanWeighConfirmWeight" text="{i18n>BtnConfirm}" enabled="false" type="Emphasized"
-                press="onWeighDialogConfirm" />
+                visible="{configModel>/showWeighingConfirm}" press="onWeighDialogConfirm" />
             <Button id="btnScanWeighAddWeight" enabled="false" text="{i18n>BtnAddWeight}"
-                press="onWeighDialogAddWeight" />
+                visible="{configModel>/showWeighingAddWeight}" press="onWeighDialogAddWeight" />
             <Button id="btnScanWeighCancelWeight" text="{i18n>BtnCancel}" press="onWeighDialogCancel" />
         </buttons>
     </Dialog>

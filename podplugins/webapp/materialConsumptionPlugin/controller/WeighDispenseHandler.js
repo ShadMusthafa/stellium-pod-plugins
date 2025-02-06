@@ -442,18 +442,6 @@ sap.ui.define([
                 oBtnSetZero.setEnabled(bEnabledState);
             }
             
-            var bShowWeighingConfirm = oPluginConfiguration.showWeighingConfirm;
-            if (bShowWeighingConfirm) {
-                var oBtnWeighConfirm = this.getCurrentConfirmButton();
-                oBtnWeighConfirm.setVisible(bShowWeighingConfirm);
-            }
-
-            var bShowWeighingAddWeight = oPluginConfiguration.showWeighingAddWeight;
-            if (bShowWeighingAddWeight) {
-                var oBtnAddWeight = this.getCurrentAddWeightButton();
-                oBtnAddWeight.setVisible(bShowWeighingAddWeight);
-            }
-
             var bSetTareVisible = oPluginConfiguration.showWeighingSetTare;
             if (bSetTareVisible) {
                 var oBtnSetTare = this.getCurrentSetTareButton();
