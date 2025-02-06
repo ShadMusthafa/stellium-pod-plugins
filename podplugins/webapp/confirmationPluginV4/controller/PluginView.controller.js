@@ -302,15 +302,16 @@ sap.ui.define(
 
       onFinalConfirmationSelectionChange: function(oEvent) {
         var oControl = oEvent.getSource();
-        if (oControl.getSelected()) {
-          this._hasParkedOrBatchCorrectionItems().then(bFlag => {
-            if (bFlag) {
-              MessageBox.error(this.getI18nText('finalConfirmation.parkedOrBatchCorrErrMsg'));
-              oControl.setSelected(false);
-              return;
-            }
-          });
-        }
+        //TODO: cleanup this validation
+        // if (oControl.getSelected()) {
+        //   this._hasParkedOrBatchCorrectionItems().then(bFlag => {
+        //     if (bFlag) {
+        //       MessageBox.error(this.getI18nText('finalConfirmation.parkedOrBatchCorrErrMsg'));
+        //       oControl.setSelected(false);
+        //       return;
+        //     }
+        //   });
+        // }
       },
 
       // getFinalconfirmationvalidation: function () {
@@ -2370,30 +2371,30 @@ sap.ui.define(
 
         //! Rewrite the below to use model for the dialog. Do not interact directly with the controls
         // Loop through table items
-        for (var i = 0; i < aItems.length; i++) {
-          var oRow = aItems[i];
-          var aCells = oRow.getCells();
-          var oYieldInput = aCells[0];
-          var oUpdateInput = aCells[1];
-          oUpdateInput.setEditable(true); // Assuming the 3rd column has the input for result
-          var totalqty = this.getPodSelectionModel().selectedOrderData.sfcPlannedQty;
-          var oScrap = this.byId('scrapQuantity');
-          var fscrapValue = parseFloat(oScrap.getValue()) || 0;
-          var fYieldValue = parseFloat(oInput.getValue()) || 0;
-          var fStandardValue = oData[i].targetQuantity.value;
+        // for (var i = 0; i < aItems.length; i++) {
+        //   var oRow = aItems[i];
+        //   var aCells = oRow.getCells();
+        //   var oYieldInput = aCells[0];
+        //   var oUpdateInput = aCells[1];
+        //   oUpdateInput.setEditable(true); // Assuming the 3rd column has the input for result
+        //   var totalqty = this.getPodSelectionModel().selectedOrderData.sfcPlannedQty;
+        //   var oScrap = this.byId('scrapQuantity');
+        //   var fscrapValue = parseFloat(oScrap.getValue()) || 0;
+        //   var fYieldValue = parseFloat(oInput.getValue()) || 0;
+        //   var fStandardValue = oData[i].targetQuantity.value;
 
-          if (!isNaN(fStandardValue)) {
-            var oconvertstvalue = fStandardValue * 60;
-            var fResult = oconvertstvalue / totalqty * (fYieldValue + fscrapValue);
-            var converttounit = fResult / 60;
-            oUpdateInput.setValue(converttounit.toFixed(2)); // Display result with 2 decimal places
-            //oUpdateInput.setEditable(false); // Make it non-editable after update
-          } else {
-            // Handle invalid or zero yield value
-            oUpdateInput.setValue(''); // Clear the result if yield is not valid
-            oUpdateInput.setEditable(true);
-          }
-        }
+        //   if (!isNaN(fStandardValue)) {
+        //     var oconvertstvalue = fStandardValue * 60;
+        //     var fResult = oconvertstvalue / totalqty * (fYieldValue + fscrapValue);
+        //     var converttounit = fResult / 60;
+        //     oUpdateInput.setValue(converttounit.toFixed(2)); // Display result with 2 decimal places
+        //     //oUpdateInput.setEditable(false); // Make it non-editable after update
+        //   } else {
+        //     // Handle invalid or zero yield value
+        //     oUpdateInput.setValue(''); // Clear the result if yield is not valid
+        //     oUpdateInput.setEditable(true);
+        //   }
+        // }
 
         if (Number.isNaN(value) || (value && !this._validatePositiveNumber(value)) || parseFloat(value) === 0) {
           ErrorHandler.setErrorState(oEvent.getSource(), this.getI18nText('POSITIVE_INPUT'));
@@ -2574,16 +2575,18 @@ sap.ui.define(
         var yieldValue = parseFloat(oYieldInput.getValue()) || 0;
         var scrapValue = parseFloat(oScrapInput.getValue()) || 0;
         var sfcQuantityValue = parseFloat(oSfcQuantityInput) || 0;
+
         //var sfcquantity = this.getPodSelectionModel().selectedOrderData.sfcPlannedQtyInProductionUom
-        if (yieldValue + scrapValue > sfcQuantityValue) {
-          MessageBox.error('Quantity (sum of yield and scrap) should not exceed SFC quantity');
-          oYieldInput.setValueState(sap.ui.core.ValueState.Error);
-          oScrapInput.setValueState(sap.ui.core.ValueState.Error);
-          return;
-        } else {
-          oYieldInput.setValueState(sap.ui.core.ValueState.None);
-          oScrapInput.setValueState(sap.ui.core.ValueState.None);
-        }
+        // if (yieldValue + scrapValue > sfcQuantityValue) {
+        //   MessageBox.error('Quantity (sum of yield and scrap) should not exceed SFC quantity');
+        //   oYieldInput.setValueState(sap.ui.core.ValueState.Error);
+        //   oScrapInput.setValueState(sap.ui.core.ValueState.Error);
+        //   return;
+        // } else {
+        //   oYieldInput.setValueState(sap.ui.core.ValueState.None);
+        //   oScrapInput.setValueState(sap.ui.core.ValueState.None);
+        // }
+
         var oModelData = this.getView().getModel('quantitiesModel').getData().value;
 
         var totalYieldQuantity = 0;
@@ -2596,25 +2599,25 @@ sap.ui.define(
           totalYieldQuantity += yieldQuantity + ScrapQuantity;
         });
         var Remaining = sfcQuantityValue - totalYieldQuantity;
-        if (yieldValue + scrapValue > Remaining) {
-          MessageBox.error('Remaining SFC Quantity : ' + Remaining + '');
-          oYieldInput.setValueState(sap.ui.core.ValueState.Error);
-          oScrapInput.setValueState(sap.ui.core.ValueState.Error);
-          return;
-        } else {
-          oYieldInput.setValueState(sap.ui.core.ValueState.None);
-          oScrapInput.setValueState(sap.ui.core.ValueState.None);
-        }
+        // if (yieldValue + scrapValue > Remaining) {
+        //   MessageBox.error('Remaining SFC Quantity : ' + Remaining + '');
+        //   oYieldInput.setValueState(sap.ui.core.ValueState.Error);
+        //   oScrapInput.setValueState(sap.ui.core.ValueState.Error);
+        //   return;
+        // } else {
+        //   oYieldInput.setValueState(sap.ui.core.ValueState.None);
+        //   oScrapInput.setValueState(sap.ui.core.ValueState.None);
+        // }
 
-        if (totalYieldQuantity >= sfcQuantityValue) {
-          MessageBox.error('SFC quantity has already been reported');
-          oYieldInput.setValueState(sap.ui.core.ValueState.Error);
-          oScrapInput.setValueState(sap.ui.core.ValueState.Error);
-          return;
-        } else {
-          oYieldInput.setValueState(sap.ui.core.ValueState.None);
-          oScrapInput.setValueState(sap.ui.core.ValueState.None);
-        }
+        // if (totalYieldQuantity >= sfcQuantityValue) {
+        //   MessageBox.error('SFC quantity has already been reported');
+        //   oYieldInput.setValueState(sap.ui.core.ValueState.Error);
+        //   oScrapInput.setValueState(sap.ui.core.ValueState.Error);
+        //   return;
+        // } else {
+        //   oYieldInput.setValueState(sap.ui.core.ValueState.None);
+        //   oScrapInput.setValueState(sap.ui.core.ValueState.None);
+        // }
 
         //Check if reason code is provided in case of scrap quantity
         if (oScrapQtyInput.getValue() && !oReasonCodeInput.getValue()) {

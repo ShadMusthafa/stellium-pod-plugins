@@ -89,6 +89,16 @@
       "i18n": "stellium.ext.podplugins.batchCorrectionPlugin.i18n.i18n",
       "productionProcessEnabled": false,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
+    },
+    {
+      "id": "stelliumConfirmationPluginV4",
+      "type": "VIEW_PLUGIN",
+      "allowMultipleInstances": false,
+      "name": "stellium.ext.podplugins.confirmationPluginV4",
+      "propertyEditor": "stellium.ext.podplugins.confirmationPluginV4.builder.PropertyEditor",
+      "i18n": "stellium.ext.podplugins.confirmationPluginV4.i18n.i18n",
+      "productionProcessEnabled": false,
+      "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     }
   ],
   "extensions":[
