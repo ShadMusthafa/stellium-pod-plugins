@@ -191,6 +191,26 @@ sap.ui.define([
             return oView.byId("btnAddWeighSetZero");
     };
 
+    CommonConsumeHandler.prototype.getCurrentConfirmButton = function () {
+        const oView = this.getView();
+        if (this.oMaterialConsumptionController.isWeighingDialogOpen && this.oMaterialConsumptionController.isWeighingDialogOpen === true)
+            return oView.byId("btnConfirmWeight")
+        if (this.oMaterialConsumptionController.isScanWeighDialogOpen && this.oMaterialConsumptionController.isScanWeighDialogOpen === true)
+            return oView.byId("btnScanWeighConfirmWeight");
+        if (this.oMaterialConsumptionController.isAddWeighDialogOpen && this.oMaterialConsumptionController.isAddWeighDialogOpen === true)
+            return oView.byId("btnAddWeighConfirmWeight");
+    };
+
+    CommonConsumeHandler.prototype.getCurrentAddWeightButton = function () {
+        const oView = this.getView();
+        if (this.oMaterialConsumptionController.isWeighingDialogOpen && this.oMaterialConsumptionController.isWeighingDialogOpen === true)
+            return oView.byId("btnAddWeight")
+        if (this.oMaterialConsumptionController.isScanWeighDialogOpen && this.oMaterialConsumptionController.isScanWeighDialogOpen === true)
+            return oView.byId("btnScanWeighAddWeight");
+        if (this.oMaterialConsumptionController.isAddWeighDialogOpen && this.oMaterialConsumptionController.isAddWeighDialogOpen === true)
+            return oView.byId("btnAddWeighAddWeight");
+    };
+
     CommonConsumeHandler.prototype.getCurrentSetTareButton = function () {
         const oView = this.getView();
         if (this.oMaterialConsumptionController.isWeighingDialogOpen && this.oMaterialConsumptionController.isWeighingDialogOpen === true)

@@ -30,6 +30,8 @@ sap.ui.define(['sap/ui/model/resource/ResourceModel', 'sap/dm/dme/podfoundation/
       this._oActionButtonSelect = this.initializedActionButtons(oPropertyFormContainer, 'selectActionButtonId', oData);
       //For Weigh-Dispense
       this.addSwitch(oPropertyFormContainer, 'showWeighingSetZero', oData);
+      this.addSwitch(oPropertyFormContainer, 'showWeighingConfirm', oData);
+      this.addSwitch(oPropertyFormContainer, 'showWeighingAddWeight', oData);
       this.addInputField(oPropertyFormContainer, 'charcSetZeroIndicator', oData);
       this.addSwitch(oPropertyFormContainer, 'showWeighingSetTare', oData);
       this.addInputField(oPropertyFormContainer, 'charcSetTareIndicator', oData);
