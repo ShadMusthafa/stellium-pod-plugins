@@ -114,13 +114,10 @@ sap.ui.define(
         var oFilterBar = oEvent.getSource();
         var oViewModel = this.getView().getModel('viewModel');
     
-        
         var sOrderId = this.getView().byId('idOrderFilterInput').getValue();
         var sSFC = this.getView().byId('idSFCSelect').getSelectedKey();
     
-        
         if (!sOrderId || !sSFC) {
-            
             if (!sOrderId) {
                 this.getView().byId('idOrderFilterInput').setValueState('Error');
                 this.getView().byId('idOrderFilterInput').setValueStateText('Please enter an Order Number');
@@ -131,21 +128,21 @@ sap.ui.define(
             }
     
             // Hide the footer
-            oViewModel.setProperty('/isFiltersApplied', !!(sOrderId && sSFC));
+            oViewModel.setProperty('/isFiltersApplied', false);
+            return; // Stop execution if validation fails
         }
     
-        
+        // Reset ValueState only when both inputs are valid
         this.getView().byId('idOrderFilterInput').setValueState('None');
         this.getView().byId('idSFCSelect').setValueState('None');
     
         // Show the footer
         oViewModel.setProperty('/isFiltersApplied', true);
     
-        
+        // Fetch data
         this._getAssignmentData();
     },
-
-      onTableItemsSelectionChange: function(oEvent) {
+       onTableItemsSelectionChange: function(oEvent) {
         var aSelectedRows = oEvent.getParameter('listItems');
         console.log(aSelectedRows);
       },
