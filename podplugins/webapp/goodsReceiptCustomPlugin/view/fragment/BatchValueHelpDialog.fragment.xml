@@ -1,0 +1,52 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog id="idBatchVhDia" title="{i18n-goodreceipt>batchBrowseTitle}" afterClose="onClose" contentHeight="80vh">
+        <subHeader>
+            <Bar>
+                <contentMiddle>
+                    <SearchField id="idBatchVhDiaSearchField" 
+                        showSearchButton="true" 
+                        liveChange="onSearchLiveChange" 
+                        maxLength="200" />
+                </contentMiddle>
+            </Bar>
+        </subHeader>
+        <content>
+            <Table id="idBatchVhDiaTable"
+                items=""
+                mode="SingleSelectMaster"
+                selectionChange="onSelect"
+                growing="true"
+                growingThreshold="20"
+                growingScrollToLoad="false"
+                autoPopinMode="true">
+                <columns>
+                    <Column width="12rem">
+                        <Text text="{i18n-goodreceipt>gr.batchNumber.lbl}" />
+                    </Column>
+                    <!--       dynamic column is here      -->
+                    <Column minScreenWidth="Desktop" demandPopin="true" hAlign="Begin">
+                        <Text text="{i18n-goodreceipt>gr.productionDate.lbl}" class="help-id-productionDate" />
+                    </Column>
+                    <Column minScreenWidth="Desktop" demandPopin="true" hAlign="Begin">
+                        <Text text="{i18n-goodreceipt>gr.expiryDate.lbl}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{batchNumber}" />
+                            <Text text="{productionDate}" />
+                            <Text text="{shelfLifeExpirationDate}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <beginButton>
+            <Button id="closeButton" 
+                text="{i18n-global>common.cancel.btn}" 
+                tooltip="{i18n-global>common.cancel.btn}"
+                press="onCancel" />
+        </beginButton>
+    </Dialog>
+</core:FragmentDefinition>
