@@ -89,14 +89,8 @@ sap.ui.define(
         var oBatchCorrectionInfo = await this._getBatchCorrectionData().catch(oError => {
           return [];
         });
-        
-        //If batch correction items exist, then get the items applicable for selected phase
-        // this.batchCorrItems = [];
+
         this.batchCorrItems = oBatchCorrectionInfo.content;
-        // if (oBatchCorrectionInfo && oBatchCorrectionInfo.content && oBatchCorrectionInfo.content.length > 0) {
-        //   var sStepId = this.getPodSelectionModel().selectedPhaseData.stepId;
-        //   this.batchCorrItems = oBatchCorrectionInfo.content.filter(oItem => oItem.phase === sStepId);
-        // }
 
         //Get goods issue summary for the components
         var aLineItems = await this._getGoodsIssueSummaryForOrder(oData.order);
@@ -257,14 +251,6 @@ sap.ui.define(
           fConsumedQty = parseFloat(oBatchCorrectionItem.consumedQuantity.value),
           sConsumedQtyUom = oBatchCorrectionItem.consumedQuantity.unitOfMeasure.uom;
 
-        // var oRequestBody = {
-        //   plant: this.getPodController().getUserPlant(),
-        //   headerMaterial: this.selectedOrder.materialName,
-        //   component: sComponent,
-        //   correctionQuantity: fConsumedQty,
-        //   uom: sConsumedQtyUom
-        // };
-
         var oRequestBody = {
           payload: {
             plant: this.getPodController().getUserPlant(),
@@ -376,7 +362,8 @@ sap.ui.define(
         MessageBox.confirm(this.getI18nText('scrapSfcConfirmationMsg', [this.selectedOrder.sfc]), {
           onClose: function(sAction) {
             if (sAction !== MessageBox.Action.OK) return;
-            this._postSfcScrap();
+            // this._postSfcScrap();
+            this.rejectBatchCorrection();
           }.bind(this)
         });
       },
@@ -404,6 +391,111 @@ sap.ui.define(
         });
       },
 
+      rejectBatchCorrection: async function() {
+        var oGiDataModel = this.getView().getModel('giData'),
+          aLineItems = oGiDataModel.getProperty('/lineItems');
+
+        //Prepare data for GI scrap posting to S4
+        var aGiLineItemPromise = aLineItems
+          .filter(oItem => oItem.componentType === 'N')
+          .map(oItem => this._getGoodsIssueItemsForMaterial(oItem));
+
+        try {
+          var aGiLineItems = await Promise.all(aGiLineItemPromise).catch(oError => {
+            Log.error('Could not load GI items information');
+            throw new Error('Could not load GI items information');
+            return;
+          });
+
+          //Prepare GI scrap posting payloads
+          var aGiScrapPayloads = aGiLineItems.filter(oItem => !oItem.cancellationTriggered).flatMap(oItem => oItem.content).map(oItem => {
+            return {
+              content: {
+                material: oItem.material,
+                plant: oItem.plant,
+                sfc: oItem.sfc,
+                order: oItem.order,
+                storage_location: oItem.storageLocation,
+                batch: oItem.batchNumber,
+                quantity: oItem.quantityInBaseUnit.value,
+                uom: oItem.quantityInBaseUnit.unitOfMeasure.internalUnitOfMeasure
+              }
+            };
+          });
+
+          //Cancel GI in DM
+          await this._cancelGoodsIssue().catch(oError => {
+            Log.error('Error posting cancel GI');
+            throw new Error('Error posting cancel GI');
+            return;
+          });
+          Log.info('Cancel goods issue PPD completed');
+
+          //Post scrap to S4
+          var aGiScrapRequests = aGiScrapPayloads.map(oPayload => this._postGiScrapToS4(oPayload));
+          await Promise.all(aGiScrapRequests).catch(oError => {
+            Log.error('Error occured while posting scrap GI qty to S4');
+            throw new Error('Error occured while posting scrap GI qty to S4');
+            return;
+          });
+
+          //TODO: Get list of open SFCs for order and scrap all SFCs
+          // var aSfcs = await this._getOrderDetails().then((oOrderDetails)=>oOrderDetails.sfcs);
+          // var aSfcScrapPromises = aSfcs.map(sSFC=>this._postSfcScrap(sSFC))
+
+          //Scrap SFC in DM
+          await this._postSfcScrap().catch(oError => {
+            Log.error('SFC could not be scrapped');
+            throw new Error('SFC could not be scrapped');
+          });
+
+          //Discard order in DM
+          await this._postDiscardOrder().catch(oError => {
+            Log.error('Error in posting discard order');
+            throw new Error('Error in posting discard order');
+            return;
+          });
+          Log.info('Posted order discard');
+        } catch (sError) {
+          MessageBox.error(sError);
+        }
+      },
+
+      _cancelGoodsIssue: function() {
+        var sUrl =
+          this.getPublicApiRestDataSourceUri() +
+          '/pe/api/v1/process/processDefinitions/start?key=REG_6777e9c1-c7e7-4cb5-8644-340d507c6fce&async=false';
+        var oPayload = {
+          InPlant: this.getPodController().getUserPlant(),
+          InOrder: this.selectedOrder.order,
+          InSFC: this.selectedOrder.sfc
+        };
+        return new Promise((resolve, reject) => this.ajaxPostRequest(sUrl, oPayload, resolve, reject));
+      },
+
+      _postGiScrapToS4: function(oPayload) {
+        var sUrl =
+          this.getPublicApiRestDataSourceUri() +
+          '/pe/api/v1/process/processDefinitions/start?key=REG_020b94e0-e4ce-4f50-98e3-502627bf56f5&async=false';
+        return new Promise((resolve, reject) => this.ajaxPostRequest(sUrl, oPayload, resolve, reject));
+      },
+
+      _postDiscardOrder: function() {
+        var sPlant = this.getPodController().getUserPlant();
+        var sOrder = this.selectedOrder.order;
+        var sUrl = this.getPublicApiRestDataSourceUri() + `/order/v1/orders/discard?plant=${sPlant}&order=${sOrder}`;
+        return new Promise((resolve, reject) => this.ajaxPostRequest(sUrl, null, resolve, reject));
+      },
+
+      _getOrderDetails: function() {
+        var sUrl = this.getPublicApiRestDataSourceUri() + '/order/v1/orders/';
+        var oParams = {
+          plant: this.getPodController().getUserPlant(),
+          order: this.selectedOrder.order
+        };
+        return new Promise((resolve, reject) => this.ajaxGetRequest(sUrl, oParams, resolve, reject));
+      },
+
       _getRoutingDetailsForOrder: function(sOrderId) {
         var sUrl = this.getPublicApiRestDataSourceUri() + 'routing/v1/routings';
         var oParams = {
@@ -415,6 +507,17 @@ sap.ui.define(
         return new Promise((resolve, reject) => {
           this.ajaxGetRequest(sUrl, oParams, resolve, reject);
         });
+      },
+
+      _getGoodsIssueItemsForMaterial: function(oItem) {
+        var sUrl = this.getPublicApiRestDataSourceUri() + 'inventory/v1/inventory/goodsIssues';
+        var oParams = {
+          plant: this.getPodController().getUserPlant(),
+          material: oItem.materialId.material,
+          materialVersion: oItem.materialId.version,
+          order: this.selectedOrder.order
+        };
+        return new Promise((resolve, reject) => this.ajaxGetRequest(sUrl, oParams, resolve, reject));
       },
 
       _getGoodsIssueSummaryForOrder: function(sOrderId) {
@@ -518,15 +621,20 @@ sap.ui.define(
           quantity: oGRSummary.targetQuantityInProductionUnit.value
         };
 
-        this.ajaxPostRequest(
-          sUrl,
-          oRequestBody,
-          function(oResponse) {
-            MessageToast.show(this.getI18nText('sfcScrapped', [this.selectedOrder.sfc]));
-            this.navigateToPage('MainPage');
-            oLogger.info('SFC scrap service response', oResponse);
-          }.bind(this)
-        );
+        return new Promise((resolve, reject) => this.ajaxPostRequest(sUrl, oRequestBody, resolve, reject)).then(oResponse => {
+          MessageToast.show(this.getI18nText('sfcScrapped', [this.selectedOrder.sfc]));
+          this.navigateToPage('MainPage');
+          oLogger.info('SFC scrap service response', oResponse);
+          return oResponse;
+        });
+
+        // this.ajaxPostRequest(
+        //   sUrl,
+        //   oRequestBody,
+        //   function(oResponse) {
+
+        //   }.bind(this)
+        // );
       },
 
       _releaseSfcHold: function() {
