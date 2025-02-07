@@ -2230,32 +2230,7 @@ sap.ui.define(
 
         //Reset the fields
         this._resetFields();
-        // var oTable = this.byId("activity");
-        // var aItems = oTable.getItems();
-        // var bAnyValuePresent = false;
-
-        // // Check for any non-empty input field
-        // aItems.forEach(function (oItem) {
-        //   var oInput = oItem.getCells()[1]; // Assuming the second cell contains the Input field
-        //   var sValue = oInput.getValue();
-
-        //   if (sValue) {
-        //     bAnyValuePresent = true;
-        //   }
-        // });
-
-        // // Set value state based on bAnyValuePresent
-        // aItems.forEach(function (oItem) {
-        //   var oInput = oItem.getCells()[1]; // Assuming the second cell contains the Input field
-        //   if (!bAnyValuePresent) {
-        //     oInput.setValueState("Error");
-        //     oInput.setValueStateText("At least one field must be filled.");
-        //   } else {
-        //     oInput.setValueState("None");
-        //   }
-        // });
-
-        // return bAnyValuePresent;
+        
         var oTable = this.byId('activity'); // Replace with the actual ID
         var aItems = oTable.getItems();
 
@@ -2294,107 +2269,18 @@ sap.ui.define(
         ErrorHandler.clearErrorState(this.byId('postingDate'));
       },
       onYieldQuantityChange: function(oEvent) {
-        var oInput = oEvent.getSource();
-        var oTable = this.byId('activity');
-        var aItems = oTable.getItems();
-
-        aItems.forEach(function(oItem) {
-          var aCells = oItem.getCells();
-          var oYieldInput = aCells[0];
-          var oUpdateInput = aCells[1];
-
-          if (oYieldInput === oInput) {
-            var fYieldValue = parseFloat(oInput.getValue());
-            oUpdateInput.setValue(fYieldValue);
-            //oUpdateInput.setEditable(false);
-          }
-        });
-
-        console.log('Updated the corresponding fields and set them to non-editable.');
       },
 
       onYieldQuantityLiveChange: function(oEvent) {
         var oView = this.getView(),
           oPostModel = oView.getModel('qtyPostModel'),
           value = oEvent.getSource().getValue();
-        var oInput = oEvent.getSource();
-        var oItem = oInput.getParent();
-        var oTable = this.byId('activity');
-        var aItems = oTable.getItems();
+
         var oYieldInput = this.byId('yieldQuantity');
         var oScrapInput = this.byId('scrapQuantity');
 
         oYieldInput.setValueState(sap.ui.core.ValueState.None);
         oScrapInput.setValueState(sap.ui.core.ValueState.None);
-
-        var oData = oTable.getModel().getData().activitySummary;
-
-        //! Remove this check if not required
-        //! Move to a separate function and call it only once on plugin load.
-        var that = this,
-          sUrl = this.getPublicApiRestDataSourceUri() + 'user/v1/supervisors';
-
-        var oParameters = {
-          plant: this.getPodController().getUserPlant(),
-          userId: this.getGlobalProperty('loggedInUserDetails').userId
-        };
-        this.ajaxGetRequest(
-          sUrl,
-          oParameters,
-          function(oResponseData) {
-            if (oResponseData.supervisedUserIds.length === 0) {
-              //! Handle this using models. Do not iterate over the cells.
-              for (var i = 0; i < aItems.length; i++) {
-                var oRow = aItems[i];
-                var aCells = oRow.getCells();
-                var oUpdateInput = aCells[1];
-                oUpdateInput.setEditable(false);
-              }
-            } else {
-              for (var i = 0; i < aItems.length; i++) {
-                var oRow = aItems[i];
-                var aCells = oRow.getCells();
-                var oUpdateInput = aCells[1];
-                oUpdateInput.setEditable(true);
-              }
-            }
-          },
-          function(oError, sHttpErrorMessage) {
-            console.error('Error fetching data:', error);
-            //that.handleErrorMessage(oError, sHttpErrorMessage);
-          }
-        );
-        //! Clear upto here
-
-        // Get the index of the current item
-        var iIndex = oTable.indexOfItem(oItem);
-
-        //! Rewrite the below to use model for the dialog. Do not interact directly with the controls
-        // Loop through table items
-        // for (var i = 0; i < aItems.length; i++) {
-        //   var oRow = aItems[i];
-        //   var aCells = oRow.getCells();
-        //   var oYieldInput = aCells[0];
-        //   var oUpdateInput = aCells[1];
-        //   oUpdateInput.setEditable(true); // Assuming the 3rd column has the input for result
-        //   var totalqty = this.getPodSelectionModel().selectedOrderData.sfcPlannedQty;
-        //   var oScrap = this.byId('scrapQuantity');
-        //   var fscrapValue = parseFloat(oScrap.getValue()) || 0;
-        //   var fYieldValue = parseFloat(oInput.getValue()) || 0;
-        //   var fStandardValue = oData[i].targetQuantity.value;
-
-        //   if (!isNaN(fStandardValue)) {
-        //     var oconvertstvalue = fStandardValue * 60;
-        //     var fResult = oconvertstvalue / totalqty * (fYieldValue + fscrapValue);
-        //     var converttounit = fResult / 60;
-        //     oUpdateInput.setValue(converttounit.toFixed(2)); // Display result with 2 decimal places
-        //     //oUpdateInput.setEditable(false); // Make it non-editable after update
-        //   } else {
-        //     // Handle invalid or zero yield value
-        //     oUpdateInput.setValue(''); // Clear the result if yield is not valid
-        //     oUpdateInput.setEditable(true);
-        //   }
-        // }
 
         if (Number.isNaN(value) || (value && !this._validatePositiveNumber(value)) || parseFloat(value) === 0) {
           ErrorHandler.setErrorState(oEvent.getSource(), this.getI18nText('POSITIVE_INPUT'));
@@ -2435,75 +2321,13 @@ sap.ui.define(
         var oView = this.getView(),
           oPostModel = oView.getModel('qtyPostModel'),
           value = oEvent.getSource().getValue();
-        var oInput = this.byId('yieldQuantity');
-        var oItem = oInput.getParent();
-        var oTable = this.byId('activity');
-        var aItems = oTable.getItems();
+        
         var oYieldInput = this.byId('yieldQuantity');
         var oScrapInput = this.byId('scrapQuantity');
 
         oYieldInput.setValueState(sap.ui.core.ValueState.None);
         oScrapInput.setValueState(sap.ui.core.ValueState.None);
-        // Get the index of the current item
-        var iIndex = oTable.indexOfItem(oItem);
-        var oData = oTable.getModel().getData().activitySummary;
-        var that = this,
-          sUrl = this.getPublicApiRestDataSourceUri() + 'user/v1/supervisors';
-
-        var oParameters = {
-          plant: this.getPodController().getUserPlant(),
-          userId: this.getGlobalProperty('loggedInUserDetails').userId
-        };
-        this.ajaxGetRequest(
-          sUrl,
-          oParameters,
-          function(oResponseData) {
-            if (oResponseData.supervisedUserIds.length === 0) {
-              for (var i = 0; i < aItems.length; i++) {
-                var oRow = aItems[i];
-                var aCells = oRow.getCells();
-                var oUpdateInput = aCells[1];
-                oUpdateInput.setEditable(false);
-              }
-            } else {
-              for (var i = 0; i < aItems.length; i++) {
-                var oRow = aItems[i];
-                var aCells = oRow.getCells();
-                var oUpdateInput = aCells[1];
-                oUpdateInput.setEditable(true);
-              }
-            }
-          },
-          function(oError, sHttpErrorMessage) {
-            console.error('Error fetching data:', error);
-            //that.handleErrorMessage(oError, sHttpErrorMessage);
-          }
-        );
-        // Loop through table items
-        for (var i = 0; i < aItems.length; i++) {
-          var oRow = aItems[i];
-          var aCells = oRow.getCells();
-          var oYieldInput = aCells[0];
-          var oUpdateInput = aCells[1];
-          oUpdateInput.setEditable(true); // Assuming the 3rd column has the input for result
-          var totalqty = this.getPodSelectionModel().selectedOrderData.sfcPlannedQty;
-          var oScrap = this.byId('scrapQuantity');
-          var fscrapValue = parseFloat(oScrap.getValue()) || 0;
-          var fYieldValue = parseFloat(oInput.getValue()) || 0;
-          var fStandardValue = oData[i].targetQuantity.value;
-
-          if (!isNaN(fStandardValue)) {
-            var oconvertstvalue = fStandardValue * 60;
-            var fResult = oconvertstvalue / totalqty * (fYieldValue + fscrapValue);
-            var converttounit = fResult / 60;
-            oUpdateInput.setValue(converttounit.toFixed(2)); // Display result with 2 decimal places
-            //oUpdateInput.setEditable(false); // Make it non-editable after update
-          } else {
-            // Handle invalid or zero yield value
-            oUpdateInput.setValue(''); // Clear the result if yield is not valid
-            oUpdateInput.setEditable(true);
-          }
-        }
+       
         if (Number.isNaN(value) || (value && !this._validatePositiveNumber(value)) || parseFloat(value) === 0) {
           ErrorHandler.setErrorState(oEvent.getSource(), this.getI18nText('POSITIVE_INPUT'));
         } else {
@@ -2516,34 +2340,6 @@ sap.ui.define(
             this._enableConfirmButton();
           }
         }
-      },
-      onValidate: function() {
-        var oTable = this.byId('activity');
-        var aItems = oTable.getItems();
-        var bAnyValuePresent = false;
-
-        // Check for any non-empty input field
-        aItems.forEach(function(oItem) {
-          var oInput = oItem.getCells()[1]; // Assuming the second cell contains the Input field
-          var sValue = oInput.getValue();
-
-          if (sValue) {
-            bAnyValuePresent = true;
-          }
-        });
-
-        // Set value state based on bAnyValuePresent
-        aItems.forEach(function(oItem) {
-          var oInput = oItem.getCells()[1]; // Assuming the second cell contains the Input field
-          if (!bAnyValuePresent) {
-            oInput.setValueState('Error');
-            oInput.setValueStateText('At least one field must be filled.');
-          } else {
-            oInput.setValueState('None');
-          }
-        });
-
-        return bAnyValuePresent;
       },
 
       onConfirm: function() {
@@ -2643,14 +2439,6 @@ sap.ui.define(
           return false;
         }
 
-        var bValid = this.onValidate(); // Perform validation
-
-        if (!bValid) {
-          // Show error message and stop form submission
-          sap.m.MessageToast.show('Please fill at least one field before submitting.');
-          return;
-        } else {
-        }
         // Append Time
         var postedDateTime = this.getView().getModel('qtyPostModel').getProperty('/dateTime') + ' ' + '00' + ':' + '00' + ':' + '00';
         // convert time to UTC
