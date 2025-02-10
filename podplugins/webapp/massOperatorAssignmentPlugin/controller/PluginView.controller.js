@@ -287,9 +287,9 @@ sap.ui.define(
             resource: '',
             resourceType: '',
             operator: '',
-            autoAcceptance: false,
-            acceptanceDelay: 0,
-            correctionTime: '',
+            autoAcceptance: true,
+            acceptanceDelay: 1,
+            correctionTime: 3000,
             lastModified: ''
         };
     
@@ -317,9 +317,9 @@ sap.ui.define(
             resource: '',
             resourceType: '',
             operator: '',
-            autoAcceptance: false,
-            acceptanceDelay: 0,
-            correctionTime: '',
+            autoAcceptance: true,
+            acceptanceDelay: 1,
+            correctionTime: 3000,
             lastModified: ''
         });
         
@@ -655,9 +655,9 @@ sap.ui.define(
               resource: '',
               resourceType: '',
               operator: '',
-              autoAcceptance: false,
-              acceptanceDelay: oConfiguration && oConfiguration.defaultAcceptanceDelay ? oConfiguration.defaultAcceptanceDelay : 0,
-              correctionTime: oConfiguration && oConfiguration.defaultCorrectionTime ? oConfiguration.defaultCorrectionTime : 0,
+              autoAcceptance: true,
+              acceptanceDelay: oConfiguration && oConfiguration.defaultAcceptanceDelay ? oConfiguration.defaultAcceptanceDelay : 1,
+              correctionTime: oConfiguration && oConfiguration.defaultCorrectionTime ? oConfiguration.defaultCorrectionTime : 3000,
               lastModified: '',
               operationActivity: phase.recipeOperation.operationActivity.operationActivity,
               bom: component.bomComponent.bom.bom,
@@ -986,9 +986,9 @@ sap.ui.define(
         if (bNew) {
           oData.isNew = true;
           oData.operator = '';
-          oData.autoAcceptance = false;
-          oData.acceptanceDelay = 0;
-          oData.correctionTime = 0;
+          oData.autoAcceptance = true;
+          oData.acceptanceDelay = 1;
+          oData.correctionTime = 3000;
         }
 
         oModel.setProperty(sPath, oData);
