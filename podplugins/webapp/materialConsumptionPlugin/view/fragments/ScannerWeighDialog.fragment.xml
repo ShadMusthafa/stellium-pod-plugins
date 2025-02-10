@@ -76,11 +76,11 @@
                             visible="{configModel>/showWeighingSetTare}"> </Text>
                     </f:content>
                 </f:SimpleForm>
-                <HBox id="beforeScaleScannerWeighMaterialPopupStatusContainer" width="auto" height="300px"
+                <!-- <HBox id="beforeScaleScannerWeighMaterialPopupStatusContainer" width="auto" height="300px"
                     class="sapUiResponsiveMargin" visible="true" justifyContent="Center" alignItems="Center">
                     <Title text="{i18n>wd.NoData}" />
-                </HBox>
-                <Panel id="vizFrameScannerWeighMaterialPopupParentContainer" width="auto" visible="false">
+                </HBox> -->
+                <!-- <Panel id="vizFrameScannerWeighMaterialPopupParentContainer" width="auto" visible="false">
                     <content>
                         <viz:VizFrame id="vizFrameScanWeighTotalWeight" uiConfig="{ applicationSet:'fiori' }"
                             height="150px" width="auto" vizType="stacked_bar">
@@ -131,7 +131,7 @@
                             </viz:feeds>
                         </viz:VizFrame>
                     </content>
-                </Panel>
+                </Panel> -->
             </l:VerticalLayout>
             <f:SimpleForm id="scanWeighMaterialForm2" editable="true" layout="ColumnLayout">
                 <f:content>

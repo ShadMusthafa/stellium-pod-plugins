@@ -843,6 +843,7 @@ sap.ui.define(
               oParameters,
               function(oResponseData) {
                 that.filteredRecords = that.filterRecordsWithZeroQuantity(oResponseData);
+                that.filteredRecords = that.fitlerRecordsWithQualityInspection(oResponseData);
                 that.batchDetailsList = that.filteredRecords;
                 if (!that.isInventoryManaged) {
                   that.batchDetailsList = that.filteredRecords.content;
@@ -1481,6 +1482,22 @@ sap.ui.define(
           return filteredRecords;
         }
         return oResponseData;
+      },
+
+      fitlerRecordsWithQualityInspection: function(oResponseData) {
+        let aFilteredRecords = [];
+        if (!this.isInventoryManaged) return oResponseData;
+
+        for (var i = 0; i < oResponseData.length; i++) {
+          if (oResponseData[i].batchCharcValues) {
+            var oQaStatus = oResponseData[i].batchCharcValues.find(
+              oCharc => oCharc.charcName === 'ZQASTAT' && (oCharc.charcValue === 'Q' || oCharc.charcValue === 'B')
+            );
+            if (oQaStatus) continue;
+          }
+          aFilteredRecords.push(oResponseData[i]);
+        }
+        return aFilteredRecords;
       },
 
       onGoAdvSearch: function(oEvent) {
@@ -2717,7 +2734,7 @@ sap.ui.define(
           return item.componentType === 'C' || item.componentType === 'B';
         });
         var oAllBiCoProducts = that.getView().getModel('coBiProductSummaryList').getData();
-        
+
         //Apply the correction entries
         if (this.batchCorrItems.length > 0) {
           aBiCoProducts.forEach(oItem => {
