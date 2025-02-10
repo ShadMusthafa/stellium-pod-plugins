@@ -403,7 +403,7 @@ sap.ui.define(
         try {
           var aGiLineItems = await Promise.all(aGiLineItemPromise).catch(oError => {
             Log.error('Could not load GI items information');
-            throw new Error('Could not load GI items information');
+            // throw new Error('Could not load GI items information');
             return;
           });
 
@@ -426,16 +426,19 @@ sap.ui.define(
           //Cancel GI in DM
           await this._cancelGoodsIssue().catch(oError => {
             Log.error('Error posting cancel GI');
-            throw new Error('Error posting cancel GI');
+            // throw new Error('Error posting cancel GI');
             return;
           });
           Log.info('Cancel goods issue PPD completed');
+
+          Log.info('Wait 1s before calling S4');
+          await this._wait(1000);
 
           //Post scrap to S4
           var aGiScrapRequests = aGiScrapPayloads.map(oPayload => this._postGiScrapToS4(oPayload));
           await Promise.all(aGiScrapRequests).catch(oError => {
             Log.error('Error occured while posting scrap GI qty to S4');
-            throw new Error('Error occured while posting scrap GI qty to S4');
+            // throw new Error('Error occured while posting scrap GI qty to S4');
             return;
           });
 
@@ -446,16 +449,22 @@ sap.ui.define(
           //Scrap SFC in DM
           await this._postSfcScrap().catch(oError => {
             Log.error('SFC could not be scrapped');
-            throw new Error('SFC could not be scrapped');
+            // throw new Error('SFC could not be scrapped');
           });
 
           //Discard order in DM
           await this._postDiscardOrder().catch(oError => {
             Log.error('Error in posting discard order');
-            throw new Error('Error in posting discard order');
+            // throw new Error('Error in posting discard order');
             return;
           });
           Log.info('Posted order discard');
+
+          Log.info('Wait 1s before calling S4')
+          await this._wait(1000);
+
+          await this._postTecoToS4();
+          Log.info('Posted Teco to S4')
         } catch (sError) {
           MessageBox.error(sError);
         }
@@ -572,6 +581,17 @@ sap.ui.define(
         });
       },
 
+      _postTecoToS4: function() {
+        var sUrl =
+          this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_39e69f0f-b61d-4d46-9274-5123baa99842';
+        var oPayload = {
+          content: {
+            Order_number: this.selectedOrder.order
+          }
+        };
+        return new Promise((resolve, reject) => this.ajaxPostRequest(sUrl, oPayload, resolve, reject));
+      },
+
       _setScaleFactorEnabled: function(bFlag) {
         this.byId('idStepInput').setEnabled(bFlag);
       },
@@ -618,7 +638,9 @@ sap.ui.define(
           plant: this.getPodController().getUserPlant(),
           sfcs: [this.selectedOrder.sfc],
           resource: oBatchCorrectionItem.workCenter,
-          quantity: oGRSummary.targetQuantityInProductionUnit.value
+          // quantity: oGRSummary.targetQuantityInProductionUnit.value,
+          quantity: oGRSummary.quantityInBaseUnit.value || oGRSummary.targetQuantityInProductionUnit.value,
+          operation: oBatchCorrectionItem.operationActivity
         };
 
         return new Promise((resolve, reject) => this.ajaxPostRequest(sUrl, oRequestBody, resolve, reject)).then(oResponse => {
@@ -627,14 +649,10 @@ sap.ui.define(
           oLogger.info('SFC scrap service response', oResponse);
           return oResponse;
         });
+      },
 
-        // this.ajaxPostRequest(
-        //   sUrl,
-        //   oRequestBody,
-        //   function(oResponse) {
-
-        //   }.bind(this)
-        // );
+      _wait: function(iMilliseconds) {
+        return new Promise(resolve => setTimeout(resolve, iMilliseconds));
       },
 
       _releaseSfcHold: function() {
