@@ -288,8 +288,8 @@ sap.ui.define(
             resourceType: '',
             operator: '',
             autoAcceptance: true,
-            acceptanceDelay: 1,
-            correctionTime: 3000,
+            acceptanceDelay: this._getDefaultAcceptanceDelay(),
+            correctionTime: this._getDefaultCorrectionTime(),
             lastModified: ''
         };
     
@@ -318,8 +318,8 @@ sap.ui.define(
             resourceType: '',
             operator: '',
             autoAcceptance: true,
-            acceptanceDelay: 1,
-            correctionTime: 3000,
+            acceptanceDelay: this._getDefaultAcceptanceDelay(),
+            correctionTime: this._getDefaultCorrectionTime(),
             lastModified: ''
         });
         
@@ -656,8 +656,8 @@ sap.ui.define(
               resourceType: '',
               operator: '',
               autoAcceptance: true,
-              acceptanceDelay: oConfiguration && oConfiguration.defaultAcceptanceDelay ? oConfiguration.defaultAcceptanceDelay : 1,
-              correctionTime: oConfiguration && oConfiguration.defaultCorrectionTime ? oConfiguration.defaultCorrectionTime : 3000,
+              acceptanceDelay: this._getDefaultAcceptanceDelay(),
+              correctionTime: this._getDefaultCorrectionTime(),
               lastModified: '',
               operationActivity: phase.recipeOperation.operationActivity.operationActivity,
               bom: component.bomComponent.bom.bom,
@@ -987,11 +987,20 @@ sap.ui.define(
           oData.isNew = true;
           oData.operator = '';
           oData.autoAcceptance = true;
-          oData.acceptanceDelay = 1;
-          oData.correctionTime = 3000;
+          oData.acceptanceDelay = this._getDefaultAcceptanceDelay();
+          oData.correctionTime = this._getDefaultCorrectionTime();
         }
 
         oModel.setProperty(sPath, oData);
+      },
+      _getDefaultAcceptanceDelay : function() {
+        var oConfiguration=this.getConfiguration();
+        return oConfiguration && oConfiguration.defaultAcceptanceDelay ? oConfiguration.defaultAcceptanceDelay : 0;
+      },
+
+      _getDefaultCorrectionTime : function() {
+        var oConfiguration=this.getConfiguration();
+        return oConfiguration && oConfiguration.defaultCorrectionTime ? oConfiguration.defaultCorrectionTime : 0;
       }
     });
 
