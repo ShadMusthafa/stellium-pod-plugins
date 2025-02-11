@@ -5525,7 +5525,8 @@ sap.ui.define(
           }
         }
 
-        var oComponentData = this._getBomInfoForComponent(sMaterial);
+        var oComponentData = this._getBomInfoForComponent(sMaterial),
+          sHandlingUnit = this.scannedMaterial && this.scannedMaterial.handlingUnit ? this.scannedMaterial.handlingUnit : '';
 
         var oPayload = {
           InBOM: oComponentData.bomComponent.bom.bom,
@@ -5550,7 +5551,8 @@ sap.ui.define(
           InUOM: oPodSelectionModel.selectedOrderData.baseInternalUom,
           InWorkCenter: oModel.getProperty('/workCenter'),
           InSubWeighing: false,
-          InBatch: oModel.getProperty('/batchNumber')
+          InBatch: oModel.getProperty('/batchNumber'),
+          InHandlingUnit: sHandlingUnit
         };
 
         var sUrl =
