@@ -147,6 +147,11 @@ sap.ui.define(
           oView.setModel(new JSONModel([]), 'quantityConfirmationItems');
           oView.setModel(new JSONModel([]), 'confirmationItems');
           oView.setModel(new JSONModel([]), 'cancellationItems');
+          oView.setModel(new JSONModel([]), 'packingItems');
+          oView.setModel(new JSONModel([]), 'goodsIssueItems');
+          oView.setModel(new JSONModel([]), 'FINISH_GOOD');
+          oView.setModel(new JSONModel([]), 'CO_PRODUCT');
+          oView.setModel(new JSONModel([]), 'BY_PRODUCT');
           oView.setModel(new JSONModel(), 'viewModel');
 
           this.getOwnerComponent().getTargets().getTarget('OrderDetail').attachDisplay(this.onRouteMatched, this);
@@ -218,6 +223,7 @@ sap.ui.define(
           this.quantityConfirmationPageNo = 0;
 
           this.getOrderDetail(oQuery.shopOrder);
+          this.getGoodsIssueItems();
           // apply class to Active Text
           this.updateExecutionStatusClass(oQuery.executionStatus);
         },
@@ -868,7 +874,7 @@ sap.ui.define(
           this.byId('headerRefresh').setEnabled(true);
         },
 
-        _readGoodsReceiptItemsSuccess: function(sTableName, bConcatFlag, oResponse) {
+        _readGoodsReceiptItemsSuccess: async function(sTableName, bConcatFlag, oResponse) {
           const oFinishGoodsTable = this.byId('goodsReceiptFinishGoodTable'),
             oByProductTable = this.byId('goodsReceiptByProductTable'),
             oCoProductTable = this.byId('goodsReceiptCoProductTable');
@@ -893,6 +899,18 @@ sap.ui.define(
             // Concatenate the new content to the existing data
             aTableData = bConcatFlag ? aContent : aTableData.concat(aContent);
 
+            //Collect the packing HU and map it to the 
+            var aPackingData = await this._getPackingDataFromS4();
+            aTableData.forEach(oItem => {
+              var aHandlingUnits = aPackingData
+                .filter(oPackItem => oPackItem.packedArticle === oItem.material && oPackItem.packedBatch === oItem.batch)
+                .reduce((acc, val) => {
+                  acc.push(val.handlingUnit);
+                  return acc;
+                }, []);
+              oItem.handlingUnit = aHandlingUnits.join(', ');
+            });
+
             // Set the updated data to the model
             this.getView().getModel(sTableName).setData(aTableData);
 
@@ -913,7 +931,7 @@ sap.ui.define(
           this.byId('headerRefresh').setEnabled(true);
         },
 
-        _readGoodsIssueItemsSuccess: function(oResponse) {
+        _readGoodsIssueItemsSuccess: async function(oResponse) {
           if (oResponse) {
             // Increment the page number for goods issue items
             this.goodsIssuePageNo++;
@@ -927,6 +945,18 @@ sap.ui.define(
 
             // Concatenate the new content with the existing items
             aGiItems = aGiItems.concat(oResponse.content);
+
+            //Collect the packing HU and map it to the 
+            var aPackingData = await this._getPackingDataFromS4();
+            aGiItems.forEach(oItem => {
+              var aHandlingUnits = aPackingData
+                .filter(oPackItem => oPackItem.packedArticle === oItem.material && oPackItem.packedBatch === oItem.batch)
+                .reduce((acc, val) => {
+                  acc.push(val.handlingUnit);
+                  return acc;
+                }, []);
+              oItem.handlingUnit = aHandlingUnits.join(', ');
+            });
 
             // Update the goods issue items model with the new data
             oGoodsIssueModel.setData(aGiItems);
@@ -1352,6 +1382,61 @@ sap.ui.define(
           }
           const iItemCount = oListBinding.getLength();
           this.byId('idCoProdTitleText').setText(this.getI18nText('CO_PRODUCT', [iItemCount]));
+        },
+
+        _getPackingDataFromS4: function() {
+          var sUrl =
+            this.getPublicApiRestDataSourceUri() +
+            '/pe/api/v1/process/processDefinitions/start?key=REG_baae1b09-7a4d-4686-86b6-c49d4ff465f3&async=false';
+          var oEntityModel = this.getView().getModel('entity');
+          var oPayload = {
+            plant: this.getPodController().getUserPlant(),
+            order: oEntityModel.getProperty('/shopOrder'),
+            SFC: oEntityModel.getProperty('/sfc')
+          };
+
+          var oPromise = new Promise((resolve, reject) => this.ajaxPostRequest(sUrl, oPayload, resolve, reject));
+
+          //Call service to get packing information from S4. Times out after 8 seconds
+          return Promise.race([this._timeoutPromise(8000), oPromise])
+            .then(oResponse => {
+              var oPackingItemsModel = this.getView().getModel('packingItems');
+              var aTableData = [];
+
+              //If content is null, map to empty array
+              if (!oResponse.content) oResponse.content = [];
+
+              oResponse.content.forEach(oItem => {
+                if (oItem.material) {
+                  aTableData.push({
+                    editable: false,
+                    handlingUnit: oItem.huno,
+                    packingArticleCode: oItem.packmat,
+                    packingArticleDescription: oItem.packmatDesc,
+                    packedArticle: oItem.material,
+                    packedArticleDescription: oItem.matDesc,
+                    packedQty: oItem.packedQty,
+                    uom: oItem.packedUom,
+                    packedBatch: oItem.batch,
+                    storageLocation: oItem.storageLocation
+                  });
+                }
+              });
+              oPackingItemsModel.setData(aTableData);
+
+              return aTableData;
+            })
+            .catch(oError => {
+              // throw new Error('Could not load packing information from S4');
+            });
+        },
+
+        _timeoutPromise: function(iMilliseconds) {
+          return new Promise(reject =>
+            setTimeout(() => {
+              reject('Timeout triggered');
+            }, iMilliseconds)
+          );
         }
       }
     );
