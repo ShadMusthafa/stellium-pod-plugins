@@ -69,18 +69,28 @@
       "i18n": "stellium.ext.podplugins.confirmationPluginV4.i18n.i18n",
       "productionProcessEnabled": false,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
+    },
+    {
+      "id": "stelliumManagePackingCancellationPlugin",
+      "type": "VIEW_PLUGIN",
+      "allowMultipleInstances": false,
+      "name": "stellium.ext.podplugins.managePackingCancellationPlugin",
+      "propertyEditor": "stellium.ext.podplugins.managePackingCancellationPlugin.builder.PropertyEditor",
+      "i18n": "stellium.ext.podplugins.managePackingCancellationPlugin.i18n.i18n",
+      "productionProcessEnabled": false,
+      "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     }
   ],
-  "extensions":[
+  "extensions": [
     {
       "provider": "stellium/ext/podplugins/orderPodSelectionExtensionProvider/ExtensionProvider",
       "controller": "sap.dm.dme.plugins.orderPodSelectionPlugin",
       "inclusions": [
-          {
-              "pods": ["SMDEV_EXTENSION*", "SMDEV_SUPERVISOR_BATCH"],
-              "plants": ["M206"]
-          }
+        {
+          "pods": ["SMDEV_EXTENSION*", "SMDEV_SUPERVISOR_BATCH"],
+          "plants": ["M206"]
+        }
       ]
-   }
+    }
   ]
 }
