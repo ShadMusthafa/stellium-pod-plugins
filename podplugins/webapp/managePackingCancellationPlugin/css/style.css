@@ -1,0 +1,13 @@
+/* Enter your custom styles here */
+
+.executionStatusActive {
+    color: green !important;
+    font-weight: normal;
+    font-size: 1.5rem !important;
+}
+
+.executionStatusDefault {
+    color: gray !important;
+    font-weight: normal;
+    font-size: 1.0rem !important;
+}

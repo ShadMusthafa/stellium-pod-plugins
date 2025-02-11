@@ -1,0 +1,92 @@
+<mvc:View id="idMasterObjectView"
+    controllerName="stellium.ext.podplugins.managePackingCancellationPlugin.controller.MasterObject" 
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns:core="sap.ui.core"
+    xmlns:uxap="sap.uxap"
+    xmlns:l="sap.ui.layout"
+    xmlns="sap.m"
+    width="100%" 
+    height="100%">
+    <uxap:ObjectPageLayout id="idMasterObjectPage" 
+        upperCaseAnchorBar="false" 
+        useIconTabBar="true"
+        headerContentPinnable="false"
+        alwaysShowContentHeader="true"
+        navigate=".onNavigate">
+        <uxap:headerTitle>
+            <uxap:ObjectPageDynamicHeaderTitle >
+                <uxap:breadcrumbs>
+                    <Breadcrumbs>
+                        <Link text="{i18n>ordersLink}" press="goOrders"/>
+                        <Link text="{entity>/shopOrder}"/>
+                    </Breadcrumbs>
+                </uxap:breadcrumbs>
+                <uxap:actions>
+                    <Button id="headerRefresh" text="{i18n>refresh}" press='.onRefreshBtnPress'/>
+                </uxap:actions> 
+            </uxap:ObjectPageDynamicHeaderTitle>
+        </uxap:headerTitle>
+        <uxap:headerContent>
+			<uxap:ObjectPageDynamicHeaderContent>
+                <l:VerticalLayout class="sapUiSmallMarginBeginEnd">
+                    <ObjectAttribute title="{i18n>material}"/>
+                    <Text text='{entity>/material}'/>
+                </l:VerticalLayout>
+                <l:VerticalLayout class="sapUiSmallMarginBeginEnd">
+                    <ObjectAttribute title="{i18n>materialDescription}"/>
+                    <Text text='{entity>/materialDescription}'/>
+                </l:VerticalLayout>
+                <l:VerticalLayout class="sapUiSmallMarginBeginEnd">
+                    <ObjectAttribute title="{i18n>sfc}"/>
+                    <Text text='{entity>/sfc}'/>
+                </l:VerticalLayout>
+                <l:VerticalLayout class="sapUiSmallMarginBeginEnd">
+                    <ObjectAttribute title="{i18n>plannedBatch}"/>
+                    <!-- <Text text='{entity>/plannedBatch}'/> -->
+                    <Text text="{parts: [{path: 'entity>/plannedBatch'}], 
+                          formatter: '.formatter.formatBatchNumber'}" />
+                </l:VerticalLayout>
+                <l:VerticalLayout class="sapUiSmallMarginBeginEnd">
+                    <ObjectAttribute title="{i18n>executionStatus}"/>
+                    <!-- <ObjectStatus text='{entity>/executionStatus}'/> -->
+                    <Text id="idActiveTxt" text="{parts: [{path: 'entity>/executionStatus'}], 
+                          formatter: '.formatter.formatExecutionStatus'}" />
+                </l:VerticalLayout>
+            </uxap:ObjectPageDynamicHeaderContent>
+		</uxap:headerContent>
+        <uxap:sections>
+           <uxap:ObjectPageSection id="goodsIssue" titleUppercase="false">
+                <uxap:ObjectPageSubSection titleUppercase="false" title="{i18n>goodsIssueTitle}">
+                    <core:Fragment 
+                        fragmentName="stellium.ext.podplugins.managePackingCancellationPlugin.view.fragments.GoodsIssueTable" 
+                        type="XML" />
+                </uxap:ObjectPageSubSection>
+            </uxap:ObjectPageSection>
+            <uxap:ObjectPageSection id="goodsReceiptSection" titleUppercase="false" title="{i18n>goodsReceiptTitle}">
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection titleUppercase="false" >
+                        <uxap:blocks>
+                            <core:Fragment 
+                                fragmentName="stellium.ext.podplugins.managePackingCancellationPlugin.view.fragments.FinishGoodsTable" 
+                                type="XML" />
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                    <uxap:ObjectPageSubSection titleUppercase="false" >
+                        <uxap:blocks>
+                            <core:Fragment 
+                                fragmentName="stellium.ext.podplugins.managePackingCancellationPlugin.view.fragments.ByProductsTable" 
+                                type="XML" />
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                    <uxap:ObjectPageSubSection titleUppercase="false" >
+                        <uxap:blocks>
+                            <core:Fragment 
+                                fragmentName="stellium.ext.podplugins.managePackingCancellationPlugin.view.fragments.CoProductsTable" 
+                                type="XML" />
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection>
+        </uxap:sections>
+    </uxap:ObjectPageLayout>
+</mvc:View> 

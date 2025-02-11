@@ -1,0 +1,29 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <ViewSettingsDialog
+        title="{i18n>groupSettingsTitle}"
+        confirm="onConfirmGroup"
+        cancel="onCancelGroup">
+        <groupItems>
+            <ViewSettingsItem
+                text="{i18n>orderId}"
+                key="shopOrder" />
+            <ViewSettingsItem
+                text="{i18n>sfc}"
+                key="sfcIdentifier" />
+            <ViewSettingsItem
+                text="{i18n>material}"
+                key="shopOrder/actualMaterial/name" />
+            <ViewSettingsItem
+                text="{i18n>materialDescription}"
+                key="shopOrder/actualMaterial/defaultDescription" />
+            <ViewSettingsItem
+                text="{i18n>plannedStartEnd}"
+                key="shopOrder/plannedStartDate" />
+            <ViewSettingsItem
+                text="{i18n>executionStatus}"
+                key="shopOrder/executionStatus" />
+        </groupItems>
+    </ViewSettingsDialog>
+</core:FragmentDefinition>

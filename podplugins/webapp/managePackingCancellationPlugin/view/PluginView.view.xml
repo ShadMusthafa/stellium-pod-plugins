@@ -1,0 +1,105 @@
+<mvc:View id="idMainView"
+    controllerName="stellium.ext.podplugins.managePackingCancellationPlugin.controller.PluginView" 
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns:fb="sap.ui.comp.filterbar" 
+    xmlns:f="sap.f" 
+    xmlns="sap.m"
+    width="100%" 
+    height="100%">
+    <Page id="idPage">
+        <f:DynamicPage id="idManageCancellationPage">
+            <f:header>
+                <f:DynamicPageHeader id="idManageCanc-header">
+                    <fb:FilterBar id="filterbar" 
+                        useToolbar="false" 
+                        showClearOnFB="true"
+                        search=".onOrdersSearch">
+                        <fb:filterGroupItems>
+                            <fb:FilterGroupItem id="idOrderSearchFGI" name="Search" label="" groupName="Group1"
+                                visibleInFilterBar="true">
+                                <fb:control>
+                                    <SearchField id="idOrderSF" search=".onOrdersSearch" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem id="idSFCFilterFGI" name="SFC" label="SFC" groupName="Group1"
+                                visibleInFilterBar="true">
+                                <fb:control>
+                                    <MultiInput id="idSFCFilterInput" />
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem id="idPlannedStartFGI" name="PlannedStart" label="Planned Start"
+                                groupName="Group1" visibleInFilterBar="true">
+                                <fb:control>
+                                    <DateTimePicker id="idPlannedStartInput" change=".onDateChange"/>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem id="idPlannedEndFGI" name="Planned End" label="Planned End"
+                                groupName="Group1" visibleInFilterBar="true">
+                                <fb:control>
+                                    <DateTimePicker id="idPlannedEndInput" change=".onDateChange"/>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                        </fb:filterGroupItems>
+                    </fb:FilterBar>
+                </f:DynamicPageHeader>
+            </f:header>
+            <f:content>
+                <Table id="idOrdersTable" 
+                    growing="true"
+                    updateStarted=".onBeforeTableUpdate"
+                    items="{masterList>/}">
+                    <headerToolbar>
+                        <Toolbar id="idOrdersTableToolbar">
+                            <Title id="idOrdersTableTitle" text="{orderListTitle>/title}" />
+                            <ToolbarSpacer id="idOrdersTableSpacer" />
+                            <Button id="idOrdersTableGroupStgBtn" 
+                                icon="sap-icon://group-2" 
+                                press=".onOrderListGroupingBtnPress"/>
+                            <Button id="idOrdersTableSettingsBtn" 
+                                icon="sap-icon://action-settings" 
+                                press=".onOrderListSettingsBtnPress"/>
+                        </Toolbar>
+                    </headerToolbar>
+                    <columns>
+                        <Column id="idorderIdCol"><Text id="idorderIdColLab" text="{i18n>orderIdColLab}" /></Column>
+                        <Column id="idsfcCol"><Text id="idsfcColLab" text="{i18n>sfcColLab}" /></Column>
+                        <Column id="idmaterialCol"><Text id="idmaterialColLab" text="{i18n>materialColLab}" /></Column>
+                        <Column id="idmaterialDescCol"><Text id="idmaterialDescColLab" text="{i18n>materialDescColLab}" />
+                        </Column>
+                        <Column id="idplannedStartDateCol"><Text id="idplannedStartDateColLab"
+                                text="{i18n>plannedStartDateColLab}" /></Column>
+                        <Column id="idplannedEndDateCol"><Text id="idplannedEndDateColLab"
+                                text="{i18n>plannedEndDateColLab}" /></Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem id="idOrderTableCLI" type="Navigation" press=".onListItemPress" >
+                            <cells>
+                                <ObjectIdentifier title="{masterList>shopOrder/shopOrder}" />
+                                <Text text="{masterList>sfcIdentifier}" />
+                                <Text text="{
+                                        parts:[
+                                            'masterList>shopOrder/actualMaterial/name',
+                                            'masterList>shopOrder/actualMaterial/version'
+                                        ],
+                                        formatter: '.formatter.materialFormatter'
+                                    }" />
+                                <Text text="{masterList>shopOrder/actualMaterial/defaultDescription}" />
+                                <Text text="{
+                                        parts:[
+                                            'masterList>shopOrder/plannedStartDate',
+                                            'masterList>shopOrder/plannedCompletionDate'
+                                        ],
+                                        formatter:'.formatter.plannedStartEndDateFormatter'
+                                    }" />
+                                <Text text="{
+                                        path: 'masterList>shopOrder/executionStatus',
+                                        formatter:'.formatter.executionStatusTextFormatter'
+                                    }" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </f:content>
+        </f:DynamicPage>    
+    </Page>
+</mvc:View>

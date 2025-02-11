@@ -1,0 +1,112 @@
+<core:FragmentDefinition 
+    xmlns:core="sap.ui.core" 
+    xmlns="sap.m">
+    <Table id="goodsIssueTable" items="{goodsIssueItems>/}">
+    <headerToolbar>
+        <OverflowToolbar>
+            <Title id="idGoodIssueTitleText" text="{= 'Postings (' + ${goodsIssueItems>/}.length + ')'}" />
+            <ToolbarSpacer/>
+            <!-- <Input 
+                placeholder="Search" 
+                liveChange="onGoodsIssueSearch" 
+                width="10rem" /> -->
+            <SearchField placeholder="Search" search=".onSearchGoodsIssue" width="10rem" />
+            <Button icon="sap-icon://action-settings" press="onGoodsIssueSettingsBtnPress" tooltip="Settings" visible="true"/>
+        </OverflowToolbar>
+    </headerToolbar>
+        <columns>
+            <Column id="inventoryIdGICol">
+                <Text text="{i18n>inventoryId}" />
+            </Column>
+            <Column id="batchIdGICol" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>batchId}" />
+            </Column>
+            <Column id="huNumberGICol" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>huNumber}" />
+            </Column>
+            <Column id="warehouseNumberGICol" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>warehouseNumber}" />
+            </Column>
+            <Column id="productionSupplyAreaGICol" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>productionSupplyArea}" />
+            </Column>
+            <Column id="storageBinGICol" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>storageBin}" />
+            </Column>
+            <Column id="materialGICol" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>material}" />
+            </Column>
+            <Column id="quantityGICol" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>quantity}" />
+            </Column>
+            <Column id="postedByGICol" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>postedBy}" />
+            </Column>
+            <Column id="postingDateGICol" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>postingDate}" />
+            </Column>
+            <Column id="createdOnGICol" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>createdOn}" />
+            </Column>
+            <Column id="storageLocationGICol" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>storageLocation}" />
+            </Column>
+            <Column id="commentsGICol" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>comments}" />
+            </Column>
+            <Column id="cancellationReasonGICol" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>cancellationReason}" />
+            </Column>
+            <Column id="statusGICol">
+                <Text text="{i18n>status}" />
+            </Column>
+            <Column id="actionGICol">
+                <Text text="{i18n>action}" />
+            </Column>
+        </columns>
+        <items>
+           <ColumnListItem>
+                <VBox>
+                    <ObjectIdentifier title="{goodsIssueItems>inventoryId}"/>
+                    <ObjectStatus 
+                        state="Information"
+                        inverted="true"
+                        text="{goodsIssueItems>postingTargetSystem}"/>
+                </VBox>
+                <Text text="{goodsIssueItems>batch}"/>
+                <Text text="{goodsIssueItems>handlingUnit}"/>
+                <Text text="{goodsIssueItems>warehouseNumber}"/>
+                <Text text="{goodsIssueItems>psa}"/>
+                <Text text="{goodsIssueItems>psaBin}"/>
+                <VBox>
+                    <Text text="{
+                        parts:['goodsIssueItems>material', 'goodsIssueItems>materialVersion']
+                    }"/>
+                    <Text text="{goodsIssueItems>materialDescription}"/>
+                </VBox>
+                <Text text="{
+                    parts:[
+                        'goodsIssueItems>quantityInInputUOM',
+                        'goodsIssueItems>inputUOM'
+                    ]
+                }"/>
+                <Text text="{goodsIssueItems>postedBy}"/>
+                <!-- <Text text="{goodsIssueItems>postingDateTime}"/> -->
+                <Text text="{ path: 'goodsIssueItems>postingDateTime', formatter: '.formatter.formatSingleDate' }" />
+                <!-- <Text text="{goodsIssueItems>createdDateTime}"/> -->
+                <Text text="{ path: 'goodsIssueItems>createdDateTime', formatter: '.formatter.formatDateAndTime' }" />
+                <Text text="{goodsIssueItems>storageLocation}"/>
+                <Text text="{goodsIssueItems>comments}"/>
+                <Text text="{goodsIssueItems>cancellationComments}"/>
+                <!-- <ObjectStatus text="{goodsIssueItems>status}"/> -->
+                <Text text="{path: 'goodsIssueItems>status', formatter: '.formatter.formatExecutionStatus'}" />
+                <Button text="{i18n>cancelButton}" press="onCancelConfirmationPress" visible="{data>/authorizedToCancel}">
+                    <customData>
+                        <core:CustomData key="cancelType" value='GI'/>
+                        <core:CustomData key="dataModelName" value='goodsIssueItems'/>
+                    </customData>
+                </Button>
+            </ColumnListItem>
+        </items>
+    </Table>
+</core:FragmentDefinition>

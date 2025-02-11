@@ -1,0 +1,112 @@
+<core:FragmentDefinition 
+    xmlns:core="sap.ui.core" 
+    xmlns="sap.m">
+    <Table id="goodsReceiptCoProductTable" items="{CO_PRODUCT>/}">
+     <headerToolbar>
+        <OverflowToolbar>
+            <Title id="idCoProdTitleText" text="{= 'Co-Products (' + ${CO_PRODUCT>/}.length + ')'}" />
+            <ToolbarSpacer/>
+            <!-- <Input 
+                placeholder="Search" 
+                liveChange="onCR_BP_Search" 
+                width="10rem" /> -->
+            <SearchField id="goodsReceiptByCoProductSearch" placeholder="Search" search=".onSearchCoProducts" width="10rem" />
+            <Button icon="sap-icon://action-settings" press="onGoodsReceiptCPSettingsBtnPress" tooltip="Settings" visible="true"/>
+        </OverflowToolbar>
+    </headerToolbar>
+        <columns>
+            <Column id="inventoryId_GR_CP_Col">
+                <Text text="{i18n>inventoryId}" />
+            </Column>
+            <Column id="batchId_GR_CP_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>batchId}" />
+            </Column>
+            <Column id="huNumber_GR_CP_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>huNumber}" />
+            </Column>
+            <Column id="warehouseNumber_GR_CP_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>warehouseNumber}" />
+            </Column>
+            <Column id="productionSupplyArea_GR_CP_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>productionSupplyArea}" />
+            </Column>
+            <Column id="storageBin_GR_CP_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>storageBin}" />
+            </Column>
+            <Column id="material_GR_CP_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>material}" />
+            </Column>
+            <Column id="quantity_GR_CP_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>quantity}" />
+            </Column>
+            <Column id="postedBy_GR_CP_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>postedBy}" />
+            </Column>
+            <Column id="postingDate_GR_CP_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>postingDate}" />
+            </Column>
+            <Column id="createdOn_GR_CP_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>createdOn}" />
+            </Column>
+            <Column id="storageLocation_GR_CP_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>storageLocation}" />
+            </Column>
+            <Column id="comments_GR_CP_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>comments}" />
+            </Column>
+            <Column id="cancellationReason_GR_CP_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>cancellationReason}" />
+            </Column>
+            <Column id="status_GR_CP_Col">
+                <Text text="{i18n>status}" />
+            </Column>
+            <Column id="action_GR_CP_Col">
+                <Text text="{i18n>action}" />
+            </Column>
+        </columns>
+        <items>
+           <ColumnListItem>
+                <VBox>
+                    <ObjectIdentifier title="{CO_PRODUCT>inventoryId}"/>
+                    <ObjectStatus 
+                        state="Information"
+                        inverted="true"
+                        text="{CO_PRODUCT>postingTargetSystem}"/>
+                </VBox>
+                <Text text="{CO_PRODUCT>batch}"/>
+                <Text text="{CO_PRODUCT>handlingUnit}"/>
+                <Text text="{CO_PRODUCT>warehouseNumber}"/>
+                <Text text="{CO_PRODUCT>psa}"/>
+                <Text text="{CO_PRODUCT>psaBin}"/>
+                <VBox>
+                    <Text text="{
+                        parts:['CO_PRODUCT>material', 'CO_PRODUCT>materialVersion']
+                    }"/>
+                    <Text text="{CO_PRODUCT>materialDescription}"/>
+                </VBox>
+                <Text text="{
+                    parts:[
+                        'CO_PRODUCT>quantityInInputUOM',
+                        'CO_PRODUCT>inputUOM'
+                    ]
+                }"/>
+                <Text text="{CO_PRODUCT>postedBy}"/>
+                <!-- <Text text="{CO_PRODUCT>postingDateTime}"/> -->
+                <Text text="{ path: 'CO_PRODUCT>postingDateTime', formatter: '.formatter.formatSingleDate' }" />
+                <!-- <Text text="{CO_PRODUCT>createdDateTime}"/> -->
+                <Text text="{ path: 'CO_PRODUCT>createdDateTime', formatter: '.formatter.formatDateAndTime' }" />
+                <Text text="{CO_PRODUCT>storageLocation}"/>
+                <Text text="{CO_PRODUCT>comments}"/>
+                <Text text="{CO_PRODUCT>cancellationComments}"/>  
+                <!-- <ObjectStatus text="{CO_PRODUCT>status}"/> -->
+                <Text text="{path: 'CO_PRODUCT>status', formatter: '.formatter.formatExecutionStatus'}" />
+                <Button text="{i18n>cancelButton}" press="onCancelConfirmationPress" visible="{data>/authorizedToCancel}">
+                    <customData>
+                        <core:CustomData key="cancelType" value='GR'/>
+                        <core:CustomData key="dataModelName" value='CO_PRODUCT'/>
+                    </customData>
+                </Button>
+            </ColumnListItem>
+        </items>
+    </Table>
+</core:FragmentDefinition>

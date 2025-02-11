@@ -1,0 +1,112 @@
+<core:FragmentDefinition 
+    xmlns:core="sap.ui.core" 
+    xmlns="sap.m">
+    <Table id="goodsReceiptFinishGoodTable" items="{FINISH_GOOD>/}">
+    <headerToolbar>
+        <OverflowToolbar>
+            <Title id="idFinGoodsTitleText" text="{= 'Finished Goods (' + ${FINISH_GOOD>/}.length + ')'}" />
+            <ToolbarSpacer/>
+            <!-- <Input 
+                placeholder="Search" 
+                liveChange="onGR_FG_Search" 
+                width="10rem" /> -->
+            <SearchField id="goodsReceiptSearch" placeholder="Search" search=".onSearchFinishedGoods" width="10rem" />
+            <Button icon="sap-icon://action-settings" press="onGoodsReceiptFGSettingsBtnPress" tooltip="Settings" visible="true"/>
+        </OverflowToolbar>
+    </headerToolbar>
+        <columns>
+            <Column id="inventoryId_GR_FG_Col">
+                <Text text="{i18n>inventoryId}" />
+            </Column>
+            <Column id="batchId_GR_FG_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>batchId}" />
+            </Column>
+            <Column id="huNumber_GR_FG_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>huNumber}" />
+            </Column>
+            <Column id="warehouseNumber_GR_FG_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>warehouseNumber}" />
+            </Column>
+            <Column id="productionSupplyArea_GR_FG_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>productionSupplyArea}" />
+            </Column>
+            <Column id="storageBin_GR_FG_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>storageBin}" />
+            </Column>
+            <Column id="material_GR_FG_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>material}" />
+            </Column>
+            <Column id="quantity_GR_FG_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>quantity}" />
+            </Column>
+            <Column id="postedBy_GR_FG_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>postedBy}" />
+            </Column>
+            <Column id="postingDate_GR_FG_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>postingDate}" />
+            </Column>
+            <Column id="createdOn_GR_FG_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>createdOn}" />
+            </Column>
+            <Column id="storageLocation_GR_FG_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>storageLocation}" />
+            </Column>
+            <Column id="comments_GR_FG_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>comments}" />
+            </Column>
+            <Column id="cancellationReason_GR_FG_Col" minScreenWidth="Desktop" demandPopin="true">
+                <Text text="{i18n>cancellationReason}" />
+            </Column>
+            <Column id="status_GR_FG_Col">
+                <Text text="{i18n>status}" />
+            </Column>
+            <Column id="action_GR_FG_Col">
+                <Text text="{i18n>action}" />
+            </Column>
+        </columns>
+        <items>
+           <ColumnListItem>
+                <VBox>
+                    <ObjectIdentifier title="{FINISH_GOOD>inventoryId}"/>
+                    <ObjectStatus 
+                        state="Information"
+                        inverted="true"
+                        text="{FINISH_GOOD>postingTargetSystem}"/>
+                </VBox>
+                <Text text="{FINISH_GOOD>batch}"/>
+                <Text text="{FINISH_GOOD>handlingUnit}"/>
+                <Text text="{FINISH_GOOD>warehouseNumber}"/>
+                <Text text="{FINISH_GOOD>psa}"/>
+                <Text text="{FINISH_GOOD>psaBin}"/>
+                <VBox>
+                    <Text text="{
+                        parts:['FINISH_GOOD>material', 'FINISH_GOOD>materialVersion']
+                    }"/>
+                    <Text text="{FINISH_GOOD>materialDescription}"/>
+                </VBox>
+                <Text text="{
+                    parts:[
+                        'FINISH_GOOD>quantityInInputUOM',
+                        'FINISH_GOOD>inputUOM'
+                    ]
+                }"/>
+                <Text text="{FINISH_GOOD>postedBy}"/>
+                <!-- <Text text="{FINISH_GOOD>postingDateTime}"/> -->
+                <Text text="{ path: 'FINISH_GOOD>postingDateTime', formatter: '.formatter.formatSingleDate' }" />
+                <!-- <Text text="{FINISH_GOOD>createdDateTime}"/> -->
+                <Text text="{ path: 'FINISH_GOOD>createdDateTime', formatter: '.formatter.formatDateAndTime' }" />
+                <Text text="{FINISH_GOOD>storageLocation}"/>
+                <Text text="{FINISH_GOOD>comments}"/>
+                <Text text="{FINISH_GOOD>cancellationComments}"/>
+                <!-- <ObjectStatus text="{FINISH_GOOD>status}"/> -->
+                <Text text="{path: 'FINISH_GOOD>status', formatter: '.formatter.formatExecutionStatus'}" />
+                <Button text="{i18n>cancelButton}" press="onCancelConfirmationPress" visible="{data>/authorizedToCancel}">
+                    <customData>
+                        <core:CustomData key="cancelType" value='GR'/>
+                        <core:CustomData key="dataModelName" value='FINISH_GOOD'/>
+                    </customData>
+                </Button>
+            </ColumnListItem>
+        </items>
+    </Table>
+</core:FragmentDefinition>

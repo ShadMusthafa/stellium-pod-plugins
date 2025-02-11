@@ -1,0 +1,43 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m">
+    <Dialog id="idConfirmCancellationDialog"
+        title="{i18n>cancelConfirmationsTitle}"
+        afterClose=".onCancelConfirmationDialogAfterClose">
+        <content>
+            <Table id="idCancellationTable" items="{cancellationItems>/}">
+                <columns>
+                    <Column><Text text="{i18n>operationDescription}"/></Column>
+                    <Column><Text text="{i18n>confirmationGroup}"/></Column>
+                    <Column><Text text="{i18n>confirmationCounter}"/></Column>
+                    <Column><Text text="{i18n>postedBy}"/></Column>
+                    <Column><Text text="{i18n>createdOn}"/></Column>
+                    <Column><Text text="{i18n>type}"/></Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <ObjectIdentifier 
+                                title="{cancellationItems>operationActivity}"
+                                text="{cancellationItems>operationActivityDescription}" />
+                            <Text text="{cancellationItems>confirmationGroup}" />
+                            <Text text="{cancellationItems>confirmationCounter}" />
+                            <Text text="{cancellationItems>postedBy}"/>
+                            <Text text="{
+                                path: 'cancellationItems>createdOn', 
+                                formatter: '.formatter.formatSingleDate'
+                            }" />
+                            <Text text="{= ${cancellationItems>isActivityConfirmation} ? 'Activity Confirmation' : 'Quantity Confirmation' }"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <beginButton>
+            <Button type="Emphasized" text="{i18n>confirmButton}" press=".onConfirmCancellationBtnPress"/>
+        </beginButton>
+        <endButton>
+            <Button type="Default" text="Cancel" press=".onCancelCancellationBtnPress"/>
+        </endButton>
+    </Dialog>    
+</core:FragmentDefinition>
