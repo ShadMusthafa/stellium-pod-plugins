@@ -1,0 +1,46 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m">
+    <Dialog id="idUnpackItemsDialog"
+        title="{i18n>unpkg.dialog.title}"
+        afterClose=".onUnpkgDiaAfterClose">
+        <content>
+            <Table id="idUnpackItemsTable" items="{unpackItems>/}" mode="MultiSelect">
+                <columns>
+                    <Column><Text text="{i18n>unpkg.items.handlingunit}"/></Column>
+                    <Column><Text text="{i18n>unpkg.items.packingArticle}"/></Column>
+                    <Column><Text text="{i18n>unpkg.items.packedArticle}"/></Column>
+                    <Column><Text text="{i18n>unpkg.items.packedQty}"/></Column>
+                    <!-- <Column><Text text="{i18n>unpkg.items.unpackQty}"/></Column> -->
+                    <Column><Text text="{i18n>unpkg.items.batch}"/></Column>
+                    <Column><Text text="{i18n>unpkg.items.storageLocation}"/></Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{unpackItems>handlingUnit}"/>
+                            <ObjectIdentifier 
+                                title="{unpackItems>packingArticleCode}"
+                                text="{unpackItems>packingArticleDescription}"/>
+                            <ObjectIdentifier 
+                                title="{unpackItems>packedArticle}"
+                                text="{unpackItems>packedArticleDescription}"/>
+                            <ObjectNumber 
+                                number="{unpackItems>packedQty}"
+                                unit="{unpackItems>uom}"/>
+                            <!-- <Input value="{unpackItems>unpackQty}"/> -->
+                            <Text text="{unpackItems>packedBatch}"/>
+                            <Text text="{unpackItems>storageLocation}"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <beginButton>
+            <Button type="Emphasized" text="{i18n>confirmButton}" press=".onUnpkgDiaConfirm"/>
+        </beginButton>
+        <endButton>
+            <Button type="Default" text="Cancel" press=".onUnpkgDiaCancel"/>
+        </endButton>
+    </Dialog>    
+</core:FragmentDefinition>

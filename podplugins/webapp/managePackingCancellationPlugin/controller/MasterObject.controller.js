@@ -148,6 +148,7 @@ sap.ui.define(
           oView.setModel(new JSONModel([]), 'confirmationItems');
           oView.setModel(new JSONModel([]), 'cancellationItems');
           oView.setModel(new JSONModel([]), 'packingItems');
+          oView.setModel(new JSONModel([]), 'unpackItems');
           oView.setModel(new JSONModel([]), 'goodsIssueItems');
           oView.setModel(new JSONModel([]), 'FINISH_GOOD');
           oView.setModel(new JSONModel([]), 'CO_PRODUCT');
@@ -340,9 +341,140 @@ sap.ui.define(
           if (oCustomData.cancelType === 'ActQtyCombined') {
             this.cancelActQtyConfirmation(oEvent);
           } else {
-            var oCancellationItem = oEvent.getSource().getBindingContext(oCustomData.dataModelName).getObject();
-            this.onSubmitDialogPress(oCancellationItem, oCustomData.cancelType, oCustomData.dataModelName);
+            // else if (oCustomData.cancelType === 'GI') {
+            //   this.cancelGIConfirmation(oEvent, oCustomData.cancelType, oCustomData.dataModelName);
+            // }
+            // var oCancellationItem = oEvent.getSource().getBindingContext(oCustomData.dataModelName).getObject();
+            // this.onSubmitDialogPress(oCancellationItem, oCustomData.cancelType, oCustomData.dataModelName);
+            this.cancelGIGRConfirmation(oEvent, oCustomData.cancelType, oCustomData.dataModelName);
           }
+        },
+
+        cancelGIGRConfirmation: function(oEvent, sCancelType, sModelName) {
+          var oView = this.getView(),
+            oConfirmationItem = oEvent.getSource().getBindingContext(sModelName).getObject(),
+            oPackingItemsModel = oView.getModel('packingItems'),
+            aPackingData = oPackingItemsModel.getData();
+
+          this.cancelConfirmationData = {
+            item: oConfirmationItem,
+            cancelType: sCancelType,
+            modelName: sModelName
+          };
+
+          //Get packing items relevant for cancellation item
+          var aPackingItems = aPackingData.filter(
+            oPackItem => oPackItem.packedArticle === oConfirmationItem.material && oPackItem.packedBatch === oConfirmationItem.batch
+          );
+          oView.getModel('unpackItems').setData(aPackingItems);
+
+          //If there are no items to unpack, allow direct cancellation
+          if (aPackingItems.length === 0) {
+            this.onSubmitDialogPress(
+              this.cancelConfirmationData.item,
+              this.cancelConfirmationData.cancelType,
+              this.cancelConfirmationData.modelName
+            );
+            return;
+          }
+
+          this.showUnpackItemsDialog();
+        },
+
+        showUnpackItemsDialog: function() {
+          var that = this,
+            oView = this.getView(),
+            oUnpackItemsDialog = oView.byId('idUnpackItemsDialog');
+
+          if (oUnpackItemsDialog) {
+            oUnpackItemsDialog.open();
+            return;
+          }
+
+          Fragment.load({
+            id: oView.getId(),
+            name: 'stellium.ext.podplugins.managePackingCancellationPlugin.view.fragments.UnPackItemsDialog',
+            controller: this
+          }).then(function(oDialog) {
+            //Handle dialog close function on escape button press
+            oDialog.setEscapeHandler(function(oPromise) {
+              // that.onConfirmCancellationBtnPress();
+              oPromise.resolve();
+            });
+
+            //Add the dialog to the view
+            oView.addDependent(oDialog);
+
+            //Show the dialog
+            oDialog.open();
+          });
+        },
+
+        onUnpkgDiaConfirm: function() {
+          var oView = this.getView(),
+            oUnPackTable = oView.byId('idUnpackItemsTable'),
+            aSelectedItems = oUnPackTable.getSelectedItems(),
+            oUnpackItemsDialog = oView.byId('idUnpackItemsDialog');
+
+          var aPayload = aSelectedItems.map(oSelectedItem => {
+            var oContext = oSelectedItem.getBindingContext('unpackItems'),
+              oSelectedData = oContext.getObject();
+            return {
+              plant: oSelectedData.plant,
+              orderNo: oSelectedData.orderNo,
+              operation: oSelectedData.operation,
+              sfc: oSelectedData.sfc,
+              huno: oSelectedData.handlingUnit,
+              packmat: oSelectedData.packingArticleCode,
+              material: oSelectedData.packedArticle,
+              packmatDesc: oSelectedData.packingArticleDescription,
+              batch: oSelectedData.packedBatch,
+              matDesc: oSelectedData.packedArticleDescription,
+              packedQty: oSelectedData.packedQty,
+              packedUom: oSelectedData.uom,
+              storage_location: oSelectedData.storageLocation
+            };
+          });
+
+          oUnpackItemsDialog.setBusy(true);
+          this._postUnPackToS4(aPayload)
+            .then(oResponse => {
+              oUnpackItemsDialog.close();
+              this.onSubmitDialogPress(
+                this.cancelConfirmationData.item,
+                this.cancelConfirmationData.cancelType,
+                this.cancelConfirmationData.modelName
+              );
+            })
+            .catch(oError => {
+              MessageBox.error('Unpacking failed');
+            })
+            .finally(() => {
+              oUnpackItemsDialog.setBusy(false);
+            });
+        },
+
+        onUnpkgDiaCancel: function() {
+          var oView = this.getView(),
+            oUnpackItemsDialog = oView.byId('idUnpackItemsDialog');
+
+          this.cancelConfirmationData = null;
+
+          //Close the dialog
+          if (oUnpackItemsDialog) oUnpackItemsDialog.close();
+
+          //Clear the model
+          oView.getModel('unpackItems').setData([]);
+        },
+
+        _postUnPackToS4: function(aPayload) {
+          var sUrl =
+            this.getPublicApiRestDataSourceUri() +
+            '/pe/api/v1/process/processDefinitions/start?key=REG_50315c9c-82d5-4684-a465-d1920be98505&async=false';
+          var oPayload = {
+            content: aPayload
+          };
+          return new Promise((resolve, reject) => this.ajaxPostRequest(sUrl, oPayload, resolve, reject));
         },
 
         /**
@@ -899,7 +1031,7 @@ sap.ui.define(
             // Concatenate the new content to the existing data
             aTableData = bConcatFlag ? aContent : aTableData.concat(aContent);
 
-            //Collect the packing HU and map it to the 
+            //Collect the packing HU and map it to the
             var aPackingData = await this._getPackingDataFromS4();
             aTableData.forEach(oItem => {
               var aHandlingUnits = aPackingData
@@ -946,7 +1078,7 @@ sap.ui.define(
             // Concatenate the new content with the existing items
             aGiItems = aGiItems.concat(oResponse.content);
 
-            //Collect the packing HU and map it to the 
+            //Collect the packing HU and map it to the
             var aPackingData = await this._getPackingDataFromS4();
             aGiItems.forEach(oItem => {
               var aHandlingUnits = aPackingData
@@ -1106,6 +1238,8 @@ sap.ui.define(
               txnId: oConfItem.txnId,
               comments: sCancelReason
             };
+
+          this.cancelConfirmationData = null;
 
           // Send the POST request using AjaxUtil
           this.ajaxPostRequest(
@@ -1407,7 +1541,7 @@ sap.ui.define(
               if (!oResponse.content) oResponse.content = [];
 
               oResponse.content.forEach(oItem => {
-                if (oItem.material) {
+                if (oItem.material && oItem.packedQty > 0) {
                   aTableData.push({
                     editable: false,
                     handlingUnit: oItem.huno,
@@ -1418,7 +1552,11 @@ sap.ui.define(
                     packedQty: oItem.packedQty,
                     uom: oItem.packedUom,
                     packedBatch: oItem.batch,
-                    storageLocation: oItem.storageLocation
+                    storageLocation: oItem.storageLocation,
+                    plant: oItem.plant,
+                    orderNo: oItem.orderNo,
+                    operation: oItem.operation,
+                    sfc: oItem.sfc
                   });
                 }
               });
