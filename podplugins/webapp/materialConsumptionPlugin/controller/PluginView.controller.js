@@ -2211,6 +2211,11 @@ sap.ui.define(
               that.isBatchNumberValid = true;
               //if (isBatchChangeFlag)
               that._enableConfirmButton();
+
+              //In case of HU scan, use scanned HU quantity
+              if (that.scannedHuItem && that.scannedHuItem.quantity) {
+                oModel.setProperty('/avlBatchQty', that.scannedHuItem.quantity);
+              }
             } else {
               that.isInventoryManaged ? oModel.setProperty('/avlBatchQty', 0) : oModel.setProperty('/avlBatchQty', '');
               oModel.setProperty('/expDate', '');
@@ -3686,6 +3691,52 @@ sap.ui.define(
         return isValidInput;
       },
 
+      handleHUScanChange: function(oEvent) {
+        var oScanControl = oEvent.getSource(),
+          sScannedValue = oScanControl.getValue(),
+          oScannedValue;
+
+        this.scannedHU = null;
+        this.scannedHuItem = null;
+
+        if (!sScannedValue) return;
+
+        try {
+          oScannedValue = JSON.parse(sScannedValue);
+        } catch (e) {}
+
+        if (!oScannedValue || !oScannedValue.length) {
+          //TODO: error handling
+          return;
+        }
+
+        var oHuItem = this._getConsumptionItemFromHu(oScannedValue);
+
+        this.scannedHU = oScannedValue;
+        this.scannedHuItem = oHuItem;
+
+        oScanControl.setValue(oHuItem.handlingUnit);
+        this.getCurrentInputMaterialControl().setValue(oHuItem.Material);
+
+        this._getMaterialDetails(oHuItem.Material);
+      },
+
+      _getConsumptionItemFromHu: function(aHuItems) {
+        var oPodSelectionModel = this.getPodSelectionModel(),
+          oSelectedPhaseData = oPodSelectionModel.selectedPhaseData,
+          aRecipie = oSelectedPhaseData.recipeArray;
+
+        var oRecipe = aRecipie.find(oItem => oItem.stepId === oSelectedPhaseData.stepId);
+        var aComponent = oRecipe.routingStepComponentList.filter(oItem => oItem.bomComponent.componentType === 'NORMAL');
+
+        for (var i = 0; i < aComponent.length; i++) {
+          var oItem = aHuItems.find(oHuItem => oHuItem.Material === aComponent[i].bomComponent.material.material);
+          if (oItem) {
+            return oItem;
+          }
+        }
+      },
+
       handleLiveChangeScan: async function(oEvent) {
         var that = this;
         var flag = true;
@@ -3702,19 +3753,6 @@ sap.ui.define(
         var oDialogSelected = this.getCurrentDialogId();
         var scannedMatDetails;
         var oMaterialInput = that.getCurrentInputMaterialControl();
-
-        // if (!(scannedMat instanceof Object)) {
-        //   var oMaterial = await this._getMaterialForEAN(scannedMat);
-        //   oMaterialInput.setValue(oMaterial.material);
-        // }
-
-        // //QR code scan for material
-        // try {
-        //   var oMatParsed = JSON.parse(oMaterialInput.getValue());
-        //   scannedMat = oMatParsed.Material;
-        //   oMaterialInput.setValue(scannedMat);
-        //   this.scannedMaterial = oMatParsed;
-        // } catch (e) {}
 
         var oScannedValue;
         //Try to parse the scanned value to get JSON
@@ -3833,6 +3871,63 @@ sap.ui.define(
         }
       },
 
+      _getMaterialDetails: function(scannedMat) {
+        let that = this;
+        let oDialogSelected = this.getCurrentDialogId();
+        let sUrl = that.getProductDataSourceUri() + "Materials?$filter=material eq '" + encodeURIComponent(scannedMat) + "'";
+        let scannedMatDetails;
+        let oParameters = {};
+
+        AjaxUtil.get(
+          sUrl,
+          oParameters,
+          function(oResponseData) {
+            if (oResponseData.value.length === 0) {
+              scannedMatDetails = {};
+              that.setDetailedModel();
+              if (that.getCurrentDialogId() !== 'none') {
+                that.showErrorMessage(that.getI18nText('INVALID_MATERIAL'));
+              }
+              setTimeout(
+                function() {
+                  that.byId('inputMatNumScan').focus();
+                }.bind(that),
+                300
+              );
+            } else {
+              for (var i = 0; i < oResponseData.value.length; i++) {
+                if (oResponseData.value[i].currentVersion) {
+                  scannedMatDetails = oResponseData.value[i];
+                  break;
+                }
+              }
+              if (!scannedMatDetails) {
+                scannedMatDetails = {};
+                that.setDetailedModel();
+                if (that.getCurrentDialogId() !== 'none') {
+                  that.showErrorMessage(that.getI18nText('INVALID_MATERIAL'));
+                }
+                setTimeout(
+                  function() {
+                    that.byId('inputMatNumScan').focus();
+                  }.bind(that),
+                  300
+                );
+              } else {
+                that.setPostMaterialSelectionDetails(scannedMatDetails, that.getView().getModel('scanModel'), oDialogSelected);
+              }
+            }
+            that.byId(oDialogSelected).setBusy(false);
+          },
+          function(oError, oHttpErrorMessage) {
+            that.byId(oDialogSelected).setBusy(false);
+            var err = oError ? oError : oHttpErrorMessage;
+            that.showErrorMessage(err, true, true);
+            that.batchDetailsList = {};
+          }
+        );
+      },
+
       setPostMaterialSelectionDetails: function(oMaterial, oModel, sDialogId) {
         var selectedMaterial = oMaterial.material;
         var selectedMaterialRef = oMaterial.ref;
@@ -3873,7 +3968,9 @@ sap.ui.define(
           //  Extend WeighingScreen
           var oInStorageLocation = this.getCurrentStorageLocationInput();
           if (isBatchManaged) {
-            if (this.scannedMaterial && this.scannedMaterial.StockID) {
+            if (this.scannedHuItem && this.scannedHuItem.batch) {
+              defaultBatchId = this.scannedHuItem.batch;
+            } else if (this.scannedMaterial && this.scannedMaterial.StockID) {
               defaultBatchId = this.scannedMaterial.StockID;
             } else {
               defaultBatchId = bomItem.plannedBatchNumber || '';
@@ -5257,7 +5354,11 @@ sap.ui.define(
         }
 
         //Fetch batch data if model is not set
-        if (!this.batchDetailsModel || (this.scannedMaterial && this.scannedMaterial.StockID)) {
+        if (
+          !this.batchDetailsModel ||
+          (this.scannedMaterial && this.scannedMaterial.StockID) ||
+          (this.scannedHuItem && this.scannedHuItem.batch)
+        ) {
           var { sUrl, oParameters } = this._createBatchDetailsServiceCall();
           await this.getBatchDetails(sUrl, oParameters);
         }
@@ -5526,7 +5627,9 @@ sap.ui.define(
         }
 
         var oComponentData = this._getBomInfoForComponent(sMaterial),
-          sHandlingUnit = this.scannedMaterial && this.scannedMaterial.handlingUnit ? this.scannedMaterial.handlingUnit : '';
+          sHandlingUnit = this.scannedHuItem && this.scannedHuItem.handlingUnit ? this.scannedHuItem.handlingUnit : '',
+          sPackingMaterial = this.scannedHuItem && this.scannedHuItem.packingUnit ? this.scannedHuItem.packingUnit : '',
+          sPackingMaterialDesc = this.scannedHuItem && this.scannedHuItem.articleDescription ? this.scannedHuItem.articleDescription : '';
 
         var oPayload = {
           InBOM: oComponentData.bomComponent.bom.bom,
@@ -5552,7 +5655,9 @@ sap.ui.define(
           InWorkCenter: oModel.getProperty('/workCenter'),
           InSubWeighing: false,
           InBatch: oModel.getProperty('/batchNumber'),
-          InHandlingUnit: sHandlingUnit
+          InHandlingUnit: sHandlingUnit,
+          InPackingMaterial: sPackingMaterial,
+          InPackingMaterialDesc: sPackingMaterialDesc
         };
 
         var sUrl =

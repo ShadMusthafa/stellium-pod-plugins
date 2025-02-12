@@ -13,6 +13,13 @@
                         <Text id="inputScanOrderNum" text="{scanWeighingModel>/shopOrder}" />
                         <Label text="{i18n>LabelPhase}" />
                         <Text id="inputScanPhaseID" text="{scanWeighingModel>/phaseId}" />
+                        <!-- Handling unit scan begin   -->
+                        <Label text="{i18n>handlingUnitScanLabel}"/>
+                        <Input id="idHandlingUnitScanInput"
+                            change=".handleHUScanChange"
+                            value="{scanWeighModel>scannedHu}"
+                            required="false" />
+                        <!-- Handling unit scan end     -->
                         <Label text="{i18n>matNum}" />
                         <Input id="inScanWeighMatNum" change="handleLiveChangeScan"
                             value="{scanWeighingModel>/material}" editable="true" required="true" class="boldText">
