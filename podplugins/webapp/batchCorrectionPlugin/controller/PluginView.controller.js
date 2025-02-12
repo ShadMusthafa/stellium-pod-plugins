@@ -432,7 +432,7 @@ sap.ui.define(
           Log.info('Cancel goods issue PPD completed');
 
           Log.info('Wait 1s before calling S4');
-          await this._wait(1000);
+          await this._wait(2000);
 
           //Post scrap to S4
           var aGiScrapRequests = aGiScrapPayloads.map(oPayload => this._postGiScrapToS4(oPayload));
@@ -461,7 +461,7 @@ sap.ui.define(
           Log.info('Posted order discard');
 
           Log.info('Wait 1s before calling S4')
-          await this._wait(1000);
+          await this._wait(2000);
 
           await this._postTecoToS4();
           Log.info('Posted Teco to S4')
