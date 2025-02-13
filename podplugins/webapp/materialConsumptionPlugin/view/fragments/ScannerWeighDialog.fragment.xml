@@ -17,8 +17,12 @@
                         <Label text="{i18n>handlingUnitScanLabel}"/>
                         <Input id="idHandlingUnitScanInput"
                             change=".handleHUScanChange"
-                            value="{scanWeighModel>scannedHu}"
-                            required="false" />
+                            value="{scanWeighingModel>/scannedHu}"
+                            required="false">
+                            <layoutData>
+                                <f:ColumnElementData cellsSmall="10" cellsLarge="6" />
+                            </layoutData>
+                        </Input>
                         <!-- Handling unit scan end     -->
                         <Label text="{i18n>matNum}" />
                         <Input id="inScanWeighMatNum" change="handleLiveChangeScan"

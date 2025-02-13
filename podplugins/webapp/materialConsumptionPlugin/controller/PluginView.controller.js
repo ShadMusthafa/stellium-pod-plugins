@@ -2625,14 +2625,21 @@ sap.ui.define(
         setTimeout(this._enableConfirmButton.bind(this), 500);
       },
 
-      _enableConfirmButton: function() {
+      _enableConfirmButton: async function() {
         var isErrorStateExist = false;
         var oModel = this.getCurrentModel();
 
         // Call the new batch validation function - AD-006
         var sBatchNumber = oModel.getProperty('/batchNumber');
         if (sBatchNumber) {
-          isErrorStateExist = !this._validateBatchSelection();
+          var oBatchValidationResult = await this._validateBatchSelection();
+          isErrorStateExist = !oBatchValidationResult.isBatchValid;
+
+          if (this.scannedHuItem && !oBatchValidationResult.isBatchValid) {
+            MessageBox.error(oBatchValidationResult.message);
+            this.resetModel(this.getCurrentModel());
+            this.getCurrentInputBatchIdControl().setValueState('None');
+          }
         }
 
         var oFormContent = this.getFormControl();
@@ -4196,6 +4203,10 @@ sap.ui.define(
           oModel.setProperty('/batchNumber', this.getI18nText('notBatchManaged'));
           oModel.setProperty('/batchManaged', false);
           oModel.setProperty('/calculatedData', null);
+        } else if (oView.getModel('scanWeighingModel') === oModel) {
+          oModel.setProperty('/scannedHu', '');
+          oModel.setProperty('/batchNumber', '');
+          oModel.setProperty('/batchManaged', true);
         } else {
           oModel.setProperty('/batchNumber', '');
           oModel.setProperty('/batchManaged', true);
@@ -5346,11 +5357,15 @@ sap.ui.define(
           sSelectedBatchId = oModel.getProperty('/batchNumber'),
           sSelectedInventoryId = oModel.getProperty('/inventory'),
           sSelectedMaterial = oModel.getProperty('/material'),
-          oInput = this.getCurrentInputBatchIdControl();
+          oInput = this.getCurrentInputBatchIdControl(),
+          sMessage;
 
         //If material is not batch managed, no batch validation
         if (!bIsBatchManaged) {
-          return true;
+          return {
+            isBatchValid: true,
+            message: ''
+          };
         }
 
         //Fetch batch data if model is not set
@@ -5372,21 +5387,32 @@ sap.ui.define(
         if (!oSelectedBatch) {
           oInput.setValueState('Error');
           oInput.setValueStateText(this.getI18nText('REQUIRED_BATCH_INPUT'));
-          return false;
+          return {
+            isBatchValid: false,
+            message: this.getI18nText('REQUIRED_BATCH_INPUT')
+          };
         }
 
         //Check if selected batch has expiry
         if (!oSelectedBatch.expiry) {
+          sMessage = this.getI18nText('batchDoesNotHaveExpiryDateErrMsg', [sSelectedBatchId]);
           oInput.setValueState('Error');
-          oInput.setValueStateText(this.getI18nText('batchDoesNotHaveExpiryDateErrMsg', [sSelectedBatchId]));
-          return false;
+          oInput.setValueStateText(sMessage);
+          return {
+            isBatchValid: false,
+            message: sMessage
+          };
         }
 
         //If material has default sloc, ensure selected batch is in the default sloc
         if (sDefaultSloc && oSelectedBatch.storageLocation.storageLocation !== sDefaultSloc) {
+          sMessage = this.getI18nText('batchNotInDefaultSlocErrMsg', [sSelectedBatchId, sDefaultSloc]);
           oInput.setValueState('Error');
-          oInput.setValueStateText(this.getI18nText('batchNotInDefaultSlocErrMsg', [sSelectedBatchId, sDefaultSloc]));
-          return false;
+          oInput.setValueStateText(sMessage);
+          return {
+            isBatchValid: false,
+            message: sMessage
+          };
         }
 
         //Check if selected batch has lowest expiry in the batch list
@@ -5396,15 +5422,22 @@ sap.ui.define(
         var oLowestExpiryBatch = aBatches.find(oBatch => moment(oBatch.expiry).isSame(oLowestExpiryDate));
 
         if (!moment(oLowestExpiryDate).isSame(oSelectedBatch.expiry)) {
+          sMessage = this.getI18nText('errorLowerBatchExpiry', [sSelectedMaterial, oLowestExpiryBatch.batchNumber]);
           oInput.setValueState('Error');
-          oInput.setValueStateText(this.getI18nText('errorLowerBatchExpiry', [sSelectedMaterial, oLowestExpiryBatch.batchNumber]));
-          return false;
+          oInput.setValueStateText(sMessage);
+          return {
+            isBatchValid: false,
+            message: sMessage
+          };
         }
 
         //Reset the value states in case of validation pass
         oInput.setValueState('None');
         oInput.setValueStateText('');
-        return true;
+        return {
+          isBatchValid: true,
+          message: ''
+        };
       },
 
       _validateAsset: function(sResourceId, sAssetId) {

@@ -17,8 +17,8 @@ sap.ui.define([
         _initializeScale: function (bTakeCurrentWeight) {
 
             var oView = this.oMaterialConsumptionController.getView();
-            var oBoxVizLegend = this.getCurrentWeighVizLegend();
-            oBoxVizLegend.setVisible(true);
+            // var oBoxVizLegend = this.getCurrentWeighVizLegend();
+            // oBoxVizLegend.setVisible(true);
 
 
             var oWeighingModel = this.getCurrentModel(),
@@ -44,38 +44,38 @@ sap.ui.define([
             oWeighingModel.setProperty("/TotalWeight", aTotalWeightData);
 
             // VizProperties Total Weight
-            var oTotalWeightData = aTotalWeightData[0],
-                dScaleRange = oTotalWeightData.Target * 4;
-            var oVizFrameTotalWeight = this.getCurrentVizFrameTotal();
-            var oVizPropTotalWeightPlotArea = {
-                plotArea: {
-                    primaryScale: {
-                        fixedRange: true,
-                        minValue: 0,
-                        maxValue: dScaleRange
-                    },
-                    colorPalette: ['#91C8F6', '#427CAC'],
-                    referenceLine: {
-                        line: {
-                            valueAxis: [
-                                {
-                                    value: oTotalWeightData.Target,
-                                    color: 'sapUiPositiveElement',
-                                    visible: true,
-                                    label: {
-                                        background: 'sapUiPositiveElement',
-                                        text: this.getI18nTextByKey("VFRefLineTarget") + " = " + Formatter.formatNumber(oTotalWeightData.Target) + " " + oTotalWeightData.UOM,
-                                        visible: true
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            };
-            oVizFrameTotalWeight.setVizProperties(oVizPropTotalWeightPlotArea);
-            oVizFrameTotalWeight.getDataset().getMeasures()[0].setUnit(sTargetQtyUOM);
-            oVizFrameTotalWeight.getDataset().getMeasures()[1].setUnit(sTargetQtyUOM);
+            // var oTotalWeightData = aTotalWeightData[0],
+            //     dScaleRange = oTotalWeightData.Target * 4;
+            // var oVizFrameTotalWeight = this.getCurrentVizFrameTotal();
+            // var oVizPropTotalWeightPlotArea = {
+            //     plotArea: {
+            //         primaryScale: {
+            //             fixedRange: true,
+            //             minValue: 0,
+            //             maxValue: dScaleRange
+            //         },
+            //         colorPalette: ['#91C8F6', '#427CAC'],
+            //         referenceLine: {
+            //             line: {
+            //                 valueAxis: [
+            //                     {
+            //                         value: oTotalWeightData.Target,
+            //                         color: 'sapUiPositiveElement',
+            //                         visible: true,
+            //                         label: {
+            //                             background: 'sapUiPositiveElement',
+            //                             text: this.getI18nTextByKey("VFRefLineTarget") + " = " + Formatter.formatNumber(oTotalWeightData.Target) + " " + oTotalWeightData.UOM,
+            //                             visible: true
+            //                         }
+            //                     }
+            //                 ]
+            //             }
+            //         }
+            //     }
+            // };
+            // oVizFrameTotalWeight.setVizProperties(oVizPropTotalWeightPlotArea);
+            // oVizFrameTotalWeight.getDataset().getMeasures()[0].setUnit(sTargetQtyUOM);
+            // oVizFrameTotalWeight.getDataset().getMeasures()[1].setUnit(sTargetQtyUOM);
 
             // Data Fetch Current Weight
             var dTargetQuantityValue = this.targetQuantityForSelectedMaterial,
@@ -162,24 +162,24 @@ sap.ui.define([
             dCurrentTarget = (dCurrentTarget > 0) ? dCurrentTarget : dTargetQuantityValue;
             var dCurrentScaleMax = dCurrentTarget + (dCurrentTarget / 100 * 20);
 
-            var oVizFrameCurrentWeight = this.getCurrentVizFrameCurrent();
-            var oVizPropCurrentWeightPlotArea = {
-                plotArea: {
-                    primaryScale: {
-                        fixedRange: true,
-                        minValue: 0,
-                        maxValue: dCurrentScaleMax
-                    },
-                    colorPalette: ['#91C8F6'],
-                    referenceLine: {
-                        line: {
-                            valueAxis: aRefLinesArray
-                        }
-                    }
-                }
-            };
-            oVizFrameCurrentWeight.setVizProperties(oVizPropCurrentWeightPlotArea);
-            oVizFrameCurrentWeight.getDataset().getMeasures()[0].setUnit(sQtyUOM);
+            // var oVizFrameCurrentWeight = this.getCurrentVizFrameCurrent();
+            // var oVizPropCurrentWeightPlotArea = {
+            //     plotArea: {
+            //         primaryScale: {
+            //             fixedRange: true,
+            //             minValue: 0,
+            //             maxValue: dCurrentScaleMax
+            //         },
+            //         colorPalette: ['#91C8F6'],
+            //         referenceLine: {
+            //             line: {
+            //                 valueAxis: aRefLinesArray
+            //             }
+            //         }
+            //     }
+            // };
+            // oVizFrameCurrentWeight.setVizProperties(oVizPropCurrentWeightPlotArea);
+            // oVizFrameCurrentWeight.getDataset().getMeasures()[0].setUnit(sQtyUOM);
         },
 
         _initWeighingHeaderModel: function (oBindingObject) {
@@ -325,15 +325,15 @@ sap.ui.define([
             };
             oWeighingModel.setProperty("/TotalWeight", null);
 
-            var oVizFrameTotalWeight = this.getCurrentVizFrameTotal();
-            oStandardVizProperties.categoryAxis.title.text = this.getI18nTextByKey("VFTitleTotalWeight");
-            oVizFrameTotalWeight.setVizProperties(oStandardVizProperties);
+            // var oVizFrameTotalWeight = this.getCurrentVizFrameTotal();
+            // oStandardVizProperties.categoryAxis.title.text = this.getI18nTextByKey("VFTitleTotalWeight");
+            // oVizFrameTotalWeight.setVizProperties(oStandardVizProperties);
 
             oWeighingModel.setProperty("/CurrentWeight", null);
 
-            var oVizFrameCurrentWeight = this.getCurrentVizFrameCurrent();
-            oStandardVizProperties.categoryAxis.title.text = this.getI18nTextByKey("VFTitleCurrentWeight");
-            oVizFrameCurrentWeight.setVizProperties(oStandardVizProperties);
+            // var oVizFrameCurrentWeight = this.getCurrentVizFrameCurrent();
+            // oStandardVizProperties.categoryAxis.title.text = this.getI18nTextByKey("VFTitleCurrentWeight");
+            // oVizFrameCurrentWeight.setVizProperties(oStandardVizProperties);
         },
         onSelectScale: function (oEvent) {
             this.aIndicatorData = null;
@@ -397,8 +397,8 @@ sap.ui.define([
             }
         },
         _resetWeighingDialog: function () {
-            var oBoxVizLegend = this.getCurrentWeighVizLegend();
-            oBoxVizLegend.setVisible(false);
+            // var oBoxVizLegend = this.getCurrentWeighVizLegend();
+            // oBoxVizLegend.setVisible(false);
             var oTxtAreaComments = this.getCurrentWeighCommentsArea();
             oTxtAreaComments.setValue("");
             this.setWeighingSaveButtons(false);
