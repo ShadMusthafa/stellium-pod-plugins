@@ -340,6 +340,7 @@ sap.ui.define(
         if (this.isScanDialogOpen && this.isScanDialogOpen === true) return oView.byId('idHandlingUnitScanInput2');
         if (this.isAddDialogOpen && this.isAddDialogOpen === true) return oView.byId('inputMatNumAdd');
         if (this.isWeighingDialogOpen && this.isWeighingDialogOpen === true) return oView.byId('idHandlingUnitScanInput4');
+        if (this.isConsumeDialogOpen && this.isConsumeDialogOpen === true) return oView.byId('idHandlingUnitScanInput3');
         // C5278086 Adding changes for W&D Start
         return this.oWeighDispenseHandler.getCurrentInputHuControl();
         //  C5278086 Adding changes for W&D End
@@ -1955,6 +1956,9 @@ sap.ui.define(
           return;
         }
 
+        this.scannedHU = null;
+        this.scannedHuItem = null;
+
         var selectedMaterial = oEvent.getSource().getBindingContext().getObject().materialId.material;
         // if (this._hasParkedItems() && !this._checkIfItemIsParked(selectedMaterial)) {
         //   MessageBox.error(this.getI18nText('processParkedItemsErrMsg', [this._getParkedMaterialList(), selectedMaterial]));
@@ -2340,12 +2344,14 @@ sap.ui.define(
               this.byId('inputPostingDate').setValue(this.getCurrentDateInPlantTimeZone());
               this.buildCustomFieldFormContent();
               this.onQuantityLiveChange();
+              this.focusHandlingUnitInput()
             }.bind(this)
           );
         } else {
           this.byId('consumeDialog').open();
           this.byId('inputPostingDate').setValue(this.getCurrentDateInPlantTimeZone());
           this.buildCustomFieldFormContent();
+          this.focusHandlingUnitInput()
         }
       },
 
@@ -2427,7 +2433,7 @@ sap.ui.define(
         var oModel = this.getCurrentModel();
         var selectedUom = oModel.getProperty('/quantity/unitOfMeasure/uom');
         var selectedInternalUom;
-        var uomControlIndex = this.getCurrentDialogId() === 'consumeDialog' ? 16 : 13;
+        var uomControlIndex = this.getCurrentDialogId() === 'consumeDialog' ? 18 : 15;
         if (oEvent.getSource().getParent().getContent().length === 1) {
           selectedInternalUom = oEvent
             .getSource()
@@ -2579,6 +2585,45 @@ sap.ui.define(
         var assemblyUrl = this.getAssemblyDataSourceUri();
         var sUrl = assemblyUrl + 'order/goodsIssue';
         this.postGiData(sUrl, this.dataToBePosted);
+
+        //If handling unit has been scanned for this item
+        if (this.scannedHuItem && this.scannedHuItem.huno) {
+          this._postGiForHuItem(this.dataToBePosted);
+        }
+      },
+
+      _postGiForHuItem: function(oData) {
+        //CPP_HandlingConsumedPost
+        var sUrl =
+          this.getPublicApiRestDataSourceUri() +
+          '/pe/api/v1/process/processDefinitions/start?key=REG_b33a8b60-ab8a-46f9-8175-3f7abe3c5a67&async=false';
+        var oPayload = {
+          items: [
+            {
+              plant: this.getPodController().getUserPlant(),
+              orderNo: oData.shopOrder,
+              operation: this.getPodSelectionModel().selectedPhaseData.stepId,
+              sfc: this.getPodSelectionModel().selectedOrderData.sfc,
+              huno: this.scannedHuItem.huno,
+              packmat: this.scannedHuItem.packmat,
+              material: oData.material,
+              packmatDesc: this.scannedHuItem.packmatDesc,
+              batch: oData.batchNumber,
+              matDesc: this.scannedHuItem.matDesc,
+              packedQty: this.scannedHuItem.packedQty || 0,
+              packedUom: oData.quantity.unitOfMeasure.uom,
+              storageLocation: oData.storageLocation,
+              openQuantity: this.scannedHuItem.openQuantity || 0,
+              consumedQuant: oData.quantity.value,
+              zuser: this.getPodController().getUserId(),
+              createdOn: '',
+              createdAt: ''
+            }
+          ]
+        };
+        this.ajaxPostRequest(sUrl, oPayload, oResponse => {
+          oLogger.info('Post consumption to S4 response: ', oResponse);
+        });
       },
 
       onCancelConsumeDialog: function() {
@@ -2602,7 +2647,7 @@ sap.ui.define(
         this.byId('inputPostedBy').setValue('');
         this.byId('inputPostingDate').setValue('');
         this.byId('avlQty').setText('');
-        this.byId('inputCommentsForConsume').setValue('');
+        // this.byId('inputCommentsForConsume').setValue('');
         this.customFieldJson = [];
         //this.byId("expDate").setText("");
 
@@ -2650,6 +2695,12 @@ sap.ui.define(
             this.resetModel(this.getCurrentModel());
             this.getCurrentInputBatchIdControl().setValueState('None');
           }
+        }
+
+        var fQuantityToConsume = oModel.getProperty('/quantity/value');
+        if(this.scannedHuItem && this.scannedHuItem.packedQty < fQuantityToConsume){
+          ErrorHandler.setErrorState(this.getCurrentInputQuantityControl(), 'Invalid quantity');
+          isErrorStateExist = true;
         }
 
         var oFormContent = this.getFormControl();
@@ -3750,6 +3801,13 @@ sap.ui.define(
         this._getMaterialDetails(oHuItem.material);
       },
 
+      _resetHandlingUnitScanData: function() {
+        var oModel = this.getCurrentModel();
+        oModel.setProperty('/scannedHu', '');
+        oModel.setProperty('/batchNumber', '');
+        oModel.setProperty('/avlBatchQty', 0);
+      },
+
       _getHandlingUnitDataFromS4: function(sHuNo) {
         //CPP_GetPackingDataFromS4
         var sUrl =
@@ -4123,7 +4181,7 @@ sap.ui.define(
         oModel.setProperty('/avlBatchQty', '');
         oModel.setProperty('/expDate', '');
         oModel.setProperty('/inventory', '');
-        if (sDialogId !== 'scanWeighDialog' && sDialogId !== 'addWeighDialog' && sDialogId !=='weighDialog') {
+        if (sDialogId !== 'scanWeighDialog' && sDialogId !== 'addWeighDialog' && sDialogId !== 'weighDialog') {
           this.onQuantityLiveChange();
         } else {
           this.isQuantityValid = false;
@@ -4832,6 +4890,9 @@ sap.ui.define(
           return;
         }
 
+        this.scannedHU = null;
+        this.scannedHuItem = null;
+
         if (!this.getConfiguration().allowWeighWithoutTolerance) {
           var oLineItem = oEvent.getSource().getBindingContext().getObject(),
             upperThresholdValue = parseFloat(oLineItem.upperThresholdValue),
@@ -5459,9 +5520,8 @@ sap.ui.define(
         }
 
         var aBatchDetails = this.batchDetailsModel.getData(),
-          oSelectedBatch = aBatchDetails.find(
-            oBatch => oBatch.batchNumber === sSelectedBatchId && oBatch.inventoryId === sSelectedInventoryId
-          );
+          oSelectedBatch = aBatchDetails.find(oBatch => oBatch.batchNumber === sSelectedBatchId);
+        // && oBatch.inventoryId === sSelectedInventoryId
 
         //Check if selected batch exists in the model
         if (!oSelectedBatch) {
@@ -5740,9 +5800,9 @@ sap.ui.define(
         }
 
         var oComponentData = this._getBomInfoForComponent(sMaterial),
-          sHandlingUnit = this.scannedHuItem && this.scannedHuItem.handlingUnit ? this.scannedHuItem.handlingUnit : '',
-          sPackingMaterial = this.scannedHuItem && this.scannedHuItem.packingUnit ? this.scannedHuItem.packingUnit : '',
-          sPackingMaterialDesc = this.scannedHuItem && this.scannedHuItem.articleDescription ? this.scannedHuItem.articleDescription : '';
+          sHandlingUnit = this.scannedHuItem && this.scannedHuItem.huno ? this.scannedHuItem.huno : '',
+          sPackingMaterial = this.scannedHuItem && this.scannedHuItem.packmat ? this.scannedHuItem.packmat : '',
+          sPackingMaterialDesc = this.scannedHuItem && this.scannedHuItem.packmatDesc ? this.scannedHuItem.packmatDesc : '';
 
         var oPayload = {
           InBOM: oComponentData.bomComponent.bom.bom,

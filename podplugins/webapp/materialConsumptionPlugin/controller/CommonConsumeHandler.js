@@ -149,6 +149,9 @@ sap.ui.define([
             return oView.byId("inScanWeighStorageLocation");
         if (this.oMaterialConsumptionController.isAddWeighDialogOpen && this.oMaterialConsumptionController.isAddWeighDialogOpen === true)
             return oView.byId("inAddWeighStorageLocation");
+        if (this.oMaterialConsumptionController.isConsumeDialogOpen && this.oMaterialConsumptionController.isConsumeDialogOpen === true)
+            return oView.byId("storageLocation");
+        
     };
 
     CommonConsumeHandler.prototype.getCurrentWeighScaleList = function () {
