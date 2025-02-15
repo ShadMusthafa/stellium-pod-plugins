@@ -8,6 +8,17 @@
                         emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="1" columnsL="1" columnsM="1"
                         singleContainerFullSize="true">
                         <f:content>
+                                <!-- Handling unit scan begin   -->
+                                <Label text="{i18n>handlingUnitScanLabel}"/>
+                                <Input id="idHandlingUnitScanInput2"
+                                        change=".handleHUScanChange"
+                                        value="{scanModel>/scannedHu}"
+                                        required="false">
+                                        <layoutData>
+                                                <f:ColumnElementData cellsSmall="10" cellsLarge="6" />
+                                        </layoutData>
+                                </Input>
+                                <!-- Handling unit scan end     -->
                                 <Label text="{i18n>matNum}" />
                                 <Input id="inputMatNumScan" change="handleLiveChangeScan" value="{scanModel>/material}"
                                         class="boldText" editable="true" required="true" />

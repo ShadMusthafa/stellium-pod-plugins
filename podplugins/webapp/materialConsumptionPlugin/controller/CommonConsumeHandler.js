@@ -67,6 +67,16 @@ sap.ui.define([
         //  C5278086 Adding changes for W&D End
     };
 
+    CommonConsumeHandler.prototype.getCurrentInputHuControl = function () {
+        const oView = this.getView();
+        // C5278086 Adding changes for W&D Start
+        if (this.oMaterialConsumptionController.isScanWeighDialogOpen && this.oMaterialConsumptionController.isScanWeighDialogOpen === true)
+            return oView.byId("idHandlingUnitScanInput");
+        if (this.oMaterialConsumptionController.isAddWeighDialogOpen && this.oMaterialConsumptionController.isAddWeighDialogOpen === true)
+            return oView.byId("inAddWeighMatNum");
+        //  C5278086 Adding changes for W&D End
+    };
+
     CommonConsumeHandler.prototype.getCurrentInputBatchIdControl = function () {
         const oView = this.getView();
         // C5278086 Adding changes for W&D Start
@@ -270,6 +280,9 @@ sap.ui.define([
     };
     CommonConsumeHandler.prototype.focusMaterialInput = function () {
         this.oMaterialConsumptionController && this.oMaterialConsumptionController.focusMaterialInput();
+    };
+    CommonConsumeHandler.prototype.focusHandlingUnitInput = function () {
+        this.oMaterialConsumptionController && this.oMaterialConsumptionController.focusHandlingUnitInput();
     };
     CommonConsumeHandler.prototype.buildCustomFieldFormContent = function () {
         this.oMaterialConsumptionController && this.oMaterialConsumptionController.buildCustomFieldFormContent();

@@ -495,7 +495,8 @@ sap.ui.define([
             let sLoggedInUser = this.getLoggedInUser();
             oModel.setProperty("/userId", sLoggedInUser);
             this.oMaterialConsumptionController.isPostedByValid = sLoggedInUser && sLoggedInUser.length > 0;
-            this.focusMaterialInput();
+            // this.focusMaterialInput();
+            this.focusHandlingUnitInput();
         },
         openWeighingDialog: function () {
 
@@ -512,10 +513,12 @@ sap.ui.define([
                     oDialog.setEscapeHandler(this.closeWeighingDialog);
                     oView.addDependent(oDialog);
                     oDialog.open();
+                    this.focusHandlingUnitInput();
                 }.bind(this));
             } else {
                 this.buildCustomFieldFormContent();
                 oWeighingDialog.open();
+                this.focusHandlingUnitInput();
             }
 
         },
@@ -536,13 +539,15 @@ sap.ui.define([
                     this.buildCustomFieldFormContent();
                     oView.addDependent(oDialog);
                     oDialog.open();
-                    this.focusMaterialInput();
+                    // this.focusMaterialInput();
+                    this.focusHandlingUnitInput();
                 }.bind(this));
             } else {
                 this.setDetailedModel();
                 this.buildCustomFieldFormContent();
                 oScanWeighingDialog.open();
-                this.focusMaterialInput();
+                // this.focusMaterialInput();
+                this.focusHandlingUnitInput();
             }
             this.setCurrentUserAndDate(oModel);
         },

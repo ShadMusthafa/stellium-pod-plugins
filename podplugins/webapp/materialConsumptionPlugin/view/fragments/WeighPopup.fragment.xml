@@ -15,6 +15,17 @@
                         <Text text="{weighingModel>/material}" class="boldText" />
                         <Label text="{i18n>materialDescription}" />
                         <Text text="{weighingModel>/materialDescription}" />
+                        <!-- Handling unit scan begin   -->
+                        <Label text="{i18n>handlingUnitScanLabel}"/>
+                        <Input id="idHandlingUnitScanInput4"
+                            change=".handleHUScanChange"
+                            value="{weighingModel>/scannedHu}"
+                            required="false">
+                            <layoutData>
+                                <f:ColumnElementData cellsSmall="10" cellsLarge="6" />
+                            </layoutData>
+                        </Input>
+                        <!-- Handling unit scan end     -->
                         <Label text="{i18n>batchid} / {i18n>storageLoc}" />
                         <Input id="inBatchIDWeighing" value="{weighingModel>/batchNumber}"
                             showValueHelp="{weighingModel>/batchManaged}" enabled="{weighingModel>/batchManaged}"

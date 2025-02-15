@@ -335,6 +335,16 @@ sap.ui.define(
         //  C5278086 Adding changes for W&D End
       },
 
+      getCurrentInputHuControl: function() {
+        var oView = this.getView();
+        if (this.isScanDialogOpen && this.isScanDialogOpen === true) return oView.byId('idHandlingUnitScanInput2');
+        if (this.isAddDialogOpen && this.isAddDialogOpen === true) return oView.byId('inputMatNumAdd');
+        if (this.isWeighingDialogOpen && this.isWeighingDialogOpen === true) return oView.byId('idHandlingUnitScanInput4');
+        // C5278086 Adding changes for W&D Start
+        return this.oWeighDispenseHandler.getCurrentInputHuControl();
+        //  C5278086 Adding changes for W&D End
+      },
+
       getCurrentInputBatchIdControl: function() {
         var oView = this.getView();
         if (this.isScanDialogOpen && this.isScanDialogOpen === true) return oView.byId('inputBatchIdScan');
@@ -2213,8 +2223,8 @@ sap.ui.define(
               that._enableConfirmButton();
 
               //In case of HU scan, use scanned HU quantity
-              if (that.scannedHuItem && that.scannedHuItem.quantity) {
-                oModel.setProperty('/avlBatchQty', that.scannedHuItem.quantity);
+              if (that.scannedHuItem && that.scannedHuItem.packedQty) {
+                oModel.setProperty('/avlBatchQty', that.scannedHuItem.packedQty);
               }
             } else {
               that.isInventoryManaged ? oModel.setProperty('/avlBatchQty', 0) : oModel.setProperty('/avlBatchQty', '');
@@ -3603,7 +3613,8 @@ sap.ui.define(
         } else {
           this.isPostedByValid = false;
         }
-        this.focusMaterialInput();
+        // this.focusMaterialInput();
+        this.focusHandlingUnitInput();
       },
 
       onBatchLiveChange: function(oEvent) {
@@ -3698,7 +3709,7 @@ sap.ui.define(
         return isValidInput;
       },
 
-      handleHUScanChange: function(oEvent) {
+      handleHUScanChange: async function(oEvent) {
         var oScanControl = oEvent.getSource(),
           sScannedValue = oScanControl.getValue(),
           oScannedValue;
@@ -3712,36 +3723,90 @@ sap.ui.define(
           oScannedValue = JSON.parse(sScannedValue);
         } catch (e) {}
 
-        if (!oScannedValue || !oScannedValue.length) {
-          //TODO: error handling
+        if (!oScannedValue) {
+          MessageBox.error('Could not retrieve data from scan');
+          this.resetModel(this.getCurrentModel());
           return;
         }
 
-        var oHuItem = this._getConsumptionItemFromHu(oScannedValue);
+        var sMaterial = this.getCurrentModel().getProperty('/material');
+
+        var oHuItem = await this._getConsumptionItemFromHu(oScannedValue.handlingUnit, sMaterial);
+        if (!oHuItem) {
+          MessageBox.error('Hu items are not relevant for current SFC');
+          this.resetModel(this.getCurrentModel());
+          return;
+        }
 
         this.scannedHU = oScannedValue;
         this.scannedHuItem = oHuItem;
 
-        oScanControl.setValue(oHuItem.handlingUnit);
-        this.getCurrentInputMaterialControl().setValue(oHuItem.Material);
+        oScanControl.setValue(oHuItem.huno);
 
-        this._getMaterialDetails(oHuItem.Material);
+        var oMaterialInput = this.getCurrentInputMaterialControl();
+        if (oMaterialInput) {
+          oMaterialInput.setValue(oHuItem.material);
+        }
+        this._getMaterialDetails(oHuItem.material);
       },
 
-      _getConsumptionItemFromHu: function(aHuItems) {
-        var oPodSelectionModel = this.getPodSelectionModel(),
-          oSelectedPhaseData = oPodSelectionModel.selectedPhaseData,
-          aRecipie = oSelectedPhaseData.recipeArray;
+      _getHandlingUnitDataFromS4: function(sHuNo) {
+        //CPP_GetPackingDataFromS4
+        var sUrl =
+          this.getPublicApiRestDataSourceUri() +
+          '/pe/api/v1/process/processDefinitions/start?key=REG_57bd9fbd-5f78-4ac0-ba6b-7577d0bf7a57&async=false';
+        var oPayload = {
+          items: [{ huno: sHuNo }]
+        };
+        return new Promise((resolve, reject) => this.ajaxPostRequest(sUrl, oPayload, resolve, reject));
+      },
 
-        var oRecipe = aRecipie.find(oItem => oItem.stepId === oSelectedPhaseData.stepId);
-        var aComponent = oRecipe.routingStepComponentList.filter(oItem => oItem.bomComponent.componentType === 'NORMAL');
+      _getConsumptionItemFromHu: async function(sHandlingUnit, sMaterial) {
+        var oCurrentDialog = this.byId(this.getCurrentDialogId());
+        oCurrentDialog.setBusy(true);
 
-        for (var i = 0; i < aComponent.length; i++) {
-          var oItem = aHuItems.find(oHuItem => oHuItem.Material === aComponent[i].bomComponent.material.material);
-          if (oItem) {
-            return oItem;
-          }
+        var aHuItems = await this._getHandlingUnitDataFromS4(sHandlingUnit)
+          .then(oResponse => {
+            if (!oResponse || !oResponse.content || oResponse.content.length === 0) {
+              return null;
+            }
+
+            var aItems = oResponse.content;
+            if (sMaterial) {
+              aItems = oResponse.content.filter(oItem => oItem.material === sMaterial);
+            }
+            // return oResponse.content;
+            return aItems;
+          })
+          .finally(() => {
+            oCurrentDialog.setBusy(false);
+          });
+
+        if (!aHuItems || aHuItems.length === 0) {
+          return null;
         }
+
+        var aLineItems = this.giModel.getProperty('/lineItems');
+        for (var i = 0; i < aLineItems.length; i++) {
+          var oItem = aHuItems.find(oHuItem => {
+            //If material does not match, proceed with next check
+            if (oHuItem.material !== aLineItems[i].materialId.material) return false;
+
+            //If threshold values are available, use that for checking component
+            if (aLineItems[i].lowerThresholdValue && aLineItems[i].consumedQuantity.value < aLineItems[i].lowerThresholdValue) return true;
+
+            //If component does not have tolerance, check against target values
+            var fConsumedQuantity = aLineItems[i].consumedQuantity.value || 0;
+            if (aLineItems[i].targetQuantity.value > fConsumedQuantity) return true;
+
+            //Default- fail check
+            return false;
+          });
+
+          if (oItem) return oItem;
+        }
+
+        return null;
       },
 
       handleLiveChangeScan: async function(oEvent) {
@@ -4058,7 +4123,7 @@ sap.ui.define(
         oModel.setProperty('/avlBatchQty', '');
         oModel.setProperty('/expDate', '');
         oModel.setProperty('/inventory', '');
-        if (sDialogId !== 'scanWeighDialog' && sDialogId !== 'addWeighDialog') {
+        if (sDialogId !== 'scanWeighDialog' && sDialogId !== 'addWeighDialog' && sDialogId !=='weighDialog') {
           this.onQuantityLiveChange();
         } else {
           this.isQuantityValid = false;
@@ -4203,6 +4268,7 @@ sap.ui.define(
           oModel.setProperty('/batchNumber', this.getI18nText('notBatchManaged'));
           oModel.setProperty('/batchManaged', false);
           oModel.setProperty('/calculatedData', null);
+          oModel.setProperty('/scannedHu', '');
         } else if (oView.getModel('scanWeighingModel') === oModel) {
           oModel.setProperty('/scannedHu', '');
           oModel.setProperty('/batchNumber', '');
@@ -4210,6 +4276,7 @@ sap.ui.define(
         } else {
           oModel.setProperty('/batchNumber', '');
           oModel.setProperty('/batchManaged', true);
+          oModel.setProperty('/scannedHu', '');
         }
         oModel.setProperty('/workCenter', this.selectedDataInList.workCenter.workcenter);
         oModel.setProperty('/avlBatchQty', '');
@@ -4226,6 +4293,9 @@ sap.ui.define(
         if (oView.getModel('unitModel')) {
           oView.getModel('unitModel').setData([]);
         }
+
+        this.scannedHU = null;
+        this.scannedHuItem = null;
       },
 
       onMaterialBrowse: function(oEvent) {
@@ -5266,6 +5336,16 @@ sap.ui.define(
       },
       openWeighingAddDialog: function() {
         this.oWeighDispenseHandler.openWeighingAddDialog();
+      },
+
+      focusHandlingUnitInput: function() {
+        setTimeout(
+          function() {
+            var oInputField = this.getCurrentInputHuControl();
+            oInputField.focus();
+          }.bind(this),
+          300
+        );
       },
 
       focusMaterialInput: function() {
