@@ -430,7 +430,8 @@ sap.ui.define(
               packmatDesc: oSelectedData.packingArticleDescription,
               batch: oSelectedData.packedBatch,
               matDesc: oSelectedData.packedArticleDescription,
-              packedQty: oSelectedData.packedQty,
+              // packedQty: oSelectedData.packedQty,
+              packedQty: 0, //Packed qty to be zero as per service logic
               packedUom: oSelectedData.uom,
               storage_location: oSelectedData.storageLocation
             };
