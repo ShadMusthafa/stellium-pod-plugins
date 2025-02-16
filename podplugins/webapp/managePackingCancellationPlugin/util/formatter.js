@@ -165,9 +165,8 @@ sap.ui.define(['sap/ui/core/format/DateFormat', 'sap/ui/core/date/UI5Date', 'sap
       return formattedText;
     },
 
-    cancelConfirmationVisiblityFormatter: function(bAuth, status, confirmationGroup, confirmationCounter) {
+    cancelConfirmationVisiblityFormatter: function(bAuth, status) {
       if (!bAuth) return false;
-      if (!confirmationGroup || !confirmationCounter) return false;
       switch (status) {
         case 'POSTED_IN_DMC':
         case 'POSTED_IN_DM':

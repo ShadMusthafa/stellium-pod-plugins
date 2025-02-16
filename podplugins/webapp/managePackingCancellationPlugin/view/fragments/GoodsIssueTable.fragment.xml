@@ -99,8 +99,13 @@
                 <Text text="{goodsIssueItems>comments}"/>
                 <Text text="{goodsIssueItems>cancellationComments}"/>
                 <!-- <ObjectStatus text="{goodsIssueItems>status}"/> -->
-                <Text text="{path: 'goodsIssueItems>status', formatter: '.formatter.formatExecutionStatus'}" />
-                <Button text="{i18n>cancelButton}" press="onCancelConfirmationPress" visible="{data>/authorizedToCancel}">
+                <Text text="{path: 'goodsIssueItems>status', formatter: '.formatter.statusTextFormatter'}" />
+                <Button text="{i18n>cancelButton}" 
+                    press="onCancelConfirmationPress" 
+                    visible="{
+                        parts: ['data>/authorizedToCancel', 'goodsIssueItems>status'],
+                        formatter: '.formatter.cancelConfirmationVisiblityFormatter'
+                    }">
                     <customData>
                         <core:CustomData key="cancelType" value='GI'/>
                         <core:CustomData key="dataModelName" value='goodsIssueItems'/>
