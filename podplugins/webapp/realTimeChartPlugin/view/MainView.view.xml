@@ -1,0 +1,46 @@
+<mvc:View controllerName="stellium.ext.podplugins.realTimeChartPlugin.controller.MainView" width="100%" height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core" 
+    xmlns:commons="sap.suite.ui.commons" 
+    xmlns:viz="sap.viz.ui5.controls">
+    <Panel id="idvizPluginPanel" 
+        width="100%" 
+        height="100%" 
+        expandable="false" 
+        expanded="true" 
+        accessibleRole="Region" 
+        backgroundDesign="Transparent">
+        <!-- <headerToolbar>
+			<OverflowToolbar>
+				<ToolbarSpacer />
+				<Button text="Consume Chart" press="onConsumeChartPress" />
+				<Button text="Tare Chart" press="onTareChartPress" />
+			</OverflowToolbar>
+		</headerToolbar> -->
+        <content>
+            <commons:ChartContainer id="idChartContainer"
+                showFullScreen="true"
+                showPersonalization="false"
+                autoAdjustHeight="true">
+                <commons:customIcons>
+                    <core:Icon id="idChartContainerRefresh"
+                        src="sap-icon://refresh"
+                        tooltip="Refresh chart data"
+                        press=".onRefreshIconPress"></core:Icon>
+                </commons:customIcons>
+                <commons:ChartContainerContent id="idChartContainerContent1">
+                    <commons:content>
+                        <viz:VizFrame id="idVizFrame" uiConfig="{applicationSet:'fiori'}"
+                            height='100%' width="100%" vizType='timeseries_bullet'>
+                            <viz:dependents>
+                                <viz:Popover id="idPopOver"></viz:Popover>
+                            </viz:dependents>
+                        </viz:VizFrame>
+                    </commons:content>
+                </commons:ChartContainerContent>
+            </commons:ChartContainer>    
+        </content>
+    </Panel> 
+</mvc:View>
