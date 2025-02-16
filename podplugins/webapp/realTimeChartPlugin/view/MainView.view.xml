@@ -12,13 +12,13 @@
         expanded="true" 
         accessibleRole="Region" 
         backgroundDesign="Transparent">
-        <!-- <headerToolbar>
+        <headerToolbar>
 			<OverflowToolbar>
 				<ToolbarSpacer />
 				<Button text="Consume Chart" press="onConsumeChartPress" />
 				<Button text="Tare Chart" press="onTareChartPress" />
 			</OverflowToolbar>
-		</headerToolbar> -->
+		</headerToolbar>
         <content>
             <commons:ChartContainer id="idChartContainer"
                 showFullScreen="true"
@@ -30,6 +30,12 @@
                         tooltip="Refresh chart data"
                         press=".onRefreshIconPress"></core:Icon>
                 </commons:customIcons>
+                <!-- <commons:toolbar>
+                    <OverflowToolbar>
+                        <Button text="Consumption Chart" press="onConsumeChartPress" />
+                        <Button text="Tare Chart" press="onTareChartPress" />
+                    </OverflowToolbar>
+                </commons:toolbar> -->
                 <commons:ChartContainerContent id="idChartContainerContent1">
                     <commons:content>
                         <viz:VizFrame id="idVizFrame" uiConfig="{applicationSet:'fiori'}"
