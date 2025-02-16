@@ -2048,6 +2048,7 @@ sap.ui.define(
           this.isPostedByValid = false;
         }
         oView.getModel('consumeModel').setProperty('/handlingUnitNumber', '');
+        oView.getModel('consumeModel').setProperty('/scannedHu', '');
         oView.getModel('consumeModel').setProperty('/useFullHandlingUnit', false);
         oView.getModel('consumeModel').setProperty('/batchManaged', isBatchManaged);
         oView.getModel('consumeModel').setProperty('/storageLocation', storageLocation);
@@ -2344,14 +2345,14 @@ sap.ui.define(
               this.byId('inputPostingDate').setValue(this.getCurrentDateInPlantTimeZone());
               this.buildCustomFieldFormContent();
               this.onQuantityLiveChange();
-              this.focusHandlingUnitInput()
+              this.focusHandlingUnitInput();
             }.bind(this)
           );
         } else {
           this.byId('consumeDialog').open();
           this.byId('inputPostingDate').setValue(this.getCurrentDateInPlantTimeZone());
           this.buildCustomFieldFormContent();
-          this.focusHandlingUnitInput()
+          this.focusHandlingUnitInput();
         }
       },
 
@@ -2659,7 +2660,7 @@ sap.ui.define(
         ErrorHandler.clearErrorState(this.byId('inputBatchId'));
         ErrorHandler.clearErrorState(this.byId('inputPostedBy'));
         ErrorHandler.clearErrorState(this.byId('inputPostingDate'));
-        ErrorHandler.clearErrorState(this.byId('inputCommentsForConsume'));
+        // ErrorHandler.clearErrorState(this.byId('inputCommentsForConsume'));
       },
 
       onQuantityLiveChange: function(oEvent) {
@@ -2698,7 +2699,7 @@ sap.ui.define(
         }
 
         var fQuantityToConsume = oModel.getProperty('/quantity/value');
-        if(this.scannedHuItem && this.scannedHuItem.packedQty < fQuantityToConsume){
+        if (this.scannedHuItem && this.scannedHuItem.packedQty < fQuantityToConsume) {
           ErrorHandler.setErrorState(this.getCurrentInputQuantityControl(), 'Invalid quantity');
           isErrorStateExist = true;
         }
@@ -3799,6 +3800,7 @@ sap.ui.define(
           oMaterialInput.setValue(oHuItem.material);
         }
         this._getMaterialDetails(oHuItem.material);
+        this.focusHandlingUnitInput();
       },
 
       _resetHandlingUnitScanData: function() {
