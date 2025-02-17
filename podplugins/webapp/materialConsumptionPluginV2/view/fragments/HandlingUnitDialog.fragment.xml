@@ -1,0 +1,60 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog id="HUDialog" title="" class="sapUiContentPadding" contentWidth="80%" resizable="true">
+        <content>
+            <SearchField id="HUSearch" liveChange="onSearchHUListWithVal" width="100%" />
+            <Table id="HUList" width="auto" growing="true" growingThreshold="20" growingScrollToLoad="true"
+                updateStarted="queryNextPageHU" sticky="ColumnHeaders" items="{HUModel>/}" mode="SingleSelectLeft"
+                selectionChange="onInvHUChange">
+                <headerToolbar>
+                    <Toolbar>
+                        <Title id="HUListTitle" text="{i18n>items}" />
+                    </Toolbar>
+                </headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="{i18n>batchId}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>MATERIAL}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>psa}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>psaBin}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>serialNum}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>avlQty}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>uom}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>handlingUnit}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <Text text="{HUModel>batchNumber}" />
+                        <Text text="{HUModel>material}" />
+                        <Text text="{HUModel>psa}" />
+                        <Text text="{HUModel>psaBin}" />
+                        <Text text="{HUModel>serialNumber}" />
+                        <Text
+                            text="{parts : ['HUModel>availableQuantity/value','HUModel>availableQuantity/unitOfMeasure/uom'],formatter:'.oFormatter.formatQtyWithDecimals'}" />
+                        <Text text="{HUModel>availableQuantity/unitOfMeasure/uom}" />
+                        <Text text="{HUModel>handlingUnitNumber}" />
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <buttons>
+            <Button id="okHU" text="{i18n-global>ok}" type="Emphasized" press="onOkHU" enabled="false" />
+            <Button id="useFullHU" text="{i18n>useFull}" type="Emphasized" press="onClickUseFullHU" enabled="false" />
+            <Button text="{i18n>cancel}" press="onCancelHU" />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

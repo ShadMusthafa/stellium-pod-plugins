@@ -1,0 +1,76 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns:f="sap.ui.layout.form" xmlns:l="sap.ui.layout" xmlns="sap.m">
+    <Dialog id="calculateDialog" class="sapUiContentPadding" title="{i18n>calculateQTYtoConsume.title}" resizable="true"
+        contentWidth="675px" contentHeight="300px" escapeHandler="onCancelCalculateDialog">
+        <content>
+            <f:SimpleForm id="calculateForm" editable="true" title="{i18n>calculateSelectComponent.title}"
+                layout="ResponsiveGridLayout" labelSpanXL="2" labelSpanL="2" labelSpanM="4" labelSpanS="4"
+                adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="1"
+                columnsL="1" columnsM="1" singleContainerFullSize="true">
+                <f:content>
+                    <Label text="{i18n>components}" />
+                    <Select forceSelection="false" items="{phaseComponents>/}" change="onComponentsChange"
+                        showSecondaryValues="true">
+                        <layoutData>
+                            <l:GridData span="XL6 L6 M6 S6" />
+                        </layoutData>
+                        <items>
+                            <core:ListItem key="{phaseComponents>bomComponentRef}"
+                                text="{phaseComponents>materialId/material}"
+                                additionalText="{phaseComponents>description}" />
+                        </items>
+                    </Select>
+                    <ObjectStatus visible="{hint>/enable}" text="{hint>/value}" icon="sap-icon://message-information"
+                        state="Warning">
+                        <layoutData>
+                            <l:GridData span="XL2 L2 M2 S2" />
+                        </layoutData>
+                    </ObjectStatus>
+                </f:content>
+            </f:SimpleForm>
+            <f:SimpleForm editable="true" title="{i18n>calculateFormulaVariables.title}" layout="ResponsiveGridLayout"
+                labelSpanXL="2" labelSpanL="2" labelSpanM="4" labelSpanS="4" adjustLabelSpan="false" emptySpanXL="0"
+                emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="1" columnsL="1" columnsM="1"
+                singleContainerFullSize="true">
+                <f:content>
+                    <Table mode="SingleSelectMaster" items="{userSpecificFields>/variables}">
+                        <columns>
+                            <Column vAlign="Middle" hAlign="Left" width="65%" demandPopin="true">
+                                <Text text="{i18n>calculateFormulaVariables.variableName.col}" />
+                            </Column>
+                            <Column vAlign="Middle" hAlign="Left" width="30%" demandPopin="false">
+                                <Text text="{i18n>calculateFormulaVariables.variableValue.col}" />
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem vAlign="Middle">
+                                <cells>
+                                    <Label required="true" text="{userSpecificFields>fieldName}" />
+                                    <Input
+                                        value="{ path: 'userSpecificFields>fieldValue', type: '.fieldValueDecimalType' }" />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </f:content>
+            </f:SimpleForm>
+            <f:SimpleForm editable="true" layout="ResponsiveGridLayout" labelSpanXL="2" labelSpanL="2" labelSpanM="4"
+                labelSpanS="4" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0"
+                columnsXL="1" singleContainerFullSize="true" columnsL="1">
+                <f:content>
+                    <Label id="calculateComments" labelFor="inputCommentsForCalculate"
+                        text="{i18n>calculateQTYtoConsume.comments.lbl}" />
+                    <TextArea id="inputCommentsForCalculate" value="{userSpecificFields>/comments}" width="100%"
+                        showExceededText="false" growing="true" rows="4" growingMaxLines="5" />
+                </f:content>
+            </f:SimpleForm>
+        </content>
+        <buttons>
+            <Button id="calculationButton" text="{i18n>calculate}" type="Emphasized" press="onCaclulate"
+                enabled="true" />
+            <Button id="calculateClearButton" text="{i18n>calculateQTYtoConsume.clear.btn}"
+                tooltip="{i18n>calculateQTYtoConsume.clear.btn}" press="onCalculateClear" />
+            <Button id="calculateCancelButton" text="{i18n-global>cancel}" tooltip="{i18n-global>cancel}"
+                press="onCalculateCancel" />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

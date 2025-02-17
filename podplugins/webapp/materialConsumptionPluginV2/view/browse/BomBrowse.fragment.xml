@@ -1,0 +1,104 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:fb="sap.ui.comp.filterbar" xmlns:l="sap.ui.layout">
+<Dialog id="dialog" title="{i18n-bom>bomBrowseTitle}" afterClose="onClose" contentHeight="2000px">
+<content>
+<fb:FilterBar id="filterBar" showGoOnFB="false" showClearOnFB="true" showFilterConfiguration="false" filterBarExpanded="false" filterContainerWidth="225px" clear="onFilterBarClear" basicSearch="searchField">
+<fb:content>
+<l:VerticalLayout visible="false">
+<SearchField id="searchField" showSearchButton="false" liveChange="onSearchLiveChange" maxLength="200"/>
+</l:VerticalLayout>
+</fb:content>
+<fb:filterGroupItems>
+<fb:FilterGroupItem groupName="basic" name="bom" label="{i18n-bom>common.bom.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Input id="bomFilter" change="onFilterBarChange" class="mesUpperCaseTransform" maxLength="200"/>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="description" label="{i18n-global>common.description.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Input id="descriptionFilter" change="onFilterBarChange" maxLength="200"/>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="bomType" label="{i18n-objectType>common.bomType.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Select id="typeFilter" selectedKey="ALL" items="{bomTypeItems>/}" change="onFilterBarChange">
+<items>
+<core:Item key="{bomTypeItems>key}" text="{bomTypeItems>text}"/>
+</items>
+</Select>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="status" label="{i18n-status>common.status.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Select id="statusFilter" selectedKey="ALL" items="{statusItems>/}" change="onFilterBarChange">
+<items>
+<core:Item key="{statusItems>key}" text="{statusItems>text}"/>
+</items>
+</Select>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="component" label="{i18n-bom>common.component.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Input id="componentFilter" class="mesUpperCaseTransform" showValueHelp="true" valueHelpRequest="onComponentBrowse" change="onFilterBarChange" maxLength="200"/>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="componentVersion" label="{i18n-bom>common.componentVersion.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Input id="componentVersionFilter" class="mesUpperCaseTransform" change="onFilterBarChange" maxLength="200"/>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="creationTimeRange" label="{i18n-global>common.creationTimeRange.lbl}" visibleInFilterBar="true">
+<fb:control>
+<DateRangeSelection id="creationTimeRangeFilter" displayFormat="yyyy/MM/dd" change="onFilterBarChange"/>
+</fb:control>
+</fb:FilterGroupItem>
+<fb:FilterGroupItem groupName="basic" name="currentVersion" label="{i18n-global>common.currentVersionOnly.lbl}" visibleInFilterBar="true">
+<fb:control>
+<Switch id="currentVersionFilter" customTextOn="{i18n-global>common.yes.switch}" customTextOff="{i18n-global>common.no.switch}" change="onFilterBarChange"/>
+</fb:control>
+</fb:FilterGroupItem>
+</fb:filterGroupItems>
+</fb:FilterBar>
+<Table id="resultTable" items="{ path: 'product>/Boms', parameters: { $select: ['ref','bom','version','description','status','bomType','currentVersion', 'bomTemplate'] } }" mode="SingleSelectMaster" selectionChange="onSelect" growing="true" growingThreshold="20" growingScrollToLoad="true">
+<columns>
+<Column width="13em">
+<Text text="{i18n-bom>common.bom.lbl}"/>
+</Column>
+<Column width="5em" minScreenWidth="Tablet" demandPopin="true">
+<Text text="{i18n-global>common.version.lbl}"/>
+</Column>
+<Column minScreenWidth="Desktop" demandPopin="true">
+<Text text="{i18n-global>common.description.lbl}"/>
+</Column>
+<Column minScreenWidth="Desktop" demandPopin="true">
+<Text text="{i18n-status>common.status.lbl}"/>
+</Column>
+<Column minScreenWidth="Desktop" demandPopin="true">
+<Text text="{i18n-objectType>common.bomType.lbl}"/>
+</Column>
+<Column minScreenWidth="Desktop" demandPopin="true">
+<Text text="{i18n-global>common.currentVersion.lbl}"/>
+</Column>
+<Column minScreenWidth="Desktop" demandPopin="true">
+<Text text="{i18n-bom>common.bomTemplate.lbl}"/>
+</Column>
+</columns>
+<items>
+<ColumnListItem>
+<cells>
+<Text text="{product>bom}"/>
+<Text text="{product>version}"/>
+<Text text="{product>description}"/>
+<Text text="{ path: 'product>status', type: 'sap.ui.model.odata.type.String', formatter: '.statusFormatter.getStatusText' }"/>
+<Text text="{ path: 'product>bomType', type: 'sap.ui.model.odata.type.String', formatter: '.objectTypeFormatter.getBomTypeText' }"/>
+<Text text="{product>currentVersion}"/>
+<Text text="{product>bomTemplate}"/>
+</cells>
+</ColumnListItem>
+</items>
+</Table>
+</content>
+<beginButton>
+<Button id="closeButton" text="{i18n-global>cancel}" tooltip="{i18n-global>cancel}" press="onCancel"/>
+</beginButton>
+</Dialog>
+</core:FragmentDefinition>

@@ -1,0 +1,95 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog id="postingsDialog" title="{i18n>viewPostings} ({postingsCountModel>/totalCount})"
+        class="sapUiContentPadding" contentWidth="70%" resizable="true" draggable="true">
+        <content>
+            <Table id="postingsTable" items="{postingsModel>/details}" growing="true" growingScrollToLoad="true"
+                growingThreshold="35" updateStarted="fetchMoreGiPostingDetails">
+                <columns>
+                    <Column mergeDuplicates="true" minScreenWidth="Small" demandPopin="true">
+                        <header>
+                            <Text text="{i18n>matNum}" />
+                        </header>
+                    </Column>
+                    <Column demandPopin="true" minScreenWidth="Small" hAlign="End">
+                        <header>
+                            <Text text="{i18n>QUANTITY}" />
+                        </header>
+                    </Column>
+                    <Column visible="{= ${postingsModel>/batchManaged} === 'ORDER'}" demandPopin="true"
+                        minScreenWidth="Small" hAlign="End">
+                        <header>
+                            <Text text="{i18n>batchId}" />
+                        </header>
+                    </Column>
+                    <Column demandPopin="true" minScreenWidth="Small" hAlign="Center">
+                        <header>
+                            <Text text="{i18n>postedBy}" />
+                        </header>
+                    </Column>
+                    <Column demandPopin="true" minScreenWidth="Small" hAlign="End">
+                        <header>
+                            <Text text="{i18n>postingDate}" />
+                        </header>
+                    </Column>
+                    <Column demandPopin="true" hAlign="End" minScreenWidth="Tablet">
+                        <header>
+                            <Text text="{i18n>creationDate}" />
+                        </header>
+                    </Column>
+                    <Column hAlign="Left" demandPopin="true" minScreenWidth="Tablet">
+                        <header>
+                            <Text text="{i18n>calculateQTYtoConsume.comments.lbl}" />
+                        </header>
+                    </Column>
+                    <Column hAlign="Left" demandPopin="true" minScreenWidth="Tablet">
+                        <header>
+                            <Text text="{i18n>status}" />
+                        </header>
+                    </Column>
+                    <Column hAlign="Left" demandPopin="true" minScreenWidth="Tablet"
+                        visible="{= ${postingsModel>/hasCustomColumn} === true}">
+                        <header>
+                            <Text text="{postingsModel>/customColumnName}" />
+                        </header>
+                    </Column>
+                </columns>
+                <ColumnListItem id="postingDetailsCLItem">
+                    <cells>
+                        <Text text="{postingsModel>material}" />
+                        <VBox width="100%" direction="Column" alignItems="End">
+                            <items>
+                                <HBox>
+                                    <items>
+                                        <Text
+                                            text="{parts : ['postingsModel>quantity/value','postingsModel>quantity/unitOfMeasure/uom'],formatter:'.oFormatter.showValueUptoThreeDecimalWithUom'}"
+                                            textAlign="Right" />
+                                        <core:Icon class="sapUiTinyMarginBegin" src="sap-icon://simulate"
+                                            visible="{=!!${postingsModel>calculatedData}}" press="onCalculateIconPress"
+                                            tooltip="{i18n>postingDialog.calculatedData.tooltip}" />
+                                    </items>
+                                </HBox>
+                            </items>
+                        </VBox>
+                        <Text text="{postingsModel>batchNumber}" />
+                        <Text text="{postingsModel>userId}" />
+                        <Text
+                            text="{path : 'postingsModel>dateTime',formatter:'.oFormatter.formatUTCDateTimeToPlantTimeZone'}" />
+                        <Text
+                            text="{path : 'postingsModel>createdDateTime',formatter:'.oFormatter.formatUTCDateTimeToPlantTimeZone'}" />
+                        <HBox width="100%" alignItems="Start" justifyContent="Start">
+                            <items>
+                                <Text text="{postingsModel>comments}" textAlign="Begin" wrapping="true"
+                                    class="sapDmeJustifiedTextAlign" />
+                            </items>
+                        </HBox>
+                        <Text text="{path : 'postingsModel>status',formatter:'.formatMaterialConsumptionStatus'}" />
+                        <Text text="{path : 'postingsModel>customFieldData', formatter: '.formatCustomField'}" />
+                    </cells>
+                </ColumnListItem>
+            </Table>
+        </content>
+        <beginButton>
+            <Button text="{i18n>close}" press=".onClosePostingsDialog" />
+        </beginButton>
+    </Dialog>
+</core:FragmentDefinition>

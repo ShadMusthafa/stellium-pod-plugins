@@ -1,0 +1,49 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+    <TableSelectDialog id="storageLocationDialog" title="{i18n>storageLocationDialogHeader}" contentWidth="50%"
+        resizable="true" liveChange="onSeachStorageLocationListLiveChange" search="onSeachStorageLocationList"
+        confirm="onSelectStorageLocation" cancel="onCloseStorageLocationDialog" items="{storageLocationModel>/}">
+        <columns>
+            <Column hAlign="Left" vAlign="Middle" visible="{invManagedModel>/isInventoryManaged}">
+                <Text text="{i18n>inventoryId}" />
+            </Column>
+            <Column hAlign="Left" vAlign="Middle">
+                <Text text="{i18n>storageLocation}" />
+            </Column>
+            <Column hAlign="Left" vAlign="Middle">
+                <Text text="{i18n>storageLocationDescription}" />
+            </Column>
+            <Column hAlign="Right" vAlign="Middle" visible="{invManagedModel>/showQuantity}"
+                class="sapUiLargeMarginEnd">
+                <Text text="{i18n>QUANTITY}" />
+            </Column>
+        </columns>
+        <items>
+            <ColumnListItem>
+                <cells>
+                    <Text class="boldText" text="{storageLocationModel>inventoryId}" />
+                    <Text text="{storageLocationModel>storageLocation/storageLocation}" />
+                    <Text text="{storageLocationModel>storageLocation/description}" />
+                    <l:VerticalLayout>
+                        <l:content>
+                            <Button
+                                visible="{parts: ['storageLocationModel>remainingQuantity', 'invManagedModel>/isInventoryManaged'], formatter:'.oFormatter.showUpdateBtnStorLoc'}"
+                                text="{i18n>update}" width="100%" press="onGetStockForStorageLoc" />
+                            <l:HorizontalLayout>
+                                <l:content>
+                                    <Text
+                                        text="{parts : ['storageLocationModel>remainingQuantity', 'storageLocationModel>unitOfMeasure/uom'], formatter:'.oFormatter.showValueUptoThreeDecimalWithUom'}"
+                                        visible="{parts: ['storageLocationModel>remainingQuantity', 'invManagedModel>/isInventoryManaged'], formatter:'.oFormatter.showQtyStorLoc'}"
+                                        class="sapUiTinyMarginTop" />
+                                    <Button icon="sap-icon://refresh" type="Transparent" press="onGetStockForStorageLoc"
+                                        visible="{parts: ['storageLocationModel>remainingQuantity', 'invManagedModel>/isInventoryManaged'], formatter:'.oFormatter.showRefreshBtnStorLoc'}"
+                                        class="sapUiTinyMarginBegin" />
+                                </l:content>
+                            </l:HorizontalLayout>
+                        </l:content>
+                    </l:VerticalLayout>
+                </cells>
+            </ColumnListItem>
+        </items>
+    </TableSelectDialog>
+    >
+</core:FragmentDefinition>
