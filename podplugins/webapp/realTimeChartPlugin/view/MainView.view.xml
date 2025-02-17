@@ -36,6 +36,12 @@
                         <Button text="Tare Chart" press="onTareChartPress" />
                     </OverflowToolbar>
                 </commons:toolbar> -->
+                <commons:dimensionSelectors>
+                    <Select id="idChartSelector">
+                        <core:Item key="0" text="Consumption Chart" />
+                        <core:Item key="1" text="Tare Chart" />
+                    </Select> 
+                </commons:dimensionSelectors>
                 <commons:ChartContainerContent id="idChartContainerContent1">
                     <commons:content>
                         <viz:VizFrame id="idVizFrame" uiConfig="{applicationSet:'fiori'}"
