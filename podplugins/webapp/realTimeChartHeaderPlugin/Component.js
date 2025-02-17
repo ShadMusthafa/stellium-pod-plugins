@@ -4,7 +4,7 @@ sap.ui.define([
 ], function (ProductionUIComponent, Device) {
 	"use strict";
 
-	return ProductionUIComponent.extend("stellium.ext.podplugins.realTimeChartPlugin.Component", {
+	return ProductionUIComponent.extend("stellium.ext.podplugins.realTimeChartHeaderPlugin.Component", {
 		metadata: {
 			manifest: "json"
 		}

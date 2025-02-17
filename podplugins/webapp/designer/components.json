@@ -89,6 +89,16 @@
       "i18n": "stellium.ext.podplugins.realTimeChartPlugin.i18n.i18n",
       "productionProcessEnabled": false,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
+    },
+    {
+      "id": "stelliumRealTimeChartHeaderPlugin",
+      "type": "VIEW_PLUGIN",
+      "allowMultipleInstances": false,
+      "name": "stellium.ext.podplugins.realTimeChartHeaderPlugin",
+      "propertyEditor": "stellium.ext.podplugins.realTimeChartHeaderPlugin.builder.PropertyEditor",
+      "i18n": "stellium.ext.podplugins.realTimeChartHeaderPlugin.i18n.i18n",
+      "productionProcessEnabled": false,
+      "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     }
   ],
   "extensions": [

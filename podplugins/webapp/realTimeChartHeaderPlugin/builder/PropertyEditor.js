@@ -6,15 +6,15 @@ sap.ui.define([
     
     var oFormContainer;
 
-    return PropertyEditor.extend( "stellium.ext.podplugins.realTimeChartPlugin.builder.PropertyEditor" ,{
+    return PropertyEditor.extend( "stellium.ext.podplugins.realTimeChartHeaderPlugin.builder.PropertyEditor" ,{
 
 		constructor: function(sId, mSettings){
 			
 			PropertyEditor.apply(this, arguments);
 			
 			this.setI18nKeyPrefix("customComponentListConfig.");
-			this.setResourceBundleName("stellium.ext.podplugins.realTimeChartPlugin.i18n.builder");
-			this.setPluginResourceBundleName("stellium.ext.podplugins.realTimeChartPlugin.i18n.i18n");
+			this.setResourceBundleName("stellium.ext.podplugins.realTimeChartHeaderPlugin.i18n.builder");
+			this.setPluginResourceBundleName("stellium.ext.podplugins.realTimeChartHeaderPlugin.i18n.i18n");
 		},
 		
 		addPropertyEditorContent: function(oPropertyFormContainer){
@@ -34,8 +34,8 @@ sap.ui.define([
 				
 				"backButtonVisible": true,
 				"closeButtonVisible": true,
-                "title": "realTimeChartPlugin",
-				"text": "realTimeChartPlugin"
+                "title": "realTimeChartHeaderPlugin",
+				"text": "realTimeChartHeaderPlugin"
                 
 			};
 		}

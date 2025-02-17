@@ -1,7 +1,7 @@
 {
 	"_version": "1.12.0",
 	"sap.app": {
-		"id": "stellium.ext.podplugins.realTimeChartPlugin",
+		"id": "stellium.ext.podplugins.realTimeChartHeaderPlugin",
 		"type": "application",
 		"i18n": "i18n/i18n.properties",
 		"applicationVersion": {
@@ -51,7 +51,7 @@
 	"sap.ui5": {
 		"flexEnabled": false,
 		"rootView": {
-			"viewName": "stellium.ext.podplugins.realTimeChartPlugin.view.MainView",
+			"viewName": "stellium.ext.podplugins.realTimeChartHeaderPlugin.view.MainView",
 			"type": "XML",
 			"async": true,
 			"id": "MainView"
@@ -90,7 +90,7 @@
 			"i18n": {
 				"type": "sap.ui.model.resource.ResourceModel",
 				"settings": {
-					"bundleName": "stellium.ext.podplugins.realTimeChartPlugin.i18n.i18n"
+					"bundleName": "stellium.ext.podplugins.realTimeChartHeaderPlugin.i18n.i18n"
 				}
 			}
 		},
@@ -104,7 +104,7 @@
 				"routerClass": "sap.m.routing.Router",
 				"viewType": "XML",
 				"async": true,
-				"viewPath": "stellium.ext.podplugins.realTimeChartPlugin.view",
+				"viewPath": "stellium.ext.podplugins.realTimeChartHeaderPlugin.view",
 				"controlAggregation": "pages",
 				"controlId": "app",
 				"clearControlAggregation": false
