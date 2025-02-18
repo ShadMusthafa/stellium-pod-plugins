@@ -69,13 +69,13 @@
                             <l:VerticalLayout class="sapUiSmallMarginBegin sapUiMediumMarginEnd"
                                 visible="{headerInformationConfig>/cumulativeCountVisible}">
                                 <Label id="expandedCumulativeCountLabel"
-                                    text="Operator:"/>
+                                    text="Cumulative Count:"/>
                                 <ObjectStatus id="expandedCumulativeCount" text="{headerData>/cumulativeCount}" />
                             </l:VerticalLayout>
                             <l:VerticalLayout class="sapUiSmallMarginBegin sapUiMediumMarginEnd"
                                 visible="{headerInformationConfig>/consequtiveCountVisible}">
                                 <Label id="expandedConsequtiveCountLabel"
-                                    text="Resource:"/>
+                                    text="Consecutive Count:"/>
                                 <ObjectStatus id="expandedConsequtiveCount" text="{headerData>/consequtiveCount}" />
                             </l:VerticalLayout>
                         </HBox>
