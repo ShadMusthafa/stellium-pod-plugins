@@ -9,7 +9,8 @@ sap.ui.define(
     'sap/viz/ui5/api/env/Format',
     'sap/ui/model/Filter',
     'sap/ui/model/FilterOperator',
-    'sap/m/MessageBox'
+    'sap/m/MessageBox',
+    'sap/ui/core/format/NumberFormat'
   ],
   function(
     PluginViewController,
@@ -21,7 +22,8 @@ sap.ui.define(
     Format,
     Filter,
     FilterOperator,
-    MessageBox
+    MessageBox,
+    NumberFormat
   ) {
     'use strict';
 
@@ -733,9 +735,17 @@ sap.ui.define(
         var oView = this.getView(),
           oVizFrame = oView.byId('idVizFrame'),
           oPopover = oView.byId('idPopOver');
+
+        var oChartFormatter = ChartFormatter.getInstance();
+        oChartFormatter.registerCustomFormatter('quantityKG', function(value) {
+          return value ? value + ' KG' : '';
+        });
+
         oPopover.connect(oVizFrame.getVizUid());
         oPopover.setFormatString({
-          Quantity: ChartFormatter.DefaultPattern.STANDARDFLOAT,
+          Actual: 'quantityKG',
+          TargetUpper: 'quantityKG',
+          TargetLower: 'quantityKG',
           Date: 'dd/MM/yyyy hh:mm:ss'
         });
       },
