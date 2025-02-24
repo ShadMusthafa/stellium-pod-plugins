@@ -519,42 +519,42 @@ sap.ui.define(
             });
             Log.info("Cancel goods issue PPD completed");
 
-            Log.info("Wait 1s before calling S4");
-            await this._wait(3000);
+            // Log.info("Wait 1s before calling S4");
+            // await this._wait(3000);
 
             //Post scrap to S4
             // var aGiScrapRequests = aGiScrapPayloads.map((oPayload) =>
             //   this._postGiScrapToS4(oPayload)
             // );
-            await Promise.all(aGiScrapRequests).catch((oError) => {
-              Log.error("Error occured while posting scrap GI qty to S4");
-              // throw new Error('Error occured while posting scrap GI qty to S4');
-              return;
-            });
+            // await Promise.all(aGiScrapRequests).catch((oError) => {
+            //   Log.error("Error occured while posting scrap GI qty to S4");
+            //   // throw new Error('Error occured while posting scrap GI qty to S4');
+            //   return;
+            // });
 
             //TODO: Get list of open SFCs for order and scrap all SFCs
             // var aSfcs = await this._getOrderDetails().then((oOrderDetails)=>oOrderDetails.sfcs);
             // var aSfcScrapPromises = aSfcs.map(sSFC=>this._postSfcScrap(sSFC))
 
             //Scrap SFC in DM
-            await this._postSfcScrap().catch((oError) => {
-              Log.error("SFC could not be scrapped");
-              // throw new Error('SFC could not be scrapped');
-            });
+            // await this._postSfcScrap().catch((oError) => {
+            //   Log.error("SFC could not be scrapped");
+            //   // throw new Error('SFC could not be scrapped');
+            // });
 
             //Discard order in DM
-            await this._postDiscardOrder().catch((oError) => {
-              Log.error("Error in posting discard order");
-              // throw new Error('Error in posting discard order');
-              return;
-            });
-            Log.info("Posted order discard");
+            // await this._postDiscardOrder().catch((oError) => {
+            //   Log.error("Error in posting discard order");
+            //   // throw new Error('Error in posting discard order');
+            //   return;
+            // });
+            // Log.info("Posted order discard");
 
-            Log.info("Wait 1s before calling S4");
-            await this._wait(3000);
+            // Log.info("Wait 1s before calling S4");
+            // await this._wait(3000);
 
-            await this._postTecoToS4();
-            Log.info("Posted Teco to S4");
+            // await this._postTecoToS4();
+            // Log.info("Posted Teco to S4");
           } catch (sError) {
             MessageBox.error(sError);
           }
@@ -577,12 +577,12 @@ sap.ui.define(
               return;
             }
           );
+          
           var aGiScrapPayloads = aGiLineItems
             .filter((oItem) => !oItem.cancellationTriggered)
             .flatMap((oItem) => oItem.content)
             .map((oItem) => {
               return {
-                content: {
                   material: oItem.material,
                   plant: oItem.plant,
                   sfc: oItem.sfc,
@@ -592,7 +592,6 @@ sap.ui.define(
                   quantity: oItem.quantityInBaseUnit.value,
                   uom: oItem.quantityInBaseUnit.unitOfMeasure
                     .internalUnitOfMeasure,
-                },
               };
             });
           var sUrl =
@@ -602,7 +601,7 @@ sap.ui.define(
             InPlant: this.getPodController().getUserPlant(),
             InOrder: this.selectedOrder.order,
             InSFC: this.selectedOrder.sfc,
-            aGiScrapPayloads,
+            InScrapContent: aGiScrapPayloads,
           };
           return new Promise((resolve, reject) =>
             this.ajaxPostRequest(sUrl, oPayload, resolve, reject)
