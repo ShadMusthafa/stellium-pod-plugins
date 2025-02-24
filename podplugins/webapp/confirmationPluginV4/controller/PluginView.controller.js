@@ -214,12 +214,13 @@ sap.ui.define(
       // },
 
       _getGoodsIssueSummary: function() {
-        var sUrl = this.getPodController().getAssemblyDataSourceUri() + 'order/goodsIssue/summary';
+        var sUrl = this.getPublicApiRestDataSourceUri() + 'processorder/v2/goodsIssue/summary';
         var oParams = {
-          shopOrder: this.selectedOrderData.selectedShopOrder,
-          batchId: this.selectedOrderData.selectedSfc,
-          operationActivity: this.getPodSelectionModel().operations[0].operation,
-          stepId: this.selectedOrderData.truncatedPhaseId
+          plant: this.getPodController().getUserPlant(),
+          order: this.getPodSelectionModel().selectedOrderData.order,
+          sfc: this.getPodSelectionModel().selectedOrderData.sfc,
+          operationActivity: this.getPodSelectionModel().selectedPhaseData.operation.operation,
+          stepId: this.getPodSelectionModel().selectedPhaseData.stepId
         };
         return new Promise((resolve, reject) => this.ajaxGetRequest(sUrl, oParams, resolve, reject));
       },
@@ -2230,7 +2231,7 @@ sap.ui.define(
 
         //Reset the fields
         this._resetFields();
-        
+
         var oTable = this.byId('activity'); // Replace with the actual ID
         var aItems = oTable.getItems();
 
@@ -2268,8 +2269,7 @@ sap.ui.define(
         ErrorHandler.clearErrorState(this.byId('postedBy'));
         ErrorHandler.clearErrorState(this.byId('postingDate'));
       },
-      onYieldQuantityChange: function(oEvent) {
-      },
+      onYieldQuantityChange: function(oEvent) {},
 
       onYieldQuantityLiveChange: function(oEvent) {
         var oView = this.getView(),
@@ -2321,13 +2321,13 @@ sap.ui.define(
         var oView = this.getView(),
           oPostModel = oView.getModel('qtyPostModel'),
           value = oEvent.getSource().getValue();
-        
+
         var oYieldInput = this.byId('yieldQuantity');
         var oScrapInput = this.byId('scrapQuantity');
 
         oYieldInput.setValueState(sap.ui.core.ValueState.None);
         oScrapInput.setValueState(sap.ui.core.ValueState.None);
-       
+
         if (Number.isNaN(value) || (value && !this._validatePositiveNumber(value)) || parseFloat(value) === 0) {
           ErrorHandler.setErrorState(oEvent.getSource(), this.getI18nText('POSITIVE_INPUT'));
         } else {

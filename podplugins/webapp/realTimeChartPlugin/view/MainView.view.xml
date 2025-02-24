@@ -12,13 +12,13 @@
         expanded="true" 
         accessibleRole="Region" 
         backgroundDesign="Transparent">
-        <headerToolbar>
+        <!-- <headerToolbar>
 			<OverflowToolbar>
 				<ToolbarSpacer />
 				<Button text="Consume Chart" press="onConsumeChartPress" />
 				<Button text="Tare Chart" press="onTareChartPress" />
 			</OverflowToolbar>
-		</headerToolbar>
+		</headerToolbar> -->
         <content>
             <commons:ChartContainer id="idChartContainer"
                 showFullScreen="true"
@@ -37,7 +37,9 @@
                     </OverflowToolbar>
                 </commons:toolbar> -->
                 <commons:dimensionSelectors>
-                    <Select id="idChartSelector">
+                    <Select id="idChartSelector" 
+                        width="12rem"
+                        change=".onChartContainerDimensionChange">
                         <core:Item key="0" text="Consumption Chart" />
                         <core:Item key="1" text="Tare Chart" />
                     </Select> 

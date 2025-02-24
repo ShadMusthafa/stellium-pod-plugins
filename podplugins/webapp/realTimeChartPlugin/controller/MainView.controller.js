@@ -70,7 +70,7 @@ sap.ui.define(
               vizProperties: {
                 plotArea: {
                   window: {
-                    start: 'firstDataPoint',
+                    start: null,
                     end: 'lastDataPoint'
                   },
                   dataLabel: {
@@ -662,13 +662,29 @@ sap.ui.define(
         }
       },
 
+      onChartContainerDimensionChange: function(oEvent) {
+        var iSelectedKey = parseInt(oEvent.getSource().getSelectedKey());
+        switch (iSelectedKey) {
+          case 0:
+            this._loadChartData();
+            this._initChart(0);
+            break;
+
+          case 1:
+            var oMockModel = this.getView().getModel('mockdata');
+            this.getView().getModel('data').setData(oMockModel.getData());
+            this._initChart(1);
+            break;
+        }
+      },
+
       onRefreshIconPress: function() {
         this._loadChartData();
       },
 
       onConsumeChartPress: function() {
-        this._initChart(0);
         this._loadChartData();
+        this._initChart(0);
       },
       onTareChartPress: function() {
         this._initChart(1);
