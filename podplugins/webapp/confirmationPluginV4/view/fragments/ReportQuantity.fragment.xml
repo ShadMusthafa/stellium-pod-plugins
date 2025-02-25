@@ -99,7 +99,7 @@
                                 text="{parts : ['targetQuantity/value','targetQuantity/unitOfMeasure/uom'],formatter:'.oFormatter.showValueWithUom'}" /> -->
                         <!-- <Text
                             text="{parts : ['actualQuantity/value','actualQuantity/unitOfMeasure/uom'],formatter:'.oFormatter.showValueWithUom'}" /> -->
-                        <Input required="true"   valueState="None"></Input>
+                        <Input required="true" value="{reportedQty/value}" valueState="None"></Input>
                         <Select id="uom" items="{uModel>/}" change="selectUom($event, 'targetQuantity')"
                             selectedKey="{targetQuantity/unitOfMeasure/uom}" enabled="true">
 

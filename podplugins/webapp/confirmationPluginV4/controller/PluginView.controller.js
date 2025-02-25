@@ -2286,6 +2286,7 @@ sap.ui.define(
           ErrorHandler.setErrorState(oEvent.getSource(), this.getI18nText('POSITIVE_INPUT'));
         } else {
           ErrorHandler.clearErrorState(oEvent.getSource());
+          this._calculateActivityTimes();
 
           //!Move below logic to _enableConfirmButton
           var yieldQuantityValue = oPostModel.getProperty('/yieldQuantity/value');
@@ -2332,6 +2333,8 @@ sap.ui.define(
           ErrorHandler.setErrorState(oEvent.getSource(), this.getI18nText('POSITIVE_INPUT'));
         } else {
           ErrorHandler.clearErrorState(oEvent.getSource());
+
+          this._calculateActivityTimes();
 
           //!Move below logic to _enableConfirmButton
           var yieldQuantityValue = oPostModel.getProperty('/yieldQuantity/value');
@@ -2873,6 +2876,38 @@ sap.ui.define(
 
       _endsWith: function(str, suffix) {
         return str.indexOf(suffix, str.length - suffix.length) !== -1;
+      },
+
+      _calculateActivityTimes: function() {
+        var oTable = this.byId('activity'),
+          oModel = oTable.getModel(),
+          aItems = oModel.getProperty('/activitySummary'),
+          oYieldInput = this.byId('yieldQuantity'),
+          oScrapInput = this.byId('scrapQuantity');
+
+        var fTotalQty = this.getPodSelectionModel().selectedOrderData.sfcPlannedQty,
+          fYeildValue = parseFloat(oYieldInput.getValue()) || 0,
+          fScrapValue = parseFloat(oScrapInput.getValue()) || 0;
+
+        aItems.forEach(oItem => {
+          var fTargetValue = oItem.targetQuantity.value,
+            fResult = 0;
+          //If target is zero or not defined, do nothing
+          if (isNaN(fTargetValue) || fTargetValue === 0) {
+            return;
+          }
+
+          fTargetValue = fTargetValue * 60;
+          fResult = fTargetValue / fTotalQty * (fYeildValue + fScrapValue);
+          fResult = fResult / 60;
+
+          oItem.reportedQty = {
+            value: fResult.toFixed(2),
+            unitOfMeasure: oItem.targetQuantity.unitOfMeasure
+          };
+        });
+
+        oModel.setProperty('/activitySummary', aItems);
       }
     });
 
