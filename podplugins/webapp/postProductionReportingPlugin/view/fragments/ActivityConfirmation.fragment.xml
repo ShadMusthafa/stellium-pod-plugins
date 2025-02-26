@@ -1,0 +1,63 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
+<Table id="activityConfirmationTable" class="sapUiNoMarginTop" items="{activityModel>/activitySummary}" updateFinished="onListUpdateFinished" autoPopinMode="true" contextualWidth="Auto">
+<headerToolbar>
+<OverflowToolbar>
+<content>
+<Title text="{i18n>activityConfirmationTable.header}"/>
+<ToolbarSpacer/>
+<Button id="saveBtnActivity" enabled="false" press=".ActivityConfirmation.onSaveBtnPress" text="{i18n>saveData.btn}" type="Emphasized"/>
+<Button id="clearBtnActivity" press=".ActivityConfirmation.onClearBtnPress" text="{i18n>clearData.btn}"/>
+</content>
+</OverflowToolbar>
+</headerToolbar>
+<columns>
+<Column mergeDuplicates="true">
+<Label text="{i18n>process.activityType.col}"/>
+</Column>
+<Column hAlign="Begin">
+<Label text="{i18n>process.standardValue.col}"/>
+</Column>
+<Column hAlign="Begin">
+<Label text="{i18n>process.postedValue.col}"/>
+</Column>
+<Column hAlign="Center">
+<Label text="{i18n>process.action.col}"/>
+</Column>
+<Column hAlign="Begin" demandPopin="true">
+<Label text="{i18n>process.value.col}"/>
+</Column>
+<Column demandPopin="true">
+<Label text="{i18n>process.unit.col}"/>
+</Column>
+<Column demandPopin="true">
+<Label text="{i18n>process.postingDateTime.col}"/>
+</Column>
+<Column demandPopin="true">
+<Label text="{i18n>process.postedBy.col}"/>
+</Column>
+<Column demandPopin="true" visible="{=${configuration>/customField1} ? true : false}">
+<Label text="{configuration>/customField1}"/>
+</Column>
+<Column hAlign="Center"> </Column>
+</columns>
+<items>
+<ColumnListItem highlight="{activityModel>rowStatus}">
+<Label text="{parts : ['activityModel>activityId','activityModel>activityText'], formatter:'.formatter.showActivityIdWithText'}" design="Bold" wrapping="true"/>
+<Label text="{parts : ['activityModel>targetQuantity/value','activityModel>targetQuantity/unitOfMeasure/uom'], formatter:'.formatter.showValue'}" visible="{activityModel>actionBtnVisible}" textAlign="End"/>
+<Label text="{parts : ['activityModel>actualQuantity/value','activityModel>actualQuantity/unitOfMeasure/uom'],formatter:'.formatter.showValue'}" visible="{activityModel>actionBtnVisible}" textAlign="End"/>
+<Button hAlign="Center" visible="{activityModel>actionBtnVisible}" press=".ActivityConfirmation.onViewPostsBtnPress" text="{i18n>process.viewPosts.btn}" width="100%" tooltip="{i18n>process.viewPosts.btn}"/>
+<Input change=".ActivityConfirmation.onValueChange" value="{parts:[{path:'activityModel>value'},{path:'activityModel>selectedUoM'}], type:'.types.quantity'}" textAlign="Begin"/>
+<Select width="100%" forceSelection="false" change=".ActivityConfirmation.handleSelectChange" selectedKey="{activityModel>selectedUoM}" items="{path:'activityModel>unitList', templateShareable:false}">
+<core:Item key="{activityModel>internalUom}" text="{activityModel>uom} - {activityModel>shortText}"/>
+</Select>
+<DateTimePicker value="{path : 'activityModel>postingDateTime', formatter:'.formatter.formatDateTime'}" initialFocusedDateValue="{activityModel>focusedDateTime}" valueFormat="yyyy-MM-dd HH:mm:ss" change=".ActivityConfirmation.handleChangeDateTime"/>
+<Input value="{activityModel>postedBy}" enabled="false"/>
+<Input value="{activityModel>customFieldValue}" visible="{=${configuration>/customField1} ? true : false}" liveChange=".ActivityConfirmation.onCustomFieldLiveChange"/>
+<HBox>
+<Button icon="sap-icon://sys-add" type="Transparent" tooltip="{i18n-global>common.add.btn}" press=".ActivityConfirmation.onPressAdd" class="sapUiTinyMarginRight" enabled="{ parts: [ { path: 'configuration>/sequence' }, { value: 'ActivityConfirmation' } ], formatter:'.formatter.addButtonVisible'}"/>
+<Button icon="sap-icon://sys-minus" type="Transparent" tooltip="{i18n-global>common.delete.btn}" press=".ActivityConfirmation.onPressRemove" enabled="{activityModel>removeEnabled}"/>
+</HBox>
+</ColumnListItem>
+</items>
+</Table>
+</core:FragmentDefinition>

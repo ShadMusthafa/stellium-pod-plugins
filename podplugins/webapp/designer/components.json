@@ -109,6 +109,16 @@
       "i18n": "stellium.ext.podplugins.materialConsumptionPluginV2.i18n.i18n",
       "productionProcessEnabled": false,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
+    },
+    {
+      "id": "stelliumPostProductionReportingPlugin",
+      "type": "VIEW_PLUGIN",
+      "allowMultipleInstances": false,
+      "name": "stellium.ext.podplugins.postProductionReportingPlugin",
+      "propertyEditor": "stellium.ext.podplugins.postProductionReportingPlugin.builder.PropertyEditor",
+      "i18n": "stellium.ext.podplugins.postProductionReportingPlugin.i18n.i18n",
+      "productionProcessEnabled": false,
+      "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     }
   ],
   "extensions": [

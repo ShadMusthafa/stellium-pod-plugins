@@ -1,0 +1,71 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
+<Table id="goodsReceiptTable" class="sapUiNoMarginTop" autoPopinMode="true" contextualWidth="Auto" items="{ path: 'grModel>/lineItems', sorter: { path: 'grModel>category', descending: true, group: true } }">
+<headerToolbar>
+<Toolbar>
+<Title text="{i18n>goodsReceipt}"/>
+<ToolbarSpacer/>
+<Button id="saveBtnGR" press=".GoodsReceipt.onSaveBtnPress" text="{i18n>saveData.btn}" enabled="false" type="Emphasized"/>
+<Button id="clearBtnGR" press=".GoodsReceipt.onClearBtnPress" text="{i18n>clearData.btn}"/>
+</Toolbar>
+</headerToolbar>
+<columns>
+<Column mergeDuplicates="true" mergeFunctionName="data#mergeKey" width="10%">
+<Label text="{i18n>process.material.col}"/>
+</Column>
+<Column width="10%" hAlign="End">
+<Label text="{i18n>process.postedValue.col}"/>
+</Column>
+<Column hAlign="Center" width="7%">
+<Label text="{i18n>process.action.col}"/>
+</Column>
+<Column hAlign="Begin" demandPopin="true" width="12%">
+<Label text="{i18n>process.batchId.col}"/>
+</Column>
+<Column hAlign="Begin" demandPopin="true" width="12%">
+<Label text="{i18n>process.storLoc.col}"/>
+</Column>
+<Column hAlign="Begin" demandPopin="true" width="12%">
+<Label text="{i18n>process.quantity.col}"/>
+</Column>
+<Column demandPopin="true" width="8%">
+<Label text="{i18n>process.unit.col}"/>
+</Column>
+<Column demandPopin="true" width="12%">
+<Label text="{i18n>process.postingDateTime.col}"/>
+</Column>
+<Column demandPopin="true" width="10%">
+<Label text="{i18n>process.postedBy.col}"/>
+</Column>
+<Column demandPopin="true" width="10%" visible="{=${configuration>/customField1} ? true : false}">
+<Label text="{configuration>/customField1}"/>
+</Column>
+<Column hAlign="Center" width="5%"> </Column>
+</columns>
+<items>
+<ColumnListItem highlight="{grModel>rowStatus}">
+<VBox>
+<Text text="{grModel>material}" class="boldText"/>
+<Text text="{grModel>description}"/>
+<customData>
+<core:CustomData key="mergeKey" value="{parts : [ 'grModel>material', 'grModel>description' ], formatter: '.formatter.getMergeKey'}"/>
+</customData>
+</VBox>
+<ProgressIndicator tooltip="{parts : [ 'grModel>targetQuantity/value', 'grModel>receivedQuantity/value', 'grModel>receivedQuantity/unitOfMeasure/uom' ], formatter: '.formatter.getDisplayValueForGR'}" percentValue="{parts : [ 'grModel>targetQuantity/value', 'grModel>receivedQuantity/value' ], formatter: '.formatter.getPercentValueForGR'}" displayValue="{parts : [ 'grModel>targetQuantity/value', 'grModel>receivedQuantity/value', 'grModel>receivedQuantity/unitOfMeasure/uom' ], formatter: '.formatter.getDisplayValueForGR'}" showValue="true" state="{parts : [ 'grModel>receivedQuantity/value', 'grModel>targetQuantity/value'], formatter: '.formatter.getGRPostedQtyColorCode'}" visible="{grModel>actionBtnVisible}"/>
+<Button hAlign="Center" visible="{grModel>actionBtnVisible}" press=".GoodsReceipt.onViewPostsBtnPress" text="{i18n>process.viewPosts.btn}" width="105%" tooltip="{i18n>process.viewPosts.btn}"/>
+<Input value="{grModel>enteredBatchNumber}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest=".GoodsReceipt.showBatchDialog" enabled="{parts : ['grModel>batchManaged', 'grModel>type', 'orderData>/erpAutoGRStatus' ], formatter: '.formatter.getDisplayBatchIDForGR'}"/>
+<Input value="{grModel>enteredStorageLoc}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest=".GoodsReceipt.showStorageLocDialog" enabled="{parts : [ 'grModel>type', 'orderData>/erpAutoGRStatus' ], formatter: '.formatter.isGrFieldEnabled'}"/>
+<Input value="{parts:[{path:'grModel>value'},{path:'grModel>selectedUoM'}], type:'.types.quantity'}" textAlign="Left" change=".GoodsReceipt.onValueChange" enabled="{parts : [ 'grModel>type', 'orderData>/erpAutoGRStatus' ], formatter: '.formatter.isGrFieldEnabled'}"/>
+<Select width="100%" forceSelection="false" change=".GoodsReceipt.handleSelectChange" selectedKey="{grModel>selectedUoM}" items="{path:'grModel>unitList', templateShareable:false}" enabled="{parts : [ 'grModel>type', 'orderData>/erpAutoGRStatus' ], formatter: '.formatter.isGrFieldEnabled'}">
+<core:Item key="{grModel>uom}" text="{grModel>uom} - {grModel>shortText}"/>
+</Select>
+<DateTimePicker value="{path : 'grModel>postingDateTime', formatter:'.formatter.formatDateTime'}" initialFocusedDateValue="{grModel>focusedDateTime}" valueFormat="yyyy-MM-dd HH:mm:ss" change=".GoodsReceipt.handleChangeDateTime" enabled="{parts : ['grModel>type', 'orderData>/erpAutoGRStatus' ], formatter: '.formatter.isGrFieldEnabled'}"/>
+<Input value="{grModel>postedBy}" enabled="false"/>
+<Input value="{grModel>customFieldValue}" visible="{=${configuration>/customField1} ? true : false}" liveChange=".GoodsReceipt.onCustomFieldLiveChange"/>
+<HBox>
+<Button icon="sap-icon://sys-add" type="Transparent" press=".GoodsReceipt.onPressAdd" class="sapUiTinyMarginRight" tooltip="{i18n-global>common.add.btn}" enabled="{parts : ['grModel>type', 'orderData>/erpAutoGRStatus', 'configuration>/multipleReportingGR' ], formatter: '.formatter.isGrFieldEnabled'}"/>
+<Button icon="sap-icon://sys-minus" type="Transparent" press=".GoodsReceipt.onPressRemove" tooltip="{i18n-global>common.delete.btn}" enabled="{grModel>removeEnabled}"/>
+</HBox>
+</ColumnListItem>
+</items>
+</Table>
+</core:FragmentDefinition>

@@ -1,0 +1,13 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
+<l:VerticalLayout id="defaultSettingsLayout" width="100%">
+<MessageStrip text="{i18n>reportInfoMsgStrip}" type="Information" showIcon="true" class="sapUiSmallMarginBottom"/>
+<Label text="{i18n>commonPostingDateTime}:" labelFor="inputCmnPostDateTime"/>
+<DateTimePicker class="sapUiTinyMarginBottom" valueFormat="yyyy-MM-dd HH:mm:ss" value="{ReportInfoSection>/selectedTime}" id="inputCmnPostDateTime" width="30%" change="handleChangeReportInfoDate" formatter=".formatter.formatDateTime"/>
+<Label text="{i18n>commonPostingOperator}:" labelFor="inputCmnPostUser"/>
+<Input id="inputCmnPostUser" class="sapUiTinyMarginBottom" width="30%" value="{ReportInfoSection>/selectedUser}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="showUserDialogRI"/>
+<HBox width="30%">
+<Button id="saveReportInfo" text="{i18n>apply}" press="handleApplyReportInfoData" class="sapUiTinyMarginEnd" type="Emphasized"/>
+<Button text="{i18n>resetData}" press="handleResetReportInfoData" type="Transparent"/>
+</HBox>
+</l:VerticalLayout>
+</core:FragmentDefinition>

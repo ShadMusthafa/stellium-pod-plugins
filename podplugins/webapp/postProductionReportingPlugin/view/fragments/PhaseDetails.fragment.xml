@@ -1,0 +1,62 @@
+<core:FragmentDefinition xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:layout="sap.ui.layout" xmlns:form="sap.ui.layout.form">
+<Panel id="phaseDetailsPanel" width="100%" height="100%" accessibleRole="Region" backgroundDesign="Transparent" class="sapUiNoContentPadding" items="{/}" aria-label="{i18n>PhaseDetails.header}">
+<layout:VerticalLayout width="100%">
+<MessageStrip text="{i18n>reportInfoMsgStrip}" ariaDescribedBy="phaseDetailsPanel" ariaLabelledBy="phaseDetailsPanel" type="Information" showIcon="true" class="sapUiTinyMarginBottom"/>
+</layout:VerticalLayout>
+<VBox>
+<form:SimpleForm editable="false" layout="ColumnLayout" class="sapUiNoContentPadding" width="100%" columnsM="2" columnsL="3" columnsXL="3">
+<form:content>
+<core:Title text="{i18n>PhaseDetails.header}"/>
+<Label text="{i18n>process.operationId.lbl}"/>
+<Text text="{phaseDetails>truncatedOperationId}"/>
+<Label text="{i18n>process.resource.lbl}"/>
+<Text text="{phaseDetails>workCenter/workcenter}"/>
+<Label text="{i18n>process.phaseId.lbl}"/>
+<Text text="{phaseDetails>truncatedPhaseId}"/>
+<!--  Added Empty group to move description to next column  -->
+<Label text=""/>
+<Text text=""/>
+<Label text="{i18n-global>common.description.lbl}"/>
+<Text text="{phaseDetails>phaseDescription}"/>
+</form:content>
+</form:SimpleForm>
+<form:SimpleForm editable="false" layout="ColumnLayout" class="sapUiNoContentPadding" width="100%" columnsM="2" columnsL="3" columnsXL="3">
+<form:content>
+<core:Title text="{i18n>process.plannedValues.lbl}"/>
+<Label text="{i18n>process.plannedStartDateTime.lbl}" class="sapUiTinyMarginBottom"/>
+<Text text="{path : 'phaseDetails>scheduleStartDate', formatter:'.formatter.formatDateTime'}"/>
+<Label text="{i18n>process.plannedStopDateTime.lbl}" class="sapUiTinyMarginBottom"/>
+<Text text="{path : 'phaseDetails>scheduleEndDate', formatter:'.formatter.formatDateTime'}"/>
+<core:Title text="{i18n>process.lastReportedValues.lbl}"/>
+<Label text="{i18n>process.lastReportedStartDate.lbl}" class="sapUiTinyMarginBottom"/>
+<Text text="{path: 'phaseDetails>actualStartDate', formatter: '.formatter.formatDateTime'}"/>
+<Label text="{i18n>process.lastReportedCompleteDate.lbl}" class="sapUiTinyMarginBottom"/>
+<Text text="{path: 'phaseDetails>actualEndDate', formatter: '.formatter.formatDateTime'}"/>
+<core:Title text="{i18n>process.actualValues.lbl}"/>
+<Label id="idLblActualStartDate" text="{i18n>process.actualStartDateTime.lbl}"/>
+<DateTimePicker id="actualStartDate" value="{path : 'phaseDetails>tempStartDate', formatter:'.formatter.formatDateTime'}" valueFormat="yyyy-MM-dd HH:mm:ss" change=".PhaseDetails.handleChangeStartDateTime">
+<layoutData>
+<form:ColumnElementData cellsSmall="6" cellsLarge="5"/>
+</layoutData>
+</DateTimePicker>
+<Button id="startDateSave" press=".PhaseDetails.onSaveBtnPress" text="{= ${phaseDetails>actualStartDate} === null ? ${i18n>startOperationActivity.btn} : ${i18n>update.btn}}" type="Emphasized" ariaLabelledBy="idLblActualStartDate">
+<layoutData>
+<form:ColumnElementData cellsSmall="5" cellsLarge="3"/>
+</layoutData>
+</Button>
+<Label id="idLblActualEndDate" text="{i18n>process.actualStopDateTime.lbl}"/>
+<DateTimePicker id="actualEndDate" value="{path : 'phaseDetails>tempEndDate', formatter:'.formatter.formatDateTime'}" valueFormat="yyyy-MM-dd HH:mm:ss" change=".PhaseDetails.handleChangeEndDateTime">
+<layoutData>
+<form:ColumnElementData cellsSmall="6" cellsLarge="5"/>
+</layoutData>
+</DateTimePicker>
+<Button id="endDateSave" press=".PhaseDetails.onSaveBtnPress" text="{= ${phaseDetails>actualEndDate} === null ? ${i18n>completeOperationActivity.btn} : ${i18n>update.btn}}" type="Emphasized" ariaLabelledBy="idLblActualEndDate" tooltip="{= ${phaseDetails>actualEndDate} === null ? ${i18n>completeOperationActivity.btn} : ${i18n>update.btn}}">
+<layoutData>
+<form:ColumnElementData cellsSmall="5" cellsLarge="3"/>
+</layoutData>
+</Button>
+</form:content>
+</form:SimpleForm>
+</VBox>
+</Panel>
+</core:FragmentDefinition>

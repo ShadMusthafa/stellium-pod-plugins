@@ -1,0 +1,41 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+<Dialog id="QuantityPostingsDialog" title="{i18n>materialComponentsPostingDialog.header}" class="sapUiContentPadding" contentWidth="70%">
+<content>
+<Table id="QuantityDetailsTable" inset="false" items="{ path: 'viewQuantityReportModel>/details', sorter: { path: 'createdDateTime', descending: true } }" autoPopinMode="true">
+<columns>
+<Column hAlign="End" visible="{= ${viewQuantityReportModel>/quantityType} === 'Yield'}">
+<Text text="{i18n>process.yield.col}"/>
+</Column>
+<Column hAlign="End" visible="{= ${viewQuantityReportModel>/quantityType} === 'Scrap'}">
+<Text text="{i18n>process.scrap.col}"/>
+</Column>
+<Column hAlign="Begin" demandPopin="true">
+<Text text="{i18n>process.postedBy.col}"/>
+</Column>
+<Column hAlign="End" demandPopin="true">
+<Text text="{i18n>process.postingDate.col}"/>
+</Column>
+<Column hAlign="End" demandPopin="true">
+<Text text="{i18n>process.creationDate.col}"/>
+</Column>
+<Column hAlign="End" demandPopin="true">
+<Text text="{i18n>process.status.col}"/>
+</Column>
+</columns>
+<items>
+<ColumnListItem id="QuantityDetailsCLItem">
+<Text text="{parts : ['viewQuantityReportModel>yieldQuantity/value','viewQuantityReportModel>yieldQuantity/unitOfMeasure/uom'],formatter:'.formatter.showFormattedValueWithUom'}" textAlign="Right"/>
+<Text text="{parts : ['viewQuantityReportModel>scrapQuantity/value','viewQuantityReportModel>scrapQuantity/unitOfMeasure/uom'],formatter:'.formatter.showFormattedValueWithUom'}" textAlign="Right"/>
+<Text text="{viewQuantityReportModel>userId}" textAlign="left"/>
+<Text text="{path : 'viewQuantityReportModel>dateTime',formatter:'.formatter.formatDateTimeFromUTC'}"/>
+<Text text="{path : 'viewQuantityReportModel>createdDateTime',formatter:'.formatter.formatDateTimeFromUTC'}"/>
+<Text text="{path : 'viewQuantityReportModel>qtyConfirmationStatus',formatter:'.formatter.formatConfirmationStatus'}"/>
+</ColumnListItem>
+</items>
+</Table>
+</content>
+<beginButton>
+<Button text="{i18n-global>close}" press=".QuantityConfirmationPostingDialog.onCloseQuantityPostingsDialog"/>
+</beginButton>
+</Dialog>
+</core:FragmentDefinition>

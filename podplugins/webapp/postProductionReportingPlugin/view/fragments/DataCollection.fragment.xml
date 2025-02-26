@@ -1,0 +1,76 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+<Table id="dataCollectionTable" class="sapUiNoMarginTop" items="{dataCollectionModel>/}" autoPopinMode="true" contextualWidth="Auto">
+<headerToolbar>
+<OverflowToolbar>
+<content>
+<Title text="{i18n>dataCollection.header}"/>
+<ToolbarSpacer/>
+<Button id="saveBtnDC" text="{i18n>saveData.btn}" enabled="false" press=".DataCollection.onSaveBtnPress" type="Emphasized"/>
+<Button id="clearBtnDC" text="{i18n>clearData.btn}" press=".DataCollection.onClearBtnPress"/>
+</content>
+</OverflowToolbar>
+</headerToolbar>
+<columns>
+<Column mergeDuplicates="true" mergeFunctionName="data#mergeKey" width="25%" hAlign="Begin">
+<Label text="{i18n>process.DCname.col}" wrapping="true"/>
+</Column>
+<Column hAlign="Center" mergeDuplicates="true" mergeFunctionName="data#mergeKeyAction">
+<Label text="{i18n>process.action.col}"/>
+</Column>
+<Column mergeFunctionName="data#reqKey" hAlign="Begin">
+<Label text="{i18n>process.paraName.col}"/>
+</Column>
+<Column hAlign="Begin">
+<Label text="{i18n>process.value.col}"/>
+</Column>
+<Column hAlign="Begin"> </Column>
+<Column hAlign="Center">
+<Label text="{i18n>process.minimum.col}"/>
+</Column>
+<Column hAlign="Center">
+<Label text="{i18n>process.maximum.col}"/>
+</Column>
+<Column hAlign="Begin">
+<Label text="{i18n>process.operatorNotes.col}"/>
+</Column>
+</columns>
+<items>
+<ColumnListItem>
+<VBox>
+<Label text="{dataCollectionModel>dcGroup} / {dataCollectionModel>version}" design="Bold" wrapping="true" textAlign="Left"/>
+<Label text="{dataCollectionModel>description}" textAlign="Left" wrapping="true"/>
+<customData>
+<core:CustomData key="mergeKey" value="{parts : [ 'dataCollectionModel>dcGroup', 'dataCollectionModel>version', 'dataCollectionModel>description'], formatter: '.formatter.getDCMergeKey'}"/>
+</customData>
+</VBox>
+<Button hAlign="Center" text="{i18n>process.viewPosts.btn}" press=".DataCollection.onViewPostsBtnPress" width="100%" tooltip="{i18n>process.viewPosts.btn}">
+<customData>
+<core:CustomData key="mergeKeyAction" value="{parts : [ 'dataCollectionModel>dcGroup', 'dataCollectionModel>version', 'dataCollectionModel>description'], formatter: '.formatter.getDCMergeKey'}"/>
+<core:CustomData key="dcGroup" value="{dataCollectionModel>dcGroup}"/>
+</customData>
+</Button>
+<VBox>
+<HBox>
+<Label text="{dataCollectionModel>parameterName}" textAlign="Left" wrapping="true"/>
+<Label text="{dataCollectionModel>isRequired}" class="isReq" wrapping="true"/>
+<customData>
+<core:CustomData key="reqKey" value="{parts : [ 'dataCollectionModel>parameterName', 'dataCollectionModel>isRequired' ], formatter: '.formatter.isRequired'}"/>
+</customData>
+</HBox>
+</VBox>
+<VBox>
+<Input value="{dataCollectionModel>value}" liveChange=".DataCollection.onValueLiveChange" visible="{=!${dataCollectionModel>isBoolean}}"/>
+<Select width="100%" change=".DataCollection.onValueLiveChange" visible="{dataCollectionModel>isBoolean}" forceSelection="false" selectedKey="{dataCollectionModel>value}">
+<core:Item key="" text=""/>
+<core:Item key="{dataCollectionModel>trueValueName}" text="{dataCollectionModel>trueValueName}"/>
+<core:Item key="{dataCollectionModel>falseValueName}" text="{dataCollectionModel>falseValueName}"/>
+</Select>
+</VBox>
+<Label text="{=${dataCollectionModel>commercialUnitOfMeasure} ? ${dataCollectionModel>commercialUnitOfMeasure} : ${dataCollectionModel>unitOfMeasure}}" textAlign="Left" wrapping="true"/>
+<Label text="{dataCollectionModel>minValue}" textAlign="Right"/>
+<Label text="{dataCollectionModel>maxValue}" textAlign="Right"/>
+<Input value="{dataCollectionModel>comments}"/>
+</ColumnListItem>
+</items>
+</Table>
+</core:FragmentDefinition>

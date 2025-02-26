@@ -1,0 +1,90 @@
+<mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns:l="sap.ui.layout" xmlns:tnt="sap.tnt"
+    xmlns="sap.uxap" xmlns:m="sap.m" height="100%"
+    controllerName="stellium.ext.podplugins.postProductionReportingPlugin.controller.PluginView">
+    <ObjectPageLayout id="postProductionReportingPageLayout" enableLazyLoading="false" useIconTabBar="true"
+        navigate="onNavigateToSection" showTitleInHeaderContent="true" upperCaseAnchorBar="false"
+        class="sapDmeOrderCardObjectPageLayout" isChildPage="true" showAnchorBarPopover="false"
+        toggleAnchorBar="onTitleSelectorPressed">
+        <headerTitle>
+            <ObjectPageDynamicHeaderTitle>
+                <expandedHeading>
+                    <l:HorizontalLayout>
+                        <m:Title id="expandedTitle"
+                            text="{parts : [ 'orderData>/orderSelectionType', 'orderData>/showMultipleSfcsEnabled', 'orderData>/order', 'orderData>/sfc' ], formatter: '.formatter.formatTitle'}"
+                            wrapping="true" class="sapUiTinyMarginEnd" />
+                        <tnt:InfoLabel id="autoGrFlag" text="{i18n>autoGrEnabled}" colorScheme="9"
+                            visible="{orderData>/erpAutoGRStatus}" />
+                    </l:HorizontalLayout>
+                </expandedHeading>
+                <snappedHeading>
+                    <l:HorizontalLayout>
+                        <m:Title id="snappedTitle"
+                            text="{parts : [ 'orderData>/orderSelectionType', 'orderData>/showMultipleSfcsEnabled', 'orderData>/order', 'orderData>/sfc' ], formatter: '.formatter.formatTitle'}"
+                            wrapping="true" class="sapUiTinyMarginEnd" />
+                        <tnt:InfoLabel id="autoGrFlagSnapped" text="{i18n>autoGrEnabled}" colorScheme="9"
+                            visible="{orderData>/erpAutoGRStatus}" />
+                    </l:HorizontalLayout>
+                </snappedHeading>
+                <expandedContent>
+                    <m:Text id="expandedMaterialNumber" text="{orderData>/material/material}" />
+                </expandedContent>
+                <snappedContent>
+                    <m:Text id="snappedMaterialNumber" text="{orderData>/material/material}" />
+                </snappedContent>
+            </ObjectPageDynamicHeaderTitle>
+        </headerTitle>
+        <headerContent>
+            <m:FlexBox wrap="Wrap" fitContainer="true">
+                <l:VerticalLayout class="sapUiLargeMarginBeginEnd">
+                    <m:ObjectStatus id="orderHeaderMatDescLbl" title="{i18n>materialDescription}" />
+                    <m:ObjectStatus id="orderHeaderMatDescTxt" text="{orderData>/material/description}" />
+                </l:VerticalLayout>
+                <l:VerticalLayout class="sapUiLargeMarginEnd">
+                    <m:ObjectStatus id="orderHeaderPlannedBatchLbl" title="{i18n>plannedBatch}" />
+                    <m:ObjectStatus id="orderHeaderPlannedBatchTxt" text="{orderData>/orderBatchId}" />
+                </l:VerticalLayout>
+                <l:VerticalLayout class="sapUiLargeMarginEnd">
+                    <m:ObjectStatus id="orderHeaderPlannedDateLbl" title="{i18n>plannedDate}" />
+                    <m:ObjectStatus id="orderHeaderPlannedDateTxt"
+                        text="{parts : [ 'orderData>/plannedStartDate', 'orderData>/plannedCompletionDate' ], formatter: '.formatter.formatDate'}" />
+                </l:VerticalLayout>
+                <l:VerticalLayout class="sapUiLargeMarginEnd">
+                    <m:ObjectStatus id="orderHeaderStatusLbl" title="{i18n>orderStatus}" />
+                    <m:ObjectStatus id="orderHeaderStatusTxt"
+                        text="{parts: ['orderData>/orderExecutionStatus'], formatter: '.formatter.getOrderStatus'}" />
+                </l:VerticalLayout>
+                <l:VerticalLayout id="headerTextContainer" class="sapUiLargeMarginEnd" width="19rem"
+                    visible="{=${orderData>/headerText}!==undefined &amp;&amp; ${orderData>/headerText}!==null &amp;&amp; ${orderData>/headerText}!==''}">
+                    <m:ObjectStatus title="{i18n>orderCard.orderHeader}" />
+                    <m:ExpandableText id="headerText" text="{orderData>/headerText}" renderWhitespace="true"
+                        overflowMode="Popover" class="sapUiSmallMarginBottom" />
+                </l:VerticalLayout>
+                <l:VerticalLayout class="sapUiLargeMarginEnd" visible="{=${orderData>/showMultipleSfcsEnabled}!==true}">
+                    <m:ObjectStatus id="orderHeaderGRQuantityLbl" title="{i18n>GRquantity}" />
+                    <m:ProgressIndicator id="GRQuantity" class="margin"
+                        percentValue="{parts : [ 'orderData>/plannedQty', 'orderData>/completedQty','orderData>/plannedQtyInProductionUom', 'orderData>/completedQtyInProductionUom', 'orderData>/productionCommercialUom' ], formatter: '.formatter.getPercentValue'}"
+                        displayValue="{parts : [ 'orderData>/plannedQty', 'orderData>/completedQty', 'orderData>/plannedQtyInProductionUom', 'orderData>/completedQtyInProductionUom', 'orderData>/baseCommercialUom', 'orderData>/productionCommercialUom'], formatter: '.formatter.getDisplayValue'}"
+                        tooltip="{parts : [ 'orderData>/plannedQty', 'orderData>/completedQty', 'orderData>/plannedQtyInProductionUom', 'orderData>/completedQtyInProductionUom', 'orderData>/baseCommercialUom', 'orderData>/productionCommercialUom' ], formatter: '.formatter.getDisplayValue'}"
+                        showValue="true"
+                        state="{parts : [ 'orderData>/completedQty', 'orderData>/plannedQty' ], formatter: '.formatter.getOrderQtyColorCode'}" />
+                </l:VerticalLayout>
+                <l:VerticalLayout class="sapUiLargeMarginBeginEnd" visible="{orderData>/showMultipleSfcsEnabled}">
+                    <m:ObjectStatus id="orderHeaderSFCQuantityLbl"
+                        title="{=${orderData>/orderSelectionType} === 'PROCESS' ? ${i18n>ChargeQuantity} : ${i18n>SFCquantity} }" />
+                    <m:ProgressIndicator id="SFCquantity" class="margin"
+                        percentValue="{parts : [ 'orderData>/sfcPlannedQty', 'orderData>/sfcCompletedQty', 'orderData>/sfcPlannedQtyInProductionUom', 'orderData>/sfcCompletedQtyInProductionUom' ], formatter: '.formatter.getPercentValue'}"
+                        displayValue="{parts : [ 'orderData>/sfcPlannedQty', 'orderData>/sfcCompletedQty', 'orderData>/sfcPlannedQtyInProductionUom', 'orderData>/sfcCompletedQtyInProductionUom', 'orderData>/baseCommercialUom', 'orderData>/productionCommercialUom' ], formatter: '.formatter.getDisplayValue'}"
+                        tooltip="{parts : [ 'orderData>/sfcPlannedQty', 'orderData>/sfcCompletedQty', 'orderData>/sfcPlannedQtyInProductionUom', 'orderData>/sfcCompletedQtyInProductionUom', 'orderData>/baseCommercialUom', 'orderData>/productionCommercialUom' ], formatter: '.formatter.getDisplayValue'}"
+                        showValue="true"
+                        state="{parts : [ 'orderData>/completedQty', 'orderData>/plannedQty' ], formatter: '.formatter.getOrderQtyColorCode'}" />
+                </l:VerticalLayout>
+                <l:VerticalLayout class="sapUiLargeMarginBegin" visible="{orderData>/showMultipleSfcsEnabled}">
+                    <m:ObjectStatus id="sfcDefaultBatchLbl"
+                        title="{= ${orderData>/orderSelectionType} === 'PROCESS' ? ${i18n>ChargeDefaultBatch} : ${i18n>SFCDefaultBatch}}" />
+                    <m:ObjectStatus id="sfcDefaultBatchTxt" class="sapMObjectStatusLarge" state="None"
+                        text="{orderData>/sfcBatchId}" />
+                </l:VerticalLayout>
+            </m:FlexBox>
+        </headerContent>
+    </ObjectPageLayout>
+</mvc:View>

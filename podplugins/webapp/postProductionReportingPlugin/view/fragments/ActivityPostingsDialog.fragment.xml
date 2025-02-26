@@ -1,0 +1,39 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+<Dialog id="ActivityPostingsDialog" title="{i18n>materialComponentsPostingDialog.header}" class="sapUiContentPadding">
+<content>
+<Table id="ActivityDetailsTable" inset="false" items="{ path: 'viewActivityReportModel>/activityDetails', sorter: { path: 'dateTime', descending: true } }">
+<columns>
+<Column hAlign="Center">
+<Text id="ActivityTextColumn" text=""/>
+</Column>
+<Column hAlign="Begin" demandPopin="true">
+<Text text="{i18n>process.postedBy.col}"/>
+</Column>
+<Column hAlign="End" demandPopin="true">
+<Text text="{i18n>process.postingDate.col}"/>
+</Column>
+<Column hAlign="End" demandPopin="true">
+<Text text="{i18n>process.creationDate.col}"/>
+</Column>
+<Column hAlign="Begin" demandPopin="true">
+<Text text="{i18n-status>common.status.lbl}"/>
+</Column>
+</columns>
+<items>
+<ColumnListItem id="actConfirmationPostingDetailsCLItem">
+<cells>
+<Text text="{parts : ['viewActivityReportModel>reportedQuantity/value','viewActivityReportModel>reportedQuantity/unitOfMeasure/uom'],formatter:'.formatter.showValue'}" textAlign="Right"/>
+<Text text="{viewActivityReportModel>postedBy}" textAlign="Left"/>
+<Text text="{path : 'viewActivityReportModel>postingDate',formatter:'.formatter.getDateTimeInPlantTimeZone'}"/>
+<Text text="{path : 'viewActivityReportModel>creationDate',formatter:'.formatter.getDateTimeInPlantTimeZone'}"/>
+<Text text="{path : 'viewActivityReportModel>status',formatter:'.formatter.formatActivityConfirmationStatus'}"/>
+</cells>
+</ColumnListItem>
+</items>
+</Table>
+</content>
+<beginButton>
+<Button text="{i18n-global>close}" press=".ActivityPostingsDialog.onCloseActivityPostingsDialog"/>
+</beginButton>
+</Dialog>
+</core:FragmentDefinition>

@@ -1,0 +1,34 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core">
+<TableSelectDialog id="storageLocationDialog" title="{i18n>storageLocationDialog.header}" contentWidth="50%" resizable="true" liveChange=".StorageLocationDialog.onSeachStorageLocationListLive" search=".StorageLocationDialog.onSeachStorageLocationList" confirm=".StorageLocationDialog.onSelectStorageLocation" items="{storageLocationModel>/}">
+<columns>
+<Column hAlign="Left" vAlign="Middle" visible="{invManagedModel>/isInventoryManaged}">
+<Text text="{i18n>process.inventoryId.col}"/>
+</Column>
+<Column hAlign="Left" vAlign="Middle">
+<Text text="{i18n>process.storLoc.col}"/>
+</Column>
+<Column hAlign="Right" vAlign="Middle" visible="{invManagedModel>/showQuantity}" class="sapUiLargeMarginEnd">
+<Text text="{i18n>process.quantity.col}"/>
+</Column>
+</columns>
+<items>
+<ColumnListItem>
+<cells>
+<Text class="boldText" text="{storageLocationModel>inventoryId}"/>
+<Text text="{storageLocationModel>storageLocation/storageLocation}"/>
+<l:VerticalLayout>
+<l:content>
+<Button visible="{parts: ['storageLocationModel>remainingQuantity', 'invManagedModel>/isInventoryManaged'], formatter:'.formatter.showUpdateBtnStorLoc'}" text="{i18n>update.btn}" width="100%" press=".StorageLocationDialog.onGetStockForStorageLoc"/>
+<l:HorizontalLayout>
+<l:content>
+<Text text="{parts : ['storageLocationModel>remainingQuantity', 'storageLocationModel>unitOfMeasure/uom'], formatter:'.formatter.showFormattedValueWithUom'}" visible="{parts: ['storageLocationModel>remainingQuantity', 'invManagedModel>/isInventoryManaged'], formatter:'.formatter.showQtyStorLoc'}" class="sapUiTinyMarginTop"/>
+<Button icon="sap-icon://refresh" type="Transparent" press=".StorageLocationDialog.onGetStockForStorageLoc" visible="{parts: ['storageLocationModel>remainingQuantity', 'invManagedModel>/isInventoryManaged'], formatter:'.formatter.showRefreshBtnStorLoc'}" class="sapUiTinyMarginBegin"/>
+</l:content>
+</l:HorizontalLayout>
+</l:content>
+</l:VerticalLayout>
+</cells>
+</ColumnListItem>
+</items>
+</TableSelectDialog>
+</core:FragmentDefinition>

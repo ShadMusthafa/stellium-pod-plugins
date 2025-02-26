@@ -1,0 +1,70 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
+<Table id="quantityConfirmationTable" class="sapUiNoMarginTop" items="{quantityModel>/quantSummary}" autoPopinMode="true" contextualWidth="Auto">
+<headerToolbar>
+<OverflowToolbar>
+<content>
+<Title text="{i18n>quantityConfirmationTable.header}"/>
+<ToolbarSpacer/>
+<Button id="saveBtnQuantity" text="{i18n>saveData.btn}" enabled="false" press=".QuantityConfirmation.onSaveBtnPress" type="Emphasized"/>
+<Button id="clearBtnQuantity" text="{i18n>clearData.btn}" press=".QuantityConfirmation.onClearBtnPress"/>
+<ToolbarSeparator/>
+<Button id="finalConfBtn" press=".QuantityConfirmation.onFinalConfBtnPress" text="{i18n>finalConf.btn}" tooltip="{i18n>finalConf.btn}" visible="{= ${configuration>/allowFinalConfirmation} === true}"/>
+<Button id="calculateBtn" press=".QuantityConfirmation.onCalculateBtnPress" text="{i18n>calculate.btn}" tooltip="{i18n>calculate.btn}" enabled="{= ${configuration>/calculateGI} === true}"/>
+</content>
+</OverflowToolbar>
+</headerToolbar>
+<columns>
+<Column mergeDuplicates="true">
+<Label text="{i18n>process.quantityType.col}"/>
+</Column>
+<Column hAlign="Begin">
+<Label text="{i18n>process.postedValue.col}"/>
+</Column>
+<Column visible="{quantityModel>/erpAutoGr}">
+<Label text="{i18n>process.batchId.col}"/>
+</Column>
+<Column visible="{quantityModel>/erpAutoGr}">
+<Label text="{i18n>process.storLoc.col}"/>
+</Column>
+<Column hAlign="Center">
+<Label text="{i18n>process.action.col}"/>
+</Column>
+<Column hAlign="Begin" demandPopin="true">
+<Label text="{i18n>process.quantity.col}"/>
+</Column>
+<Column demandPopin="true">
+<Label text="{i18n>process.unit.col}"/>
+</Column>
+<Column demandPopin="true">
+<Label text="{i18n>process.postingDateTime.col}"/>
+</Column>
+<Column demandPopin="true">
+<Label text="{i18n>process.postedBy.col}"/>
+</Column>
+<Column demandPopin="true" visible="{=${configuration>/customField1} ? true : false}">
+<Label text="{configuration>/customField1}"/>
+</Column>
+<Column width="8%"> </Column>
+</columns>
+<items>
+<ColumnListItem highlight="{quantityModel>rowStatus}">
+<Label text="{quantityModel>quantityText}" design="Bold" wrapping="true"/>
+<Label visible="{quantityModel>actionBtnVisible}" text="{parts : ['quantityModel>quantity','quantityModel>unitOfMeasure/uom'],formatter:'.formatter.showFormattedValueWithUom'}" textAlign="Right"/>
+<Input visible="{quantityModel>batchIn}" value="{quantityModel>batchNumber}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest=".QuantityConfirmation.showBatchDialog"/>
+<Input visible="{quantityModel>storLocIn}" value="{quantityModel>storageLocation}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest=".QuantityConfirmation.showStorageLocDialog" enabled="true"/>
+<Button hAlign="Center" text="{i18n>process.viewPosts.btn}" visible="{quantityModel>actionBtnVisible}" width="100%" tooltip="{i18n>process.viewPosts.btn}" press=".QuantityConfirmation.onViewPostsBtnPress"/>
+<Input value="{parts:[{path:'quantityModel>value'},{path:'quantityModel>selectedUoM'}], type:'.types.quantity'}" textAlign="Left" change=".QuantityConfirmation.onValueChange"/>
+<Select width="100%" forceSelection="false" change=".QuantityConfirmation.handleSelectChange" selectedKey="{quantityModel>selectedUoM}" items="{path:'quantityModel>/unitList', templateShareable:false}">
+<core:Item key="{quantityModel>uom}" text="{quantityModel>uom} - {quantityModel>shortText}"/>
+</Select>
+<DateTimePicker value="{path : 'quantityModel>postingDateTime', formatter:'.formatter.formatDateTime'}" initialFocusedDateValue="{quantityModel>focusedDateTime}" valueFormat="yyyy-MM-dd HH:mm:ss" formatter=".formatter.formatDateTime" change=".QuantityConfirmation.handleChangeDateTime"/>
+<Input value="{quantityModel>postedBy}" enabled="false"/>
+<Input value="{quantityModel>customFieldValue}" visible="{=${configuration>/customField1} ? true : false}" liveChange=".QuantityConfirmation.onCustomFieldLiveChange"/>
+<HBox>
+<Button icon="sap-icon://sys-add" type="Transparent" tooltip="{i18n-global>common.add.btn}" press=".QuantityConfirmation.onPressAdd" class="sapUiTinyMarginRight" enabled="{parts: [ { path: 'configuration>/sequence' }, { value: 'QuantityConfirmation' } ], formatter:'.formatter.addButtonVisible'}"/>
+<Button icon="sap-icon://sys-minus" type="Transparent" tooltip="{i18n-global>common.delete.btn}" press=".QuantityConfirmation.onPressRemove" enabled="{quantityModel>removeEnabled}"/>
+</HBox>
+</ColumnListItem>
+</items>
+</Table>
+</core:FragmentDefinition>

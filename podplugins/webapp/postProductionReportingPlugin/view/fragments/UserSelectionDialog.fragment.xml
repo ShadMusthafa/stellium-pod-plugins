@@ -1,0 +1,36 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+<Dialog id="userSelectionDialog" title="{i18n>userSelectionDialog.header}" contentWidth="60%" resizable="true">
+<subHeader>
+<Toolbar>
+<SearchField id="userSearch" liveChange=".UserSelectionDialog.onSearchUserList" width="100%"/>
+</Toolbar>
+</subHeader>
+<content>
+<Table id="userListTable" items="{userModel>/}" visible="true" class="tableContent" popinLayout="GridLarge" mode="SingleSelectMaster" selectionChange=".UserSelectionDialog.onSelectUser">
+<columns>
+<Column hAlign="Left" vAlign="Middle" width="40%">
+<Text text="{i18n>process.user.col}"/>
+</Column>
+<Column hAlign="Left" vAlign="Middle" width="30%">
+<Text text="{i18n>process.firstname.col}"/>
+</Column>
+<Column hAlign="Left" vAlign="Middle" width="30%">
+<Text text="{i18n>process.lastname.col}"/>
+</Column>
+</columns>
+<items>
+<ColumnListItem>
+<cells>
+<Text class="boldText" text="{userModel>userId}"/>
+<Text text="{userModel>givenName}"/>
+<Text text="{userModel>familyName}"/>
+</cells>
+</ColumnListItem>
+</items>
+</Table>
+</content>
+<beginButton>
+<Button text="{i18n-global>close}" press=".UserSelectionDialog.onCloseUserSelectionDialog"/>
+</beginButton>
+</Dialog>
+</core:FragmentDefinition>

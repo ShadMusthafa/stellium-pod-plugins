@@ -1,0 +1,11 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:fb="sap.ui.comp.filterbar" xmlns:core="sap.ui.core">
+<Dialog id="batchDialog" title="" contentWidth="60%" contentHeight="60%" draggable="true" resizable="false">
+<content>
+<!-- <SearchField id="batchSearch" liveChange="onSearchBatchList" width="100%" /> -->
+<fb:FilterBar id="filterBar" advancedMode="true" search="onGoAdvSearch"> </fb:FilterBar>
+</content>
+<beginButton>
+<Button text="{i18n>cancel}" press="onCloseBatchDialog"/>
+</beginButton>
+</Dialog>
+</core:FragmentDefinition>
