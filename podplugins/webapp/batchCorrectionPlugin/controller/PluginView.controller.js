@@ -555,6 +555,8 @@ sap.ui.define(
 
             // await this._postTecoToS4();
             // Log.info("Posted Teco to S4");
+
+            this.navigateToPage('MainPage');
           } catch (sError) {
             MessageBox.error(sError);
           }
