@@ -473,7 +473,7 @@ sap.ui.define([
                   }
               }
               if (!updateFlag) {
-                  that.createGrSection();
+                //   that.createGrSection();
                   that._bHeaderExpanded = true;
                   that.changeBackgroundColorAccordingToTheme();
               } else {
@@ -652,7 +652,7 @@ sap.ui.define([
       resetState: function () {
           Fragment.byId("ReportInfoDialog", "inputCmnPostDateTime").setValueState("None");
           Fragment.byId("ReportInfoDialog", "inputCmnPostDateTime").setValueStateText("");
-          Fragment.byId("ReportInfoDialog", "saveReportInfo").setEnabled(true);
+        //   Fragment.byId("ReportInfoDialog", "saveReportInfo").setEnabled(true);
       },
 
       showUserDialogRI: function () {
