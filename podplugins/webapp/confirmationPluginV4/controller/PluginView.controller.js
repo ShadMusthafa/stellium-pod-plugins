@@ -1598,6 +1598,18 @@ sap.ui.define(
               oView.addDependent(oDialog);
               var oActivity = this.byId('activity');
               var activityConfirmationPluginOverviewModel = new JSONModel();
+
+              var aItems = this.activityConfirmationPluginList.activitySummary;
+              this.activityConfirmationPluginList.activitySummary = aItems.map(oItem => {
+                return {
+                  ...oItem,
+                  reportedQty: {
+                    value: null,
+                    unitOfMeasure: oItem.targetQuantity.unitOfMeasure
+                  }
+                };
+              });
+
               activityConfirmationPluginOverviewModel.setData(this.activityConfirmationPluginList);
               oActivity.setModel(activityConfirmationPluginOverviewModel);
               var oUOM = this.byId('uom');
@@ -1632,6 +1644,18 @@ sap.ui.define(
         } else {
           var oActivity = this.byId('activity');
           var activityConfirmationPluginOverviewModel = new JSONModel();
+
+          var aItems = this.activityConfirmationPluginList.activitySummary;
+          this.activityConfirmationPluginList.activitySummary = aItems.map(oItem => {
+            return {
+              ...oItem,
+              reportedQty: {
+                value: null,
+                unitOfMeasure: oItem.targetQuantity.unitOfMeasure
+              }
+            };
+          });
+
           activityConfirmationPluginOverviewModel.setData(this.activityConfirmationPluginList);
           oActivity.setModel(activityConfirmationPluginOverviewModel);
           var oUOM = this.byId('uom');

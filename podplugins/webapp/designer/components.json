@@ -7,7 +7,7 @@
       "name": "stellium.ext.podplugins.confirmationPlugin",
       "propertyEditor": "stellium.ext.podplugins.confirmationPlugin.builder.PropertyEditor",
       "i18n": "stellium.ext.podplugins.confirmationPlugin.i18n.i18n",
-      "productionProcessEnabled": false,
+      "productionProcessEnabled": true,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
@@ -17,7 +17,7 @@
       "name": "stellium.ext.podplugins.packingPlugin",
       "propertyEditor": "stellium.ext.podplugins.packingPlugin.builder.PropertyEditor",
       "i18n": "stellium.ext.podplugins.packingPlugin.i18n.i18n",
-      "productionProcessEnabled": false,
+      "productionProcessEnabled": true,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
@@ -27,7 +27,7 @@
       "name": "stellium.ext.podplugins.manageCancellationPlugin",
       "propertyEditor": "stellium.ext.podplugins.manageCancellationPlugin.builder.PropertyEditor",
       "i18n": "stellium.ext.podplugins.manageCancellationPlugin.i18n.i18n",
-      "productionProcessEnabled": false,
+      "productionProcessEnabled": true,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
@@ -37,7 +37,7 @@
       "name": "stellium.ext.podplugins.materialConsumptionPlugin",
       "propertyEditor": "stellium.ext.podplugins.materialConsumptionPlugin.builder.PropertyEditor",
       "i18n": "stellium.ext.podplugins.materialConsumptionPlugin.i18n.i18n",
-      "productionProcessEnabled": false,
+      "productionProcessEnabled": true,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
@@ -47,7 +47,7 @@
       "name": "stellium.ext.podplugins.massOperatorAssignmentPlugin",
       "propertyEditor": "stellium.ext.podplugins.massOperatorAssignmentPlugin.builder.PropertyEditor",
       "i18n": "stellium.ext.podplugins.massOperatorAssignmentPlugin.i18n.i18n",
-      "productionProcessEnabled": false,
+      "productionProcessEnabled": true,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
@@ -57,7 +57,7 @@
       "name": "stellium.ext.podplugins.batchCorrectionPlugin",
       "propertyEditor": "stellium.ext.podplugins.batchCorrectionPlugin.builder.PropertyEditor",
       "i18n": "stellium.ext.podplugins.batchCorrectionPlugin.i18n.i18n",
-      "productionProcessEnabled": false,
+      "productionProcessEnabled": true,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
@@ -67,7 +67,7 @@
       "name": "stellium.ext.podplugins.confirmationPluginV4",
       "propertyEditor": "stellium.ext.podplugins.confirmationPluginV4.builder.PropertyEditor",
       "i18n": "stellium.ext.podplugins.confirmationPluginV4.i18n.i18n",
-      "productionProcessEnabled": false,
+      "productionProcessEnabled": true,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
@@ -77,7 +77,7 @@
       "name": "stellium.ext.podplugins.managePackingCancellationPlugin",
       "propertyEditor": "stellium.ext.podplugins.managePackingCancellationPlugin.builder.PropertyEditor",
       "i18n": "stellium.ext.podplugins.managePackingCancellationPlugin.i18n.i18n",
-      "productionProcessEnabled": false,
+      "productionProcessEnabled": true,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
@@ -87,7 +87,7 @@
       "name": "stellium.ext.podplugins.realTimeChartPlugin",
       "propertyEditor": "stellium.ext.podplugins.realTimeChartPlugin.builder.PropertyEditor",
       "i18n": "stellium.ext.podplugins.realTimeChartPlugin.i18n.i18n",
-      "productionProcessEnabled": false,
+      "productionProcessEnabled": true,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
@@ -97,7 +97,7 @@
       "name": "stellium.ext.podplugins.realTimeChartHeaderPlugin",
       "propertyEditor": "stellium.ext.podplugins.realTimeChartHeaderPlugin.builder.PropertyEditor",
       "i18n": "stellium.ext.podplugins.realTimeChartHeaderPlugin.i18n.i18n",
-      "productionProcessEnabled": false,
+      "productionProcessEnabled": true,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
@@ -107,7 +107,7 @@
       "name": "stellium.ext.podplugins.materialConsumptionPluginV2",
       "propertyEditor": "stellium.ext.podplugins.materialConsumptionPluginV2.builder.PropertyEditor",
       "i18n": "stellium.ext.podplugins.materialConsumptionPluginV2.i18n.i18n",
-      "productionProcessEnabled": false,
+      "productionProcessEnabled": true,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
@@ -117,7 +117,7 @@
       "name": "stellium.ext.podplugins.postProductionReportingPlugin",
       "propertyEditor": "stellium.ext.podplugins.postProductionReportingPlugin.builder.PropertyEditor",
       "i18n": "stellium.ext.podplugins.postProductionReportingPlugin.i18n.i18n",
-      "productionProcessEnabled": false,
+      "productionProcessEnabled": true,
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     }
   ],
