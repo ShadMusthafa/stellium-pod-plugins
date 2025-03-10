@@ -1956,6 +1956,14 @@ sap.ui.define(
           return;
         }
 
+        var oNC = await this._hasNonConformances();
+        if (oNC.count > 0) {
+          MessageBox.error(this.getI18nText('closeNonConformanceErrMsg'), {
+            details: oNC.formattedText
+          });
+          return;
+        }
+
         this.scannedHU = null;
         this.scannedHuItem = null;
 
@@ -3519,6 +3527,14 @@ sap.ui.define(
           return;
         }
 
+        var oNC = await this._hasNonConformances();
+        if (oNC.count > 0) {
+          MessageBox.error(this.getI18nText('closeNonConformanceErrMsg'), {
+            details: oNC.formattedText
+          });
+          return;
+        }
+
         if (sWorkcenter !== undefined) {
           if (!oWeighweighRelevantFlag) {
             this.openAddDialog();
@@ -3593,6 +3609,14 @@ sap.ui.define(
 
         if (!await this._validateResourceStatus(this.selectedDataInList.resource.resource)) {
           MessageBox.error(this.getI18nText('resourceStatusInvalid'));
+          return;
+        }
+
+        var oNC = await this._hasNonConformances();
+        if (oNC.count > 0) {
+          MessageBox.error(this.getI18nText('closeNonConformanceErrMsg'), {
+            details: oNC.formattedText
+          });
           return;
         }
 
@@ -4892,6 +4916,14 @@ sap.ui.define(
           return;
         }
 
+        var oNC = await this._hasNonConformances();
+        if (oNC.count > 0) {
+          MessageBox.error(this.getI18nText('closeNonConformanceErrMsg'), {
+            details: oNC.formattedText
+          });
+          return;
+        }
+
         this.scannedHU = null;
         this.scannedHuItem = null;
 
@@ -5632,7 +5664,8 @@ sap.ui.define(
         if (!aLineItems || aLineItems.length < 1) return;
 
         var aParkedItems = [],
-          bBatchCorrectionFlag = false;
+          bBatchCorrectionFlag = false,
+          oBatchCorrectionItem;
 
         for (var i = 0; i < aLineItems.length; i++) {
           //If there is no consumed qty or if consumed qty is 0 then continue
@@ -5656,13 +5689,17 @@ sap.ui.define(
           var upperThreshold = aLineItems[i].upperThresholdValue || 0;
           if (aLineItems[i].consumedQuantity.value > upperThreshold) {
             bBatchCorrectionFlag = true;
+            oBatchCorrectionItem = aLineItems[i];
             break;
           }
         }
 
         if (bBatchCorrectionFlag) {
           var sErrorMessage = this.getI18nText('batchCorrectionRequiredErrorMessage', [sShopOrder]);
-          this._setSfcHoldStatus();
+          if (this.getPodSelectionModel().selectedOrderData.sfcStatus !== 'Hold') {
+            this._raiseAlert(oBatchCorrectionItem);
+            this._setSfcHoldStatus();
+          }
           MessageBox.error(sErrorMessage, {
             onClose: function() {
               window.history.go(-1);
@@ -5689,6 +5726,22 @@ sap.ui.define(
         };
 
         this.ajaxPostRequest(sUrl, oRequestBody);
+      },
+
+      _raiseAlert: function(oItem) {
+        //DJN_ALERT_BATCH_CORECTION - DJN_ALERT
+        var sUrl =
+          this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_e59863c1-35d9-46df-b7c6-47a09dd80790';
+        var oPayload = {
+          plant: this.getPodController().getUserPlant(),
+          order: this.selectedDataInList.selectedShopOrder,
+          sfc: this.selectedDataInList.selectedSfc,
+          workcenter: this.selectedDataInList.workCenter.workcenter,
+          operation: this.selectedDataInList.operation.operation,
+          material: oItem.materialId.material,
+          resource: this.selectedDataInList.resource.resource
+        };
+        this.ajaxPostRequest(sUrl, oPayload);
       },
 
       /**
@@ -5858,6 +5911,52 @@ sap.ui.define(
         };
 
         return new Promise((resolve, reject) => this.ajaxGetRequest(sUrl, oParamters, resolve, reject));
+      },
+
+      _getNonconformances: function() {
+        var sUrl = this.getPublicApiRestDataSourceUri() + 'nonconformance/v1/nonconformances';
+        var oParams = {
+          plant: this.getPodController().getUserPlant(),
+          sfc: this.getPodSelectionModel().selectedOrderData.sfc
+        };
+        return new Promise((resolve, reject) => this.ajaxGetRequest(sUrl, oParams, resolve, reject));
+      },
+
+      _hasNonConformances: async function() {
+        var aNonconformances = await this._getNonconformances().catch(oError => {
+          console.error(oError);
+        });
+
+        //If the array is empty, there are no NCs logged
+        if (aNonconformances && aNonconformances.length === 0)
+          return {
+            count: 0,
+            items: [],
+            formattedText: ''
+          };
+
+        //Filter the response. If there are NC in OPEN state, return true
+        var aOpenNC = aNonconformances.filter(oNC => oNC.state === 'OPEN');
+        if (aOpenNC && aOpenNC.length > 0) {
+          var sFormattedText =
+            '<p><strong>Open Nonconformance:</strong></p>' +
+            '<ul>' +
+            aOpenNC.map(oNC => `<li>${oNC.incidentNumber.incidentNumber} - ${oNC.code.code} - ${oNC.code.description}</li>`).join('') +
+            '</ul>';
+
+          return {
+            count: aOpenNC.length,
+            items: aOpenNC,
+            formattedText: sFormattedText
+          };
+        }
+
+        //Default return
+        return {
+          count: 0,
+          items: [],
+          formattedText: ''
+        };
       }
     });
   }

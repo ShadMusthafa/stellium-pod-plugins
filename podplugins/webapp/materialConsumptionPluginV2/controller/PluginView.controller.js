@@ -5664,7 +5664,8 @@ sap.ui.define(
         if (!aLineItems || aLineItems.length < 1) return;
 
         var aParkedItems = [],
-          bBatchCorrectionFlag = false;
+          bBatchCorrectionFlag = false,
+          oBatchCorrectionItem;
 
         for (var i = 0; i < aLineItems.length; i++) {
           //If there is no consumed qty or if consumed qty is 0 then continue
@@ -5688,12 +5689,14 @@ sap.ui.define(
           var upperThreshold = aLineItems[i].upperThresholdValue || 0;
           if (aLineItems[i].consumedQuantity.value > upperThreshold) {
             bBatchCorrectionFlag = true;
+            oBatchCorrectionItem = aLineItems[i];
             break;
           }
         }
 
         if (bBatchCorrectionFlag) {
           var sErrorMessage = this.getI18nText('batchCorrectionRequiredErrorMessage', [sShopOrder]);
+          this._raiseAlert(oBatchCorrectionItem);
           this._setSfcHoldStatus();
           MessageBox.error(sErrorMessage, {
             onClose: function() {
@@ -5721,6 +5724,22 @@ sap.ui.define(
         };
 
         this.ajaxPostRequest(sUrl, oRequestBody);
+      },
+
+      _raiseAlert: function(oItem) {
+        //DJN_ALERT_BATCH_CORECTION - DJN_ALERT
+        var sUrl =
+          this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_e59863c1-35d9-46df-b7c6-47a09dd80790';
+        var oPayload = {
+          plant: this.getPodController().getUserPlant(),
+          order: this.selectedDataInList.selectedShopOrder,
+          sfc: this.selectedDataInList.selectedSfc,
+          workcenter: this.selectedDataInList.workCenter.workcenter,
+          operation: this.selectedDataInList.operation.operation,
+          material: oItem.materialId.material,
+          resource: this.selectedDataInList.resource.resource
+        };
+        this.ajaxPostRequest(sUrl, oPayload);
       },
 
       /**
