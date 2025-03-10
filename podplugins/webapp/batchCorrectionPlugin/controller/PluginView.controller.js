@@ -489,6 +489,7 @@ sap.ui.define(
           //   .map(oItem => this._getGoodsIssueItemsForMaterial(oItem));
 
           try {
+            this.getView().setBusy(true);
             // var aGiLineItems = await Promise.all(aGiLineItemPromise).catch(oError => {
             //   Log.error('Could not load GI items information');
             //   // throw new Error('Could not load GI items information');
@@ -532,7 +533,7 @@ sap.ui.define(
             //   return;
             // });
 
-            //TODO: Get list of open SFCs for order and scrap all SFCs
+            // TODO: Get list of open SFCs for order and scrap all SFCs
             // var aSfcs = await this._getOrderDetails().then((oOrderDetails)=>oOrderDetails.sfcs);
             // var aSfcScrapPromises = aSfcs.map(sSFC=>this._postSfcScrap(sSFC))
 
@@ -559,6 +560,8 @@ sap.ui.define(
             this.navigateToPage('MainPage');
           } catch (sError) {
             MessageBox.error(sError);
+          } finally{
+            this.getView().setBusy(false);
           }
         },
 
