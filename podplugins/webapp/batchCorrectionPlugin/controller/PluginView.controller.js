@@ -445,6 +445,7 @@ sap.ui.define(
                 if (sAction !== MessageBox.Action.OK) return;
                 // this._postSfcScrap();
                 this.rejectBatchCorrection();
+                this._showRejectionMessageBox();
               }.bind(this),
             }
           );
@@ -489,7 +490,7 @@ sap.ui.define(
           //   .map(oItem => this._getGoodsIssueItemsForMaterial(oItem));
 
           try {
-            this.getView().setBusy(true);
+            // this.getView().setBusy(true);
             // var aGiLineItems = await Promise.all(aGiLineItemPromise).catch(oError => {
             //   Log.error('Could not load GI items information');
             //   // throw new Error('Could not load GI items information');
@@ -557,11 +558,11 @@ sap.ui.define(
             // await this._postTecoToS4();
             // Log.info("Posted Teco to S4");
 
-            this.navigateToPage('MainPage');
+            // this.navigateToPage('MainPage');
           } catch (sError) {
             MessageBox.error(sError);
           } finally{
-            this.getView().setBusy(false);
+            // this.getView().setBusy(false);
           }
         },
 
@@ -903,6 +904,14 @@ sap.ui.define(
             this.ajaxPostRequest(sUrl, { Body: aPayload }, resolve, reject);
           });
         },
+
+        _showRejectionMessageBox:function(){
+          MessageBox.information('Formulation batch rejection is being processed',{
+            onClose:function(sAction){
+              this.navigateToPage('MainPage');
+            }.bind(this)
+          })
+        }
       }
     );
 
