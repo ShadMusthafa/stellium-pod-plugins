@@ -1,0 +1,21 @@
+<core:FragmentDefinition 
+    xmlns="sap.m" 
+    xmlns:l="sap.ui.layout" 
+    xmlns:f="sap.ui.layout.form" 
+    xmlns:core="sap.ui.core">
+    <Dialog id="reportActivityDialog" title="{i18n>ReportActivity}" resizable="true">
+        <f:SimpleForm id="reportActivityForm" editable="true" layout="ResponsiveGridLayout" labelSpanXL="3"
+            labelSpanL="3" labelSpanM="3" labelSpanS="3" adjustLabelSpan="true" emptySpanXL="0" emptySpanL="0"
+            emptySpanM="0" emptySpanS="0" columnsXL="1" columnsL="1" columnsM="1" columnsS="1"
+            singleContainerFullSize="false" width="100%">
+            <f:content id="reportActivityFormContent"> </f:content>
+        </f:SimpleForm>
+        <beginButton>
+            <Button id="activityConfirmBtn" text="{i18n>Confirm}" type="Emphasized" press="onPressConfirmActivityDialog"
+                enabled="false" />
+        </beginButton>
+        <endButton>
+            <Button text="{i18n>Cancel}" press="onCloseReportActivityDialog" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

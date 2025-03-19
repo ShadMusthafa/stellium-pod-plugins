@@ -71,6 +71,16 @@
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
+      "id": "confirmationPluginV5",
+      "type": "VIEW_PLUGIN",
+      "allowMultipleInstances": false,
+      "name": "stellium.ext.podplugins.confirmationPluginV5",
+      "propertyEditor": "stellium.ext.podplugins.confirmationPluginV5.builder.PropertyEditor",
+      "i18n": "stellium.ext.podplugins.confirmationPluginV5.i18n.i18n",
+      "productionProcessEnabled": true,
+      "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
+    },
+    {
       "id": "stelliumManagePackingCancellationPlugin",
       "type": "VIEW_PLUGIN",
       "allowMultipleInstances": false,

@@ -1,0 +1,16 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Popover id="reasonCodePopover" 
+        busyIndicatorDelay="10" 
+        showHeader="false" 
+        class="sapUiContentPadding"
+        placement="HorizontalPreferredRight">
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button text="{i18n>changeReasonCode}" press="handleReasonCodeUpdateFromPopover" />
+            </Toolbar>
+        </footer>
+        <Text text="{parts: ['/reasonCode', '/parentCodes'], formatter: '.oFormatter.formatReasonCodePath'}"
+            wrapping="true"> </Text>
+    </Popover>
+</core:FragmentDefinition>

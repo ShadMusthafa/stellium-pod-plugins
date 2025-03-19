@@ -1,0 +1,8 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <ViewSettingsDialog id="sortDialog" confirm="onSortDialogConfirmButtonClicked" sortDescending="true">
+        <sortItems>
+            <ViewSettingsItem text="{i18n>yieldQtyData.PostingDate}" key="dateTime" selected="true" />
+            <ViewSettingsItem text="{i18n>yieldQtyData.creationDate}" key="createdDateTime" />
+        </sortItems>
+    </ViewSettingsDialog>
+</core:FragmentDefinition>

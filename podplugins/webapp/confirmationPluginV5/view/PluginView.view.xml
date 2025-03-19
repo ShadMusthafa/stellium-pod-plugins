@@ -1,0 +1,187 @@
+<mvc:View controllerName="stellium.ext.podplugins.confirmationPluginV5.controller.PluginView" xmlns:l="sap.ui.layout"
+    xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m">
+    <Panel id="podModelPluginPanel" width="100%" height="100%" expandable="false" expanded="true"
+        accessibleRole="Region" backgroundDesign="Transparent">
+        <content>
+            <!-- <Table id="quantityConfirmationTable" growing="true" growingThreshold="20" growingScrollToLoad="false"
+                inset="false" headerText="{i18n>yieldQtyData.QuantityConfirmation}" items="{quantitiesModel>/value}">
+                <columns>
+                    <Column hAlign="End">
+                        <Text text="{i18n>yieldQtyData.YieldQuantity}" />
+                    </Column>
+                    <Column hAlign="End">
+                        <Text text="{i18n>yieldQtyData.ScrapQuantity}" />
+                    </Column>
+                    <Column></Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{
+                                    parts : [
+                                        'quantitiesModel>totalYieldQuantity/value',
+                                        'quantitiesModel>totalYieldQuantity/unitOfMeasure/uom'],
+                                    formatter:'.showValueWithUom'
+                                }" textAlign="Right" />
+                            <Text text="{
+                                    parts : [
+                                        'quantitiesModel>totalScrapQuantity/value',
+                                        'quantitiesModel>totalScrapQuantity/unitOfMeasure/uom'
+                                    ],
+                                    formatter:'.showValueWithUom'
+                                }" textAlign="Right" />
+                            <FlexBox justifyContent="Center">
+                                <items>
+                                    <Button tooltip="{i18n>report.quantity}"
+                                        enabled="{= !!${quantitiesModel>userAuthorizedForWorkCenter} &amp;&amp; ${quantitiesModel>status} !== 'COMPLETED'}"
+                                        text="{i18n>report.quantity}" press="onOpenReportQuantityDialog"
+                                        type="Emphasized" />
+                                </items>
+                            </FlexBox>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table> -->
+            <Toolbar>
+                <Title id="idApprovedQtyTitle" />
+                <ToolbarSpacer />
+                <Button tooltip="{i18n>report.quantity}"  id="Report" text="Report" press="onOpenReportQuantityDialog"
+                    type="Emphasized" />
+            </Toolbar>
+            <Table id="postingsTable" autoPopinMode="true" inset="false" sticky="HeaderToolbar,ColumnHeaders"
+                growing="true" growingThreshold="9999999" growingScrollToLoad="false" updateFinished="onTableUpdate"
+                updateStarted="onBeforeTableUpdate" class="sapUiSmallMarginTopBottom" width="auto"
+                items="{ path: 'viewQuantityReportModel>/', sorter: { path: 'createdDateTime', descending: true }}">
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title id="reportQuantitiesTitle" text="{reportQuantitiesTitle>/value}" level="H2" />
+                        <ToolbarSpacer />
+                        <Button tooltip="{i18n>tooltip.sort}" icon="sap-icon://sort" press="handleSortButtonPressed" />
+                        <Button tooltip="{i18n>tooltip.setting}" icon="sap-icon://action-settings"
+                            press="handleSettingsButtonPressed" />
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column demandPopin="true" id="postingsResource">
+                        <Text text="{i18n>resource}" />
+                    </Column>
+                    <Column id="postingsYield" hAlign="Right">
+                        <Text text="{i18n>yieldQtyData.Yield}" />
+                    </Column>
+                    <Column demandPopin="true" id="postingsScrap" hAlign="Right">
+                        <Text text="{i18n>yieldQtyData.Scrap}" />
+                    </Column>
+                    <Column demandPopin="true" id="postingsReasonCode">
+                        <Text text="{i18n>reasonCode}" />
+                    </Column>
+                    <Column demandPopin="true" id="postingsPostedBy">
+                        <Text text="{i18n>yieldQtyData.PostedBy}" />
+                    </Column>
+                    <Column hAlign="End" demandPopin="true" id="postingsPostingDate">
+                        <Text text="{i18n>yieldQtyData.PostingDate}" />
+                    </Column>
+                    <Column hAlign="End" demandPopin="true" id="postingsCreationDate">
+                        <Text text="{i18n>yieldQtyData.creationDate}" />
+                    </Column>
+                    <Column id="postingsCustomFieldlabel" visible="{data>/customFieldVisible}">
+                        <Text text="{customFieldLabelModel>/labelValue}" />
+                    </Column>
+                    <Column id="postingsStatus">
+                        <Text text="{i18n>yieldQtyData.status}" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem id="QuantityDetailsCLItem">
+                        <cells>
+                            <VBox>
+                                <Text text="{viewQuantityReportModel>resource}" />
+                                <Text text="{viewQuantityReportModel>resourceDescription}" class="sapUiTinyMarginTop" />
+                            </VBox>
+                            <Text
+                                text="{parts : ['viewQuantityReportModel>yieldQuantity/value','viewQuantityReportModel>yieldQuantity/unitOfMeasure/uom'],formatter:'.oFormatter.showValueWithUom'}"
+                                textAlign="Right" />
+                            <Text
+                                text="{parts : ['viewQuantityReportModel>scrapQuantity/value','viewQuantityReportModel>scrapQuantity/unitOfMeasure/uom'],formatter:'.oFormatter.showValueWithUom'}"
+                                textAlign="Right" />
+
+                            <HBox>
+                                <Link text="{viewQuantityReportModel>selectReasonCode}" wrapping="true"
+                                    press="onReasonCodePress"
+                                    enabled="{= ${viewQuantityReportModel>selectReasonCode} !== '' &amp;&amp; ${viewQuantityReportModel>selectReasonCode} !== 'undefined'}"
+                                    visible="{= ${viewQuantityReportModel>selectReasonCode} !== '' }" />
+                                <Button
+                                    visible="{= ${viewQuantityReportModel>scrapActivityLogId} !== null &amp;&amp; ${viewQuantityReportModel>selectReasonCode} === '' &amp;&amp; ${viewQuantityReportModel>qtyConfirmationStatus} !== 'CANCELLED_IN_DM'}"
+                                    text="{i18n>assignReasonCode}" tooltip="{i18n>assignReasonCode}"
+                                    press="handleReasonCodeUpdate" />
+                            </HBox>
+
+                            <Text text="{viewQuantityReportModel>userId}" />
+                            <Text
+                                text="{path : 'viewQuantityReportModel>dateTime',formatter:'.getDateInPlantTimeZone'}" />
+                            <Text
+                                text="{path : 'viewQuantityReportModel>createdDateTime',formatter:'.getDateTimeInPlantTimeZone'}" />
+                            <Text text="{viewQuantityReportModel>customField}" />
+                            <ObjectStatus
+                                text="{path : 'viewQuantityReportModel>qtyConfirmationStatus',formatter:'.formatConfirmationStatus'}"
+                                state="{path : 'viewQuantityReportModel>qtyConfirmationStatus',formatter:'.oFormatter.statusColorFormatter'}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+            <Table id="activityList"
+                items="{ path: '/activitySummary', sorter: { path: 'sequence', descending: false } }"
+                class="sapUiSizeCompact">
+                <headerToolbar id="activityListHeaderToolbar" aria-label="{i18n>headerToolbar}">
+                    <Toolbar>
+                        <Title id="titleText" text="{i18n>Activities}" level="H2" />
+                        <ToolbarSpacer />
+                        <!-- <Button id="reportButton" ariaDescribedBy="activityListHeaderToolbar"
+                            ariaLabelledBy="activityListHeaderToolbar" text="{i18n>Report}" tooltip="{i18n>Report}"
+                            type="Emphasized" press="onPressReportButton"
+                            /> -->
+                    </Toolbar>
+                </headerToolbar>
+                <columns>
+                    <Column hAlign="Left" vAlign="Middle">
+                        <Text text="{i18n>Parameters}" />
+                    </Column>
+                    <Column hAlign="End" vAlign="Middle">
+                        <Text text="{i18n>StandardValue}" />
+                    </Column>
+                    <Column hAlign="End" vAlign="Middle">
+                        <Text text="{i18n>Reported}" />
+                    </Column>
+                    <Column hAlign="End" vAlign="Middle" />
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <!-- <Text
+                                text="{parts : ['activityId','activityText'], formatter:'.oFormatter.showActivityIdWithText'}" /> -->
+                            <Text text="{activityText}"/>
+                            <Text
+                                text="{parts : ['targetQuantity/value','targetQuantity/unitOfMeasure/uom'],formatter:'.oFormatter.showValueWithUom'}" />
+                            <Text
+                                text="{parts : ['actualQuantity/value','actualQuantity/unitOfMeasure/uom'],formatter:'.oFormatter.showValueWithUom'}" />
+                            <Button text="{i18n>Postings}" tooltip="{i18n>Postings}" class="sapUiSmallMarginBegin"
+                                press="onPressPostingButton" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+
+
+            <!-- <Toolbar id="idConfPluginFooterToolbar" design="Solid">
+                <ToolbarSpacer id="idConfPluginFooterToolbarSpacer" />
+                <Button id="idConfPluginSaveButton" 
+                    type="Emphasized"
+                    text="Save"
+                    press=".onConfPluginSave"/>
+                <Button id="idConfPluginCancelButton"
+                    type="Default"
+                    text="Cancel"
+                    press=".onConfPluginCancel" />
+            </Toolbar> -->
+        </content>
+    </Panel>
+</mvc:View>
