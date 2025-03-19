@@ -2818,20 +2818,20 @@ sap.ui.define(
         var oAllBiCoProducts = that.getView().getModel('coBiProductSummaryList').getData();
 
         //Apply the correction entries
-        if (this.batchCorrItems.length > 0) {
-          aBiCoProducts.forEach(oItem => {
-            var oCorrItem = this.batchCorrItems.find(val => val.component === oItem.materialId.material);
-            if (!oCorrItem) return;
+        // if (this.batchCorrItems.length > 0) {
+        //   aBiCoProducts.forEach(oItem => {
+        //     var oCorrItem = this.batchCorrItems.find(val => val.component === oItem.materialId.material);
+        //     if (!oCorrItem) return;
 
-            // oItem.toleranceOver = oCorrItem.approvedTUpper;
-            // oItem.toleranceUnder = oCorrItem.approvedTLower;
-            oItem.recipeComponentToleranceOver = oCorrItem.approvedTUpper;
-            oItem.recipeComponentToleranceUnder = oCorrItem.approvedTLower;
-            oItem.targetQuantity.value = oCorrItem.approvedQuantity;
-            oItem.totalQtyEntryUom.value = oCorrItem.approvedQuantity;
-            oItem.totalQtyBaseUom.value = oCorrItem.approvedQuantity;
-          });
-        }
+        //     // oItem.toleranceOver = oCorrItem.approvedTUpper;
+        //     // oItem.toleranceUnder = oCorrItem.approvedTLower;
+        //     oItem.recipeComponentToleranceOver = oCorrItem.approvedTUpper;
+        //     oItem.recipeComponentToleranceUnder = oCorrItem.approvedTLower;
+        //     oItem.targetQuantity.value = oCorrItem.approvedQuantity;
+        //     oItem.totalQtyEntryUom.value = oCorrItem.approvedQuantity;
+        //     oItem.totalQtyBaseUom.value = oCorrItem.approvedQuantity;
+        //   });
+        // }
 
         aBiCoProducts.forEach(function(e, i) {
           var thresholdValuesToBeDisplayed = that.oFormatter.getUpperAndLowerThresholdValues(
