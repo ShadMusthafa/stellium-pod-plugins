@@ -31,7 +31,7 @@
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
-      "id": "stelliumMaterialConsumptionPlugin",
+      "id": "materialConsumptionPlugin",
       "type": "VIEW_PLUGIN",
       "allowMultipleInstances": false,
       "name": "stellium.ext.podplugins.materialConsumptionPlugin",
@@ -61,7 +61,7 @@
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
-      "id": "stelliumConfirmationPluginV4",
+      "id": "confirmationPluginV4",
       "type": "VIEW_PLUGIN",
       "allowMultipleInstances": false,
       "name": "stellium.ext.podplugins.confirmationPluginV4",
@@ -101,7 +101,7 @@
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
-      "id": "stelliumMaterialConsumptionPluginV2",
+      "id": "materialConsumptionPluginV2",
       "type": "VIEW_PLUGIN",
       "allowMultipleInstances": false,
       "name": "stellium.ext.podplugins.materialConsumptionPluginV2",
