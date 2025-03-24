@@ -31,7 +31,7 @@
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
-      "id": "materialConsumptionPlugin",
+      "id": "materialConsumptionPluginV1",
       "type": "VIEW_PLUGIN",
       "allowMultipleInstances": false,
       "name": "stellium.ext.podplugins.materialConsumptionPlugin",
