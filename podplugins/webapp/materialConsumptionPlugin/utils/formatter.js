@@ -56,7 +56,10 @@ sap.ui.define(
         }
       },
 
-      formatConsumeButton: function(userAuthorizedForWorkCenter, backflushEnabled, isWeighRelevant) {
+      formatConsumeButton: function(userAuthorizedForWorkCenter, backflushEnabled, isWeighRelevant, isWaterComponent) {
+        //No consumption posting for water components
+        if (isWaterComponent) return false;
+
         if (userAuthorizedForWorkCenter && !isWeighRelevant) {
           if (backflushEnabled) {
             return false;
@@ -328,7 +331,10 @@ sap.ui.define(
         return DMENumberFormatter.dmcLocaleNumberParser(fNumber);
       },
 
-      formatWeighButton: function(userAuthorizedForWorkCenter, backflushEnabled, isWeighRelevant) {
+      formatWeighButton: function(userAuthorizedForWorkCenter, backflushEnabled, isWeighRelevant, isWaterComponent) {
+        //No weighing for water components
+        if (isWaterComponent) return false;
+
         if (userAuthorizedForWorkCenter && isWeighRelevant) {
           if (backflushEnabled) {
             return false;

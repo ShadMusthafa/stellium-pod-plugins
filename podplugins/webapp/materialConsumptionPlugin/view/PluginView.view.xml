@@ -75,12 +75,33 @@
                     <HBox class="sapUiTinyMarginBegin">
                         <Button text="{i18n>postings}" press="showDetailsOfComponent" class="sapUiSmallMarginEnd"
                             tooltip="{i18n>postings}" enabled="{=${assembledAndCanceledComponentsCount} > 0 }" />
-                        <Button type="Emphasized" press="showConsumePopup" text="{i18n>consume}"
+                        <Button 
+                            type="Emphasized" 
+                            press="showConsumePopup" 
+                            text="{i18n>consume}"
                             class="sapUiTinyMarginEnd"
-                            enabled="{parts : ['authModel>/userAuthorizedForWorkCenter','backflushEnabled', 'authModel>/weighRelevant'],formatter:'.oFormatter.formatConsumeButton'}" />
-                        <Button type="Emphasized" press="showWeighingPopup" text="{i18n>weigh}"
+                            enabled="{
+                                parts : [
+                                    'authModel>/userAuthorizedForWorkCenter',
+                                    'backflushEnabled', 
+                                    'authModel>/weighRelevant',
+                                    'isWaterComponent'
+                                ],
+                                formatter:'.oFormatter.formatConsumeButton'
+                            }" />
+                        <Button type="Emphasized" 
+                            press="showWeighingPopup" 
+                            text="{i18n>weigh}"
                             class="sapUiTinyMarginEnd"
-                            enabled="{parts : ['authModel>/userAuthorizedForWorkCenter','backflushEnabled', 'authModel>/weighRelevant'],formatter:'.oFormatter.formatWeighButton'}" />
+                            enabled="{
+                                parts : [
+                                    'authModel>/userAuthorizedForWorkCenter',
+                                    'backflushEnabled', 
+                                    'authModel>/weighRelevant',
+                                    'isWaterComponent'
+                                ],
+                                formatter:'.oFormatter.formatWeighButton'
+                            }" />
                     </HBox>
                 </cells>
             </ColumnListItem>

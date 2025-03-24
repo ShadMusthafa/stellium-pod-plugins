@@ -3014,6 +3014,13 @@ sap.ui.define(
               } else {
                 e.showAlternateBomComponents = false;
               }
+
+              //Add flags for water bom components
+              if (e.materialId.material === '2000000001798') {
+                e.isWaterComponent = true;
+              } else {
+                e.isWaterComponent = false;
+              }
             });
             // Set the count in the header text
             var title = {
