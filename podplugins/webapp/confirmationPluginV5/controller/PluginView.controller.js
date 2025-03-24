@@ -2660,15 +2660,26 @@ sap.ui.define(
 
         //  this.onCloseReportQuantityDialog();
 
-        await this._postConsolidatedConsumption();
+        this.getView().setBusy(true);
+        this.getView().byId('reportQuantityDialog').setBusyIndicatorDelay(0);
+        this.getView().byId('reportQuantityDialog').setBusy(true);
+        
+        try {
+          await this._postConsolidatedConsumption();
 
-        Promise.all([this.reportQuantity(), this.reportActivity()]).then(aResponse => {
-          if (this.phaseControlKey === 'ZM01' && this.qtyPostData.finalConfirmation) {
-            this._postConfirmationNonMilestone().then(oResponse => {
-              this.publish('refreshPhaseList', {});
-            });
-          }
-        });
+          Promise.all([this.reportQuantity(), this.reportActivity()]).then(aResponse => {
+            if (this.phaseControlKey === 'ZM01' && this.qtyPostData.finalConfirmation) {
+              this._postConfirmationNonMilestone().then(oResponse => {
+                this.publish('refreshPhaseList', {});
+              });
+            }
+          });
+        } catch (e) {
+          console.error('Error posting confirmation', e);
+        } finally {
+          this.getView().setBusy(false);
+          this.getView().byId('reportQuantityDialog').setBusy(false);
+        }
       },
 
       reportQuantity: async function() {
@@ -3163,13 +3174,14 @@ sap.ui.define(
       _postConsolidatedConsumption: function() {
         //AD_PT_CONSOLIDATED_CONSUMPTION - CPP_consolidatedConsumptionAndPosting
         var sUrl =
-          this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_1395457a-18fa-4342-9c52-d0269ad871e9&async=false';
+          this.getPublicApiRestDataSourceUri() +
+          '/pe/api/v1/process/processDefinitions/start?key=REG_1395457a-18fa-4342-9c52-d0269ad871e9&async=false';
         var oSelection = this.getPodSelectionModel().getSelection();
         var oParams = {
           InPlant: this.getPodController().getUserPlant(),
           InOrder: oSelection.getShopOrder().shopOrder,
           InSFC: this.getPodSelectionModel().selectedOrderData.sfc,
-          InOperation: this.getPodSelectionModel().selectedPhaseData.operation.operation,
+          InOperation: this.getPodSelectionModel().selectedPhaseData.phaseId,
           InUser: this.getPodController().getUserId(),
           InWorkCenter: this.getPodSelectionModel().selectedPhaseData.workCenter.workcenter
         };
