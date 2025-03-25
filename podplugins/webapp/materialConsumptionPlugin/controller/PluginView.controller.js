@@ -3016,7 +3016,7 @@ sap.ui.define(
               }
 
               //Add flags for water bom components
-              if (e.materialId.material === '2000000001798') {
+              if (parseInt(e.materialId.material) >= 5500000000000 && parseInt(e.materialId.material) <= 5599999999999) {
                 e.isWaterComponent = true;
               } else {
                 e.isWaterComponent = false;
