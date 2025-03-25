@@ -296,6 +296,11 @@ sap.ui.define(
             fToleranceLower = 0;
 
           var aItems = oGiSummary.lineItems.filter(oItem => {
+            //Bypass check for water BOM components
+            if (parseInt(oItem.materialId.material) >= 5500000000000 && parseInt(oItem.materialId.material) <= 5599999999999) {
+              return false;
+            }
+
             var oCorrItem = oBatchCorrection.content.find(val => val.component === oItem.materialId.material);
 
             //In case of by product or co porduct, use GR recieved qty as consumed qty
@@ -2663,7 +2668,7 @@ sap.ui.define(
         this.getView().setBusy(true);
         this.getView().byId('reportQuantityDialog').setBusyIndicatorDelay(0);
         this.getView().byId('reportQuantityDialog').setBusy(true);
-        
+
         try {
           await this._postConsolidatedConsumption();
 
