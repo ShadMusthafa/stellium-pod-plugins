@@ -2236,8 +2236,13 @@ sap.ui.define(
               that._enableConfirmButton();
 
               //In case of HU scan, use scanned HU quantity
-              if (that.scannedHuItem && that.scannedHuItem.packedQty) {
-                oModel.setProperty('/avlBatchQty', that.scannedHuItem.packedQty);
+              if (that.scannedHuItem) {
+                // oModel.setProperty('/avlBatchQty', that.scannedHuItem.packedQty);
+                if (that.scannedHuItem.openindicator === 'X') {
+                  oModel.setProperty('/avlBatchQty', that.scannedHuItem.openQuantity);
+                } else {
+                  oModel.setProperty('/avlBatchQty', that.scannedHuItem.packedQty);
+                }
               }
             } else {
               that.isInventoryManaged ? oModel.setProperty('/avlBatchQty', 0) : oModel.setProperty('/avlBatchQty', '');
@@ -2623,6 +2628,7 @@ sap.ui.define(
               packedUom: oData.quantity.unitOfMeasure.uom,
               storageLocation: oData.storageLocation,
               openQuantity: this.scannedHuItem.openQuantity || 0,
+              openIndicator: 'X',
               consumedQuant: oData.quantity.value,
               zuser: this.getPodController().getUserId(),
               createdOn: '',
@@ -2707,9 +2713,20 @@ sap.ui.define(
         }
 
         var fQuantityToConsume = oModel.getProperty('/quantity/value');
-        if (this.scannedHuItem && this.scannedHuItem.packedQty < fQuantityToConsume) {
-          ErrorHandler.setErrorState(this.getCurrentInputQuantityControl(), 'Invalid quantity');
-          isErrorStateExist = true;
+        // if (this.scannedHuItem && this.scannedHuItem.packedQty < fQuantityToConsume) {
+        //   ErrorHandler.setErrorState(this.getCurrentInputQuantityControl(), 'Invalid quantity');
+        //   isErrorStateExist = true;
+        // }
+        if (this.scannedHuItem) {
+          if (this.scannedHuItem.openindicator === 'X' && this.scannedHuItem.openQuantity < fQuantityToConsume) {
+            isErrorStateExist = true;
+          } else if (this.scannedHuItem.packedQty < fQuantityToConsume) {
+            isErrorStateExist = true;
+          }
+
+          if (isErrorStateExist) {
+            ErrorHandler.setErrorState(this.getCurrentInputQuantityControl(), 'Invalid quantity');
+          }
         }
 
         var oFormContent = this.getFormControl();
@@ -5561,7 +5578,9 @@ sap.ui.define(
         }
 
         var aBatchDetails = this.batchDetailsModel.getData(),
-          oSelectedBatch = aBatchDetails.find(oBatch => oBatch.batchNumber === sSelectedBatchId);
+          oSelectedBatch = aBatchDetails.find(
+            oBatch => oBatch.batchNumber === sSelectedBatchId && oBatch.storageLocation.storageLocation === sDefaultSloc
+          );
         // && oBatch.inventoryId === sSelectedInventoryId
 
         //Check if selected batch exists in the model
@@ -5744,7 +5763,8 @@ sap.ui.define(
           order: this.selectedDataInList.selectedShopOrder,
           sfc: this.selectedDataInList.selectedSfc,
           workcenter: this.selectedDataInList.workCenter.workcenter,
-          operation: this.selectedDataInList.operation.operation,
+          // operation: this.selectedDataInList.operation.operation,
+          operation: this.selectedDataInList.phaseId,
           material: oItem.materialId.material,
           resource: this.selectedDataInList.resource.resource
         };
