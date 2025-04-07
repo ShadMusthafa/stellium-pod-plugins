@@ -94,7 +94,11 @@ sap.ui.define(['sap/ui/model/resource/ResourceModel', 'sap/dm/dme/podfoundation/
         customField1: '',
         selectActionButtonId: '',
         showAlternateBomComponents: false,
-        allowWeighWithoutTolerance: true
+        allowWeighWithoutTolerance: true,
+        showWeighingSetZero: false,
+        showWeighingConfirm: false,
+        showWeighingAddWeight: false,
+        showWeighingSetTare: false
       };
       return oData;
     }
