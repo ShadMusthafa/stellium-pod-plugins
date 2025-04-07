@@ -3825,7 +3825,8 @@ sap.ui.define(
 
         if (!oScannedValue) {
           MessageBox.error('Could not retrieve data from scan');
-          this.resetModel(this.getCurrentModel());
+          // this.resetModel(this.getCurrentModel());
+          this.getCurrentInputHuControl().setValue('');
           return;
         }
 
@@ -3834,7 +3835,8 @@ sap.ui.define(
         var oHuItem = await this._getConsumptionItemFromHu(oScannedValue.handlingUnit, sMaterial);
         if (!oHuItem) {
           MessageBox.error('Hu items are not relevant for current SFC');
-          this.resetModel(this.getCurrentModel());
+          // this.resetModel(this.getCurrentModel());
+          this.getCurrentInputHuControl().setValue('');
           return;
         }
 
@@ -3894,27 +3896,38 @@ sap.ui.define(
           return null;
         }
 
-        var aLineItems = this.giModel.getProperty('/lineItems');
-        for (var i = 0; i < aLineItems.length; i++) {
-          var oItem = aHuItems.find(oHuItem => {
-            //If material does not match, proceed with next check
-            if (oHuItem.material !== aLineItems[i].materialId.material) return false;
+        var oLineItemMaterial = this.getCurrentModel().getData().material;
+        var oItem = aHuItems.find(oHuItem => oHuItem.material === oLineItemMaterial);
 
-            //If threshold values are available, use that for checking component
-            if (aLineItems[i].lowerThresholdValue && aLineItems[i].consumedQuantity.value < aLineItems[i].lowerThresholdValue) return true;
+        //If HU is open, check if there is openQuantity for that material
+        if (oItem && oItem.openindicator === 'X' && oItem.openQuantity <= 0) return null;
 
-            //If component does not have tolerance, check against target values
-            var fConsumedQuantity = aLineItems[i].consumedQuantity.value || 0;
-            if (aLineItems[i].targetQuantity.value > fConsumedQuantity) return true;
+        //If the HU is not open, check if packedQty is not zero
+        if (oItem && oItem.openIndicator === '' && oItem.packedQty <= 0) return null;
 
-            //Default- fail check
-            return false;
-          });
+        return oItem;
 
-          if (oItem) return oItem;
-        }
+        // var aLineItems = this.giModel.getProperty('/lineItems');
+        // for (var i = 0; i < aLineItems.length; i++) {
+        //   var oItem = aHuItems.find(oHuItem => {
+        //     //If material does not match, proceed with next check
+        //     if (oHuItem.material !== aLineItems[i].materialId.material) return false;
 
-        return null;
+        //     //If threshold values are available, use that for checking component
+        //     if (aLineItems[i].lowerThresholdValue && aLineItems[i].consumedQuantity.value < aLineItems[i].lowerThresholdValue) return true;
+
+        //     //If component does not have tolerance, check against target values
+        //     var fConsumedQuantity = aLineItems[i].consumedQuantity.value || 0;
+        //     if (aLineItems[i].targetQuantity.value > fConsumedQuantity) return true;
+
+        //     //Default- fail check
+        //     return false;
+        //   });
+
+        //   if (oItem) return oItem;
+        // }
+
+        // return null;
       },
 
       handleLiveChangeScan: async function(oEvent) {
