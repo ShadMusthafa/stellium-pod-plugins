@@ -1666,24 +1666,24 @@ sap.ui.define(
           aCombinedFilters.push(oFilterWithAllProperties);
         }
 
-        var oModel = this.getCurrentModel(),
-          bBatchManaged = oModel.getProperty('/batchManaged'),
-          sStorageLoc = oModel.getProperty('/storageLocation');
-        if (sStorageLoc) {
-          var oSLocFilter = new sap.ui.model.Filter({
-            path: 'storageLocation/storageLocation',
-            operator: 'EQ',
-            value1: sStorageLoc
-          });
-          aCombinedFilters.push(oSLocFilter);
-        }
-        var oCombinedFilter = new sap.ui.model.Filter({
-          filters: aCombinedFilters,
-          and: true
-        });
-        oBinding.filter(oCombinedFilter);
+        // var oModel = this.getCurrentModel(),
+        //   bBatchManaged = oModel.getProperty('/batchManaged'),
+        //   sStorageLoc = oModel.getProperty('/storageLocation');
+        // if (sStorageLoc) {
+        //   var oSLocFilter = new sap.ui.model.Filter({
+        //     path: 'storageLocation/storageLocation',
+        //     operator: 'EQ',
+        //     value1: sStorageLoc
+        //   });
+        //   aCombinedFilters.push(oSLocFilter);
+        // }
+        // var oCombinedFilter = new sap.ui.model.Filter({
+        //   filters: aCombinedFilters,
+        //   and: true
+        // });
+        // oBinding.filter(oCombinedFilter);
 
-        // oBinding.filter(oFilterWithAllProperties);
+        oBinding.filter(oFilterWithAllProperties);
       },
 
       handleSearch: function(oValue, propertiesArray, oBinding) {
