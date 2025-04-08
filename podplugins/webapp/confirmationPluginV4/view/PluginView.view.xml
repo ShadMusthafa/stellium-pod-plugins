@@ -160,9 +160,9 @@
                                 text="{parts : ['activityId','activityText'], formatter:'.oFormatter.showActivityIdWithText'}" /> -->
                             <Text text="{activityText}"/>
                             <Text
-                                text="{parts : ['targetQuantity/value','targetQuantity/unitOfMeasure/uom'],formatter:'.oFormatter.showValueWithUom'}" />
+                                text="{parts : ['targetQuantity/value','targetQuantity/unitOfMeasure/uom'],formatter:'.oFormatter.showFloatValueWithUom'}" />
                             <Text
-                                text="{parts : ['actualQuantity/value','actualQuantity/unitOfMeasure/uom'],formatter:'.oFormatter.showValueWithUom'}" />
+                                text="{parts : ['actualQuantity/value','actualQuantity/unitOfMeasure/uom'],formatter:'.oFormatter.showFloatValueWithUom'}" />
                             <Button text="{i18n>Postings}" tooltip="{i18n>Postings}" class="sapUiSmallMarginBegin"
                                 press="onPressPostingButton" />
                         </cells>
