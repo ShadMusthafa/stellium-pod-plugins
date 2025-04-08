@@ -1,0 +1,55 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog id="alternateComponentsDialog" title="{i18n>alternateComponents}" class="sapUiContentPadding"
+        contentWidth="70%" resizable="true" draggable="true">
+        <content>
+            <Table id="alternateComponentsTable" items="{alternateComponentsModel>/alternateBoms}">
+                <columns>
+                    <Column minScreenWidth="Small" demandPopin="true" hAlign="Left">
+                        <header>
+                            <Text text="{i18n>alternateComponent}" />
+                        </header>
+                    </Column>
+                    <Column demandPopin="true" minScreenWidth="Small" hAlign="Left">
+                        <header>
+                            <Text text="{i18n>description}" />
+                        </header>
+                    </Column>
+                    <Column demandPopin="true" minScreenWidth="Small" hAlign="End">
+                        <header>
+                            <Text text="{i18n>enabled}" />
+                        </header>
+                    </Column>
+                    <Column demandPopin="true" minScreenWidth="Small" hAlign="Center">
+                        <header>
+                            <Text text="{i18n>priority}" />
+                        </header>
+                    </Column>
+                    <Column demandPopin="true" minScreenWidth="Small" hAlign="End">
+                        <header>
+                            <Text text="{i18n>validFrom}" />
+                        </header>
+                    </Column>
+                    <Column demandPopin="true" hAlign="End" minScreenWidth="Small">
+                        <header>
+                            <Text text="{i18n>validTo}" />
+                        </header>
+                    </Column>
+                </columns>
+                <ColumnListItem>
+                    <cells>
+                        <Text
+                            text="{alternateComponentsModel>material/material} / {alternateComponentsModel>material/version}" />
+                        <Text text="{alternateComponentsModel>material/description}" />
+                        <Text text="{alternateComponentsModel>enabled}" />
+                        <Text text="{alternateComponentsModel>priority}" />
+                        <Text text="{path : 'alternateComponentsModel>validFrom',formatter:'.oFormatter.formatDate'}" />
+                        <Text text="{path : 'alternateComponentsModel>validTo',formatter:'.oFormatter.formatDate'}" />
+                    </cells>
+                </ColumnListItem>
+            </Table>
+        </content>
+        <beginButton>
+            <Button text="{i18n>close}" press=".onCloseAlternateComponentsDialog" />
+        </beginButton>
+    </Dialog>
+</core:FragmentDefinition>

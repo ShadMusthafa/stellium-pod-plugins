@@ -121,6 +121,16 @@
       "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
     },
     {
+      "id": "supervisorMaterialConsumptionPlugin",
+      "type": "VIEW_PLUGIN",
+      "allowMultipleInstances": false,
+      "name": "stellium.ext.podplugins.supervisorMaterialConsumptionPlugin",
+      "propertyEditor": "stellium.ext.podplugins.supervisorMaterialConsumptionPlugin.builder.PropertyEditor",
+      "i18n": "stellium.ext.podplugins.supervisorMaterialConsumptionPlugin.i18n.i18n",
+      "productionProcessEnabled": true,
+      "supportedPodTypes": ["WORK_CENTER", "OPERATION", "ORDER", "OTHER", "MONITOR"]
+    },
+    {
       "id": "stelliumPostProductionReportingPlugin",
       "type": "VIEW_PLUGIN",
       "allowMultipleInstances": false,

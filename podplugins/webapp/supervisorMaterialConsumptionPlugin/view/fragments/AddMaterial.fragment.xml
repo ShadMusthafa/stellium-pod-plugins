@@ -1,0 +1,95 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns:f="sap.ui.layout.form" xmlns:l="sap.ui.layout" xmlns="sap.m">
+        <Dialog id="addDialog" class="sapUiContentPadding" title="{i18n>AddMaterial}" resizable="true" width="50%">
+                <f:SimpleForm id="addMaterialForm" editable="true" layout="ResponsiveGridLayout" labelSpanXL="2"
+                        labelSpanL="2" labelSpanM="4" labelSpanS="4" adjustLabelSpan="false" emptySpanXL="0"
+                        emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="1" columnsL="1" columnsM="1"
+                        singleContainerFullSize="true">
+                        <f:content>
+                                <Label text="{i18n>MATERIAL}" />
+                                <Input id="inputMatNumAdd" type="Text" value="{addModel>/material}"
+                                        showSuggestion="true" showValueHelp="true" valueHelpOnly="true"
+                                        valueHelpRequest="onMaterialBrowse" class="sapMesUpperCaseTransform"
+                                        change="onChange"> </Input>
+                                <Label text="{i18n>materialDescription}" />
+                                <Text id="inputMatDescAdd" text="{addModel>/materialDescription}" />
+                                <Label text="{i18n>batchid}" required="{addModel>/batchManaged}" />
+                                <Input id="inputBatchIdAdd" value="{addModel>/batchNumber}"
+                                        showValueHelp="{addModel>/batchManaged}"
+                                        enabled="{parts: ['addModel>/batchManaged', 'addModel>/material', 'addModel>/storageLocation', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getBatchInputEnable'}"
+                                        valueHelpRequest="showBatchDetails"
+                                        valueHelpOnly="{parts: ['configModel>/allowFreeTextForBatch', 'addModel>/material'], formatter: '.oFormatter.getValueHelpOnly'}"
+                                        change="onBatchChange" liveChange="onBatchLiveChange"> </Input>
+
+                                <!-- <Label text="{i18n>storageLocation}" required="{parts: ['addModel>/batchManaged', 'addModel>/material', 'addModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}"/>
+                                        <Input id="storageLocationAdd" textAlign="Right" value="{addModel>/storageLocation}" enabled="{parts: ['addModel>/batchManaged', 'addModel>/material', 'addModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="showStorageLocationDetails"> </Input>
+
+                                        <Label text="{i18n>storageLocationDesc}" />
+                                        <Input id="storageLocationDesc" textAlign="Left" 
+                                        value="{addModel>/storageLocationDesc}" 
+                                        editable="false" /> -->
+                                <Label text="{i18n>storageLocationDesc}"
+                                        required="{parts: ['addModel>/batchManaged', 'addModel>/material', 'addModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}" />
+                                <!-- Storage Location Input -->
+                                <Input id="storageLocationAdd" textAlign="Left" value="{addModel>/storageLocation}"
+                                        enabled="{parts: ['addModel>/batchManaged', 'addModel>/material', 'addModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}"
+                                        showValueHelp="true" valueHelpOnly="true"
+                                        valueHelpRequest="showStorageLocationDetails">
+                                <layoutData>
+                                        <l:GridData span="XL2 L2 M2 S2" />
+                                </layoutData>
+                                </Input>
+                                <!-- Storage Location Description Input -->
+                                <Text id="storageLocationDesc" text="{addModel>/storageLocationDesc}">
+                                        <layoutData>
+                                                <l:GridData span="XL4 L4 M4 S4" />
+                                        </layoutData>
+                                </Text>
+                                <Label text="{i18n>avlQty}" />
+                                <Text id="avlQtyAdd" text="{addModel>/avlBatchQty}" />
+                                <Label id="qtyLabelAdd"
+                                        text="{parts: ['i18n>qtyToConsume', 'i18n>UNIT'], formatter: '.oFormatter.getQuantityUnitLabel'}"
+                                        required="{addModel>/batchManaged}" />
+                                <Input id="inputQuantityAdd" textAlign="Right" required="true"
+                                        ariaLabelledBy="qtyLabelAdd"
+                                        value="{parts:[{path:'addModel>/quantity/value'},{path:'addModel>/quantity/unitOfMeasure/uom'}], type:'.types.quantity'}"
+                                        change="onQuantityLiveChange" />
+                                <Select id="inputUnitAdd" items="{unitModel>/}"
+                                        selectedKey="{addModel>/quantity/unitOfMeasure/uom}" enabled="true"
+                                        ariaLabelledBy="qtyLabelAdd">
+                                        <layoutData>
+                                                <l:GridData span="XL2 L2 M2 S3" />
+                                        </layoutData>
+                                        <core:Item key="{unitModel>internalUom}"
+                                                text="{unitModel>uom} - {unitModel>longText}" />
+                                </Select>
+                                <Label
+                                        text="{parts: ['i18n>postedBy', 'i18n>postingDate'], formatter: '.oFormatter.getQuantityUnitLabel'}" />
+                                <Input id="inputPostedByAdd" value="{addModel>/userId}" enabled="false">
+                                <layoutData>
+                                        <l:GridData span="XL4 L4 M4 S4" />
+                                </layoutData>
+                                </Input>
+                                <DatePicker id="inputPostingDateAdd" valueFormat="yyyy-MM-dd"
+                                        change="onChangePostingDate" class="sapUiSmallMarginBottom"
+                                        value="{path : 'addModel>/dateTime',formatter:'oFormatter.formatDate'}">
+                                        <layoutData>
+                                                <l:GridData span="XL4 L4 M4 S4" />
+                                        </layoutData>
+                                </DatePicker>
+                                <Label text="{i18n>calculateQTYtoConsume.comments.lbl}"
+                                        labelFor="inputCommentsAddMaterial" />
+                                <TextArea id="inputCommentsAddMaterial" maxLength="2048" rows="3" cols="100"
+                                        value="{addModel>/comments}" growing="true" liveChange="onChangeOfComments">
+<layoutData>
+<l:GridData span="XL8 L8 M8 S8"/>
+</layoutData>
+</TextArea>
+                        </f:content>
+                </f:SimpleForm>
+                <buttons>
+                        <Button id="giConfirmBtnAdd" text="{i18n>confirm}" type="Emphasized"
+                                press="onConfirmConsumeDialog" enabled="false" />
+                        <Button id="giCancelBtnAdd" text="{i18n>cancel}" press="onCancelAddDialog" />
+                </buttons>
+        </Dialog>
+</core:FragmentDefinition>

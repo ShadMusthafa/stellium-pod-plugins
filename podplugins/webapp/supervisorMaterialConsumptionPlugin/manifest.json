@@ -1,0 +1,109 @@
+{
+  "_version": "1.12.0",
+  "sap.app": {
+      "id": "stellium.ext.podplugins.supervisorMaterialConsumptionPlugin",
+      "type": "component",
+      "i18n": "i18n/i18n.properties",
+      "applicationVersion": {
+          "version": "25.0.0"
+      },
+      "embeddedBy": "../",
+      "title": "{{appTitle}}",
+      "description": "{{appDescription}}",
+      "resources": "resources.json"
+  },
+  "sap.ui": {
+      "technology": "UI5",
+      "deviceTypes": {
+          "desktop": true,
+          "tablet": true,
+          "phone": false
+      }
+  },
+  "sap.ui5": {
+      "rootView": {
+          "viewName": "stellium.ext.podplugins.supervisorMaterialConsumptionPlugin.view.PluginView",
+          "type": "XML",
+          "id": "supervisorMaterialConsumptionPlugin"
+      },
+      "dependencies": {
+          "minUI5Version": "1.71.15",
+          "libs": {
+              "sap.ui.core": {},
+              "sap.dm.dme": {
+                  "minVersion": "25.0.0"
+              },
+              "sap.dm.dme.podfoundation": {
+                  "minVersion": "25.0.0"
+              }
+          }
+      },
+      "contentDensities": {
+          "compact": true,
+          "cozy": true
+      },
+      "models": {
+          "i18n": {
+              "type": "sap.ui.model.resource.ResourceModel",
+              "settings": {
+                  "bundleName": "stellium.ext.podplugins.supervisorMaterialConsumptionPlugin.i18n.i18n"
+              }
+          },
+          "i18n-status": {
+              "type": "sap.ui.model.resource.ResourceModel",
+              "settings": {
+                  "bundleName": "sap.dm.dme.i18n.status"
+              }
+          },
+          "i18n-global": {
+              "type": "sap.ui.model.resource.ResourceModel",
+              "settings": {
+                  "bundleName": "sap.dm.dme.i18n.global"
+              }
+          },
+          "i18n-objectType": {
+              "type": "sap.ui.model.resource.ResourceModel",
+              "settings": {
+                  "bundleName": "sap.dm.dme.i18n.objectType"
+              }
+          },
+          "i18n-material": {
+              "type": "sap.ui.model.resource.ResourceModel",
+              "settings": {
+                  "bundleName": "sap.dm.dme.i18n.material"
+              }
+          },
+          "i18n-dataCollection": {
+              "type": "sap.ui.model.resource.ResourceModel",
+              "settings": {
+                  "bundleName": "sap.dm.dme.i18n.dataCollection"
+              }
+          },
+          "i18n-routing": {
+              "type": "sap.ui.model.resource.ResourceModel",
+              "settings": {
+                  "bundleName": "sap.dm.dme.i18n.routing"
+              }
+          },
+          "i18n-bom": {
+              "type": "sap.ui.model.resource.ResourceModel",
+              "settings": {
+                  "bundleName": "sap.dm.dme.i18n.bom"
+              }
+          },
+          "i18n-formula": {
+              "type": "sap.ui.model.resource.ResourceModel",
+              "settings": {
+                  "bundleName": "sap.dm.dme.i18n.formula"
+              }
+          }
+      },
+      "resources": {
+          "css": [
+              {
+                  "uri": "css/style.css"
+              }
+          ]
+      }
+  }
+}
