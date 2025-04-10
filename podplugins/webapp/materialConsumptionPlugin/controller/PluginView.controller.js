@@ -5779,7 +5779,8 @@ sap.ui.define(
           // operation: this.selectedDataInList.operation.operation,
           operation: this.selectedDataInList.phaseId,
           material: oItem.materialId.material,
-          resource: this.selectedDataInList.resource.resource
+          resource: this.selectedDataInList.resource.resource,
+          userID: this.getPodController().getUserId()
         };
         this.ajaxPostRequest(sUrl, oPayload);
       },
