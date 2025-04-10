@@ -1686,46 +1686,22 @@ sap.ui.define(
         oBinding.filter(oFilterWithAllProperties);
       },
 
-      handleSearch: function(oValue, propertiesArray, oBinding) {
+      handleSearch: function (oValue, propertiesArray, oBinding) {
         var aFilters = [],
-          aCombinedFilters = [],
-          filter,
-          oFilterWithAllProperties;
+            filter, oFilterWithAllProperties;
         if (oValue && oValue.length > 0) {
-          $.each(propertiesArray, function(oIndex, oObj) {
-            filter = new sap.ui.model.Filter(oObj, sap.ui.model.FilterOperator.Contains, oValue);
-            aFilters.push(filter);
-          });
-          oFilterWithAllProperties = new sap.ui.model.Filter({
-            filters: aFilters,
-            and: false
-          });
-          aCombinedFilters.push(oFilterWithAllProperties);
+            $.each(propertiesArray, function (oIndex, oObj) {
+                filter = new sap.ui.model.Filter(oObj, sap.ui.model.FilterOperator.Contains, oValue);
+                aFilters.push(filter);
+            });
+            oFilterWithAllProperties = new sap.ui.model.Filter({
+                filters: aFilters,
+                and: false
+            });
         }
-
-        var oModel = this.getCurrentModel(),
-          bBatchManaged = oModel.getProperty('/batchManaged'),
-          sStorageLoc = oModel.getProperty('/storageLocation'),
-          oSLocFilter;
-
-        if (sStorageLoc) {
-          oSLocFilter = new sap.ui.model.Filter({
-            path: 'storageLocation/storageLocation',
-            operator: 'EQ',
-            value1: this.getCurrentModel().getData().storageLocation
-          });
-          aCombinedFilters.push(oSLocFilter);
-        }
-
-        var oCombinedFilter = new sap.ui.model.Filter({
-          filters: aCombinedFilters,
-          and: true
-        });
-
-        oBinding.filter(oCombinedFilter);
-        // oBinding.filter(oFilterWithAllProperties);
+        oBinding.filter(oFilterWithAllProperties);
         this.setNumberOfItemsInBatchList();
-      },
+    },
 
       setNumberOfItemsInBatchList: function() {
         let oTable = sap.ui.getCore().byId('batchListTable');
