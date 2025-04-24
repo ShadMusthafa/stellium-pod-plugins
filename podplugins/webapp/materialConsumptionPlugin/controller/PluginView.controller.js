@@ -247,7 +247,10 @@ sap.ui.define(
         this.subscribe('WorkInstructionChangeEvent', this.getMaterialConsumptionData, this);
         this.subscribe('GoodsReceiptChangeEvent', this.getMaterialConsumptionData, this);
         this.subscribe('QuantityConfirmationChangeEvent', this.getMaterialConsumptionData, this);
-        this.publish('requestForPhaseData', { source: this, sendToAllPages: true });
+        this.publish('requestForPhaseData', {
+          source: this,
+          sendToAllPages: true
+        });
       },
 
       onTabItemSelected: function() {
@@ -2372,7 +2375,9 @@ sap.ui.define(
       buildCustomFieldFormContent: function() {
         var currentForm = this.getCurrentForm();
         if (this.oPluginConfiguration && this.oPluginConfiguration.customField1) {
-          var customFieldLabel1 = new sap.m.Label('customFieldLabel1', { text: this.oPluginConfiguration.customField1 });
+          var customFieldLabel1 = new sap.m.Label('customFieldLabel1', {
+            text: this.oPluginConfiguration.customField1
+          });
           var customFieldValue1 = new sap.m.Input('customField1', {
             value: '',
             valueLiveUpdate: true,
@@ -3019,7 +3024,9 @@ sap.ui.define(
               e.lowerThresholdValueToBeDisplayed = thresholdValuesToBeDisplayed.lowerValue;
               e.upperThresholdValue = thresholdValuesToBeCalculated.upperValue;
               e.lowerThresholdValue = thresholdValuesToBeCalculated.lowerValue;
-              e.thresholdValue = { selectedTargetValue: thresholdValuesToBeDisplayed.selectedTargetValue };
+              e.thresholdValue = {
+                selectedTargetValue: thresholdValuesToBeDisplayed.selectedTargetValue
+              };
               e.showAlternateBomComponents = that.oPluginConfiguration.showAlternateBomComponents ? true : false;
               if (that.oPluginConfiguration.selectActionButtonId) {
                 that.findWorkinstructions(e, that.itemList.lineItems.length);
@@ -3255,7 +3262,9 @@ sap.ui.define(
         var oParameters = this.getParameters(oData, rowData);
         var sUrl = this.getAssemblyDataSourceUri() + 'order/goodsIssue/details';
         this.getGiPostings(sUrl, oParameters, rowData.batchManaged);
-        let oPostingsCountModel = new JSONModel({ totalCount: (rowData && rowData.assembledAndCanceledComponentsCount) || 0 });
+        let oPostingsCountModel = new JSONModel({
+          totalCount: (rowData && rowData.assembledAndCanceledComponentsCount) || 0
+        });
         this.byId('postingsDialog') && this.byId('postingsDialog').setModel(oPostingsCountModel, 'postingsCountModel');
       },
 
@@ -5525,7 +5534,7 @@ sap.ui.define(
         const recipeArr = oData.recipeArray || [];
         const recipe = recipeArr.find(item => item.stepId === stepId);
         oData.weighRelevant =
-          (bIsWeighDispenseTopicSubscribed && (recipe && recipe.recipeOperation && recipe.recipeOperation.weighRelevant)) || false;
+          (bIsWeighDispenseTopicSubscribed && recipe && recipe.recipeOperation && recipe.recipeOperation.weighRelevant) || false;
       },
       // C5278086 Adding changes for W&D End.
       formatCharacteristics: function(sValueField, sUomField, sDataType) {
@@ -5691,9 +5700,9 @@ sap.ui.define(
       },
 
       /**
-       * If any of the table items have bom components meeting the 'Park' or 'Batch Correction' criteria,
-       * show error message and navigate user back to order selection screen
-       */
+         * If any of the table items have bom components meeting the 'Park' or 'Batch Correction' criteria,
+         * show error message and navigate user back to order selection screen
+         */
       _checkBatchCorrectionCondition: function() {
         if (!this.giModel) return;
 
@@ -5738,6 +5747,7 @@ sap.ui.define(
           if (this.getPodSelectionModel().selectedOrderData.sfcStatus !== 'Hold') {
             this._raiseAlert(oBatchCorrectionItem);
             this._setSfcHoldStatus();
+            this._setOrderCustomData('BATCH_CORRECTION', 'YES');
           }
           MessageBox.error(sErrorMessage, {
             onClose: function() {
@@ -5786,12 +5796,12 @@ sap.ui.define(
       },
 
       /**
-       * Checks the phase status and returns a boolean value
-       *  - If phase is COMPLETED and there are parked items, then true
-       *  - If phase is in ACTIVE status, then true
-       *  - Else false
-       * @returns Boolean
-       */
+         * Checks the phase status and returns a boolean value
+         *  - If phase is COMPLETED and there are parked items, then true
+         *  - If phase is in ACTIVE status, then true
+         *  - Else false
+         * @returns Boolean
+         */
       _validatePhaseStatus: function() {
         if (this._hasParkedItems() && this.selectedDataInList.status === 'COMPLETED') return true;
         if (this.selectedDataInList.status === 'ACTIVE') return true;
@@ -5998,6 +6008,21 @@ sap.ui.define(
           items: [],
           formattedText: ''
         };
+      },
+
+      _setOrderCustomData: function(sFieldName, sFieldValue) {
+        var sUrl = this.getPublicApiRestDataSourceUri() + 'order/v1/orders/customValues';
+        var oPayload = {
+          plant: this.getPodController().getUserPlant(),
+          order: this.getPodSelectionModel().selectedOrderData.order,
+          customValues: [
+            {
+              attribute: sFieldName,
+              value: sFieldValue
+            }
+          ]
+        };
+        this.ajaxPatchRequest(sUrl, oPayload);
       }
     });
   }
