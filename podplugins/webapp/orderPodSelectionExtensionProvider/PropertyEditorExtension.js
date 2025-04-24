@@ -1,19 +1,19 @@
-sap.ui.define(['sap/dm/dme/podfoundation/extension/PluginPropertyEditorExtension'], function(PluginPropertyEditorExtension) {
+sap.ui.define(['sap/dm/dme/podfoundation/extension/PluginPropertyEditorExtension'], function (PluginPropertyEditorExtension) {
   'use strict';
 
   return PluginPropertyEditorExtension.extend('stellium.ext.podplugins.orderPodSelectionExtensionProvider.PropertyEditorExtension', {
-    constructor: function(oExtensionUtilities) {
+    constructor: function (oExtensionUtilities) {
       this._oExtensionUtilities = oExtensionUtilities;
     },
 
     /*
-    * Function to override to add content before core properties
-    *
-    * @param {sap.ui.layout.form.SimpleForm} oPropertyFormContainer Form to add controls to
-    * @param {object} oPropertyData Defined Property Data
-    * @override
-    */
-    addPropertyEditorContentBefore: function(oPropertyFormContainer, oPropertyData) {
+     * Function to override to add content before core properties
+     *
+     * @param {sap.ui.layout.form.SimpleForm} oPropertyFormContainer Form to add controls to
+     * @param {object} oPropertyData Defined Property Data
+     * @override
+     */
+    addPropertyEditorContentBefore: function (oPropertyFormContainer, oPropertyData) {
       let oPropertyEditor = this.getController();
       if (oPropertyEditor) {
         let oSwitch = oPropertyEditor.addSwitch(oPropertyFormContainer, 'logToConsole', oPropertyData);
@@ -48,28 +48,36 @@ sap.ui.define(['sap/dm/dme/podfoundation/extension/PluginPropertyEditorExtension
           oLabel = aContent[iIndex - 1];
           oLabel.setText('Show Custom Charge Status Filter');
         }
+
+        let oResourceFilterVisibleSwitch = oPropertyEditor.addSwitch(oPropertyFormContainer, 'showResourceFilter', oPropertyData);
+        iIndex = oPropertyFormContainer.indexOfContent(oResourceFilterVisibleSwitch);
+        aContent = oPropertyFormContainer.getContent();
+        if (aContent[iIndex - 1].setText) {
+          oLabel = aContent[iIndex - 1];
+          oLabel.setText('Show Resource filter');
+        }
       }
     },
 
     /*
-    * Function to override to add content after core properties
-    *
-    * @param {sap.ui.layout.form.SimpleForm} oPropertyFormContainer Form to add controls to
-    * @param {object} oPropertyData Defined Property Data
-    * @override
-    */
-    addPropertyEditorContentAfter: function(oPropertyFormContainer, oPropertyData) {
+     * Function to override to add content after core properties
+     *
+     * @param {sap.ui.layout.form.SimpleForm} oPropertyFormContainer Form to add controls to
+     * @param {object} oPropertyData Defined Property Data
+     * @override
+     */
+    addPropertyEditorContentAfter: function (oPropertyFormContainer, oPropertyData) {
       this._oExtensionUtilities.logMessage('PropertyEditorExtension.addPropertyEditorContentAfter: Order POD Selection extension');
     },
 
     /*
-    * Function to override to add custom default property values to core property data
-    *
-    * @param {object} oPropertyData Defined Property Data
-    * @returns {object} Updated Property Data
-    * @override
-    */
-    getPropertyData: function(oPropertyData) {
+     * Function to override to add custom default property values to core property data
+     *
+     * @param {object} oPropertyData Defined Property Data
+     * @returns {object} Updated Property Data
+     * @override
+     */
+    getPropertyData: function (oPropertyData) {
       if (!oPropertyData) {
         oPropertyData = {};
       }
@@ -85,17 +93,20 @@ sap.ui.define(['sap/dm/dme/podfoundation/extension/PluginPropertyEditorExtension
       if (typeof oPropertyData.showCustomChargeStatus === 'undefined') {
         oPropertyData.showCustomChargeStatus = true;
       }
+      if (typeof oPropertyData.showResourceFilter === 'undefined') {
+        oPropertyData.showResourceFilter = true;
+      }
       return oPropertyData;
     },
 
     /*
-    * Function to override to add custom default property values to core property data
-    *
-    * @param {object} oPropertyData Defined Property Data
-    * @returns {object} Updated Property Data
-    * @override
-    */
-    setPropertyData: function(oPropertyData) {
+     * Function to override to add custom default property values to core property data
+     *
+     * @param {object} oPropertyData Defined Property Data
+     * @returns {object} Updated Property Data
+     * @override
+     */
+    setPropertyData: function (oPropertyData) {
       this._oExtensionUtilities.logMessage('PropertyEditorExtension.setPropertyData: Order POD Selection extension');
       if (typeof oPropertyData.logToConsole === 'undefined') {
         oPropertyData.logToConsole = false;
@@ -109,21 +120,25 @@ sap.ui.define(['sap/dm/dme/podfoundation/extension/PluginPropertyEditorExtension
       if (typeof oPropertyData.showCustomChargeStatus === 'undefined') {
         oPropertyData.showCustomChargeStatus = true;
       }
+      if (typeof oPropertyData.showResourceFilter === 'undefined') {
+        oPropertyData.showResourceFilter = true;
+      }
       return oPropertyData;
     },
 
     /*
-    * Function to override to add custom default property values
-    *
-    * @param {object} oPropertyData Defined Property Data
-    * @returns {object} Updated Property Data
-    * @override
-    */
-    getDefaultPropertyData: function(oPropertyData) {
+     * Function to override to add custom default property values
+     *
+     * @param {object} oPropertyData Defined Property Data
+     * @returns {object} Updated Property Data
+     * @override
+     */
+    getDefaultPropertyData: function (oPropertyData) {
       oPropertyData.logToConsole = false;
       oPropertyData.showHelp = true;
       oPropertyData.showFilter = true;
       oPropertyData.showCustomChargeStatus = true;
+      oPropertyData.showResourceFilter = true;
       return oPropertyData;
     }
   });
