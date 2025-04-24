@@ -474,6 +474,8 @@ sap.ui.define(
               this._sendBatchCorrectionToS4();
               //Release the SFC
               this._releaseSfcHold();
+              //Update order custom data
+              this._setOrderCustomData('BATCH_CORRECTION', 'NO');
               //Navigate back to order selection
               window.history.go(-1);
             }.bind(this),
@@ -911,6 +913,21 @@ sap.ui.define(
               this.navigateToPage('MainPage');
             }.bind(this)
           })
+        },
+        
+        _setOrderCustomData: function(sFieldName, sFieldValue) {
+          var sUrl = this.getPublicApiRestDataSourceUri() + 'order/v1/orders/customValues';
+          var oPayload = {
+            plant: this.getPodController().getUserPlant(),
+            order: this.selectedOrder.order,
+            customValues: [
+              {
+                attribute: sFieldName,
+                value: sFieldValue
+              }
+            ]
+          };
+          this.ajaxPatchRequest(sUrl, oPayload);
         }
       }
     );
