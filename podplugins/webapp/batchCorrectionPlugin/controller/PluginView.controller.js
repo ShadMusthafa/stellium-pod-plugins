@@ -523,6 +523,9 @@ sap.ui.define(
             });
             Log.info("Cancel goods issue PPD completed");
 
+            //Update the order custom data so that it does not show in the list again
+            this._setOrderCustomData('BATCH_CORRECTION', 'NO');
+
             // Log.info("Wait 1s before calling S4");
             // await this._wait(3000);
 
