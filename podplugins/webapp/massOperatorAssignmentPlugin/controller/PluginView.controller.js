@@ -920,7 +920,10 @@ sap.ui.define(
       },
 
       _assignResource: function(oItem) {
-        var sUrl = this.PPD_BASE_URL + 'key=REG_e64981d3-2a78-4751-8e86-f796485f1db5&async=false';
+        //P_AD_MT_HANDSHAKE_01_CPP_assignOperator
+        // var sUrl = this.PPD_BASE_URL + 'key=REG_e64981d3-2a78-4751-8e86-f796485f1db5&async=false';
+        //P_AD_MT_HANDSHAKE_CURRENT_V3_CPP_assignOperator -> /pe/api/v1/process/processDefinitions/start?key=REG_16f252e3-5f2b-4800-a13e-4f3b9b2375b4
+        var sUrl = this.PPD_BASE_URL + 'key=REG_16f252e3-5f2b-4800-a13e-4f3b9b2375b4&async=false';
         var oPayload = {
           InOrderStatus: this.selectedOrder.executionStatus,
           InHeaderMaterialDesc: this.selectedOrder.material.description,
@@ -937,7 +940,8 @@ sap.ui.define(
           InOrderBO: this.selectedOrder.order,
           InOperationActivity: oItem.operationActivity,
           InUOM: 'KG', //TBD leave blank for now
-          InERPSequence: oItem.sequence,
+          // InERPSequence: oItem.sequence,
+          InLocalSequence: oItem.sequence,
           InBOM: this.selectedOrder.bom.bom,
           InMaterialVersion: oItem.componentVersion,
           InBOMVersion: this.selectedOrder.bom.version,
