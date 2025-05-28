@@ -151,6 +151,7 @@ sap.ui.define(
         oView.setModel(new JSONModel([]), 'FINISH_GOOD');
         oView.setModel(new JSONModel([]), 'CO_PRODUCT');
         oView.setModel(new JSONModel([]), 'BY_PRODUCT');
+        oView.setModel(new JSONModel({}), 'userData');
         oView.setModel(new JSONModel(), 'viewModel');
 
         this.getOwnerComponent().getTargets().getTarget('OrderDetail').attachDisplay(this.onRouteMatched, this);
@@ -1256,6 +1257,7 @@ sap.ui.define(
 
         var sModelName = '';
 
+        var oConfItem = this.cancelConfirmationData.item;
         if (oConfItem)
           // Prepare the payload for the POST request
           var oPayload = {
