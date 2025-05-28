@@ -108,7 +108,11 @@
                        
                         <!-- <Text
                             text="{parts : ['targetQuantity/value','actualQuantity/value'],formatter:'.oFormatter.showValueRemaining'}" /> -->
-                        <Text text="{= ${targetQuantity/value} - ${actualQuantity/value} }" />
+                        <!-- <Text text="{= ${targetQuantity/value} - ${actualQuantity/value} }" /> -->
+                        <Text text="{
+                            parts: [{path: 'targetQuantity/value'}, {path: 'actualQuantity/value'}],
+                            formatter: '.oFormatter.formatRemainingQty'
+                        }" />
 
                         <!-- <Button text="{i18n>Postings}" tooltip="{i18n>Postings}" class="sapUiSmallMarginBegin"
                                 press="onPressPostingButton"

@@ -2932,6 +2932,12 @@ sap.ui.define(
         });
 
         oModel.setProperty('/activitySummary', aItems);
+      },
+
+      formatRemainingQty: function(fTragetValue, fActualValue){
+        if(isNaN(fTragetValue)) return 0;
+        if(isNaN(fActualValue)) return fTragetValue.toFixed(3);
+        return (fTragetValue - fActualValue).toFixed(3);
       }
     });
 

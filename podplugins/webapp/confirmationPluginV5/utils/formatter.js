@@ -146,6 +146,12 @@ sap.ui.define(
           }
         }
         return aPath.join(REASON_CODE_PATH_SEPARATOR);
+      },
+
+      formatRemainingQty: function(fTragetValue, fActualValue){
+        if(isNaN(fTragetValue)) return 0;
+        if(isNaN(fActualValue)) return fTragetValue.toFixed(3);
+        return (fTragetValue - fActualValue).toFixed(3);
       }
     };
   }
