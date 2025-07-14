@@ -12,19 +12,7 @@ sap.ui.define(
     'sap/m/MessageBox',
     'sap/ui/core/format/NumberFormat'
   ],
-  function(
-    PluginViewController,
-    JSONModel,
-    MessageToast,
-    FlattenedDataset,
-    FeedItem,
-    ChartFormatter,
-    Format,
-    Filter,
-    FilterOperator,
-    MessageBox,
-    NumberFormat
-  ) {
+  function (PluginViewController, JSONModel, MessageToast, FlattenedDataset, FeedItem, ChartFormatter, Format, Filter, FilterOperator, MessageBox, NumberFormat) {
     'use strict';
 
     return PluginViewController.extend('stellium.ext.podplugins.realTimeChartPlugin.controller.MainView', {
@@ -110,14 +98,14 @@ sap.ui.define(
                 dimensions: [
                   {
                     name: 'Date',
-                    value: '{data>Date}',
+                    value: '{tareData>CONSUMPTION_DATE}',
                     dataType: 'date'
                   }
                 ],
                 measures: [
                   {
-                    name: 'Cost',
-                    value: '{data>Cost}'
+                    name: 'Quantity',
+                    value: '{tareData>TARE_ACTUAL_WEIGHT}'
                   }
                 ],
                 data: {
@@ -162,7 +150,7 @@ sap.ui.define(
         }
       },
 
-      onInit: function(oEvent) {
+      onInit: function (oEvent) {
         // Call the base controller's onInit
         PluginViewController.prototype.onInit.apply(this, arguments);
 
@@ -170,499 +158,35 @@ sap.ui.define(
 
         var oView = this.getView();
         oView.setModel(new JSONModel(), 'data');
-        //TODO: Remove below item and replace with service call
-        var oMockData = {
-          data: [
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/16/2013',
-              Revenue: 4114672.47,
-              Cost: 1651069.9
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/17/2013',
-              Revenue: 4102263.56,
-              Cost: 1612699.35
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/18/2013',
-              Revenue: 4045931.36,
-              Cost: 1634043.2
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/19/2013',
-              Revenue: 4047479.25,
-              Cost: 1641802.05
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/20/2013',
-              Revenue: 3969401.16,
-              Cost: 1670427.78
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/21/2013',
-              Revenue: 3963544.2,
-              Cost: 1632849.44
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/22/2013',
-              Revenue: 3936925.15,
-              Cost: 1612415.82
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/23/2013',
-              Revenue: 3846673.51,
-              Cost: 1605320.87
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/24/2013',
-              Revenue: 3918483.35,
-              Cost: 1599169.52
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/25/2013',
-              Revenue: 3906454.86,
-              Cost: 1569188.34
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/26/2013',
-              Revenue: 3843918.94,
-              Cost: 1602834.06
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/27/2013',
-              Revenue: 3800927.24,
-              Cost: 1648604.67
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/28/2013',
-              Revenue: 3839956.23,
-              Cost: 1635140.35
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/29/2013',
-              Revenue: 3874721.9,
-              Cost: 1608242.5
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/30/2013',
-              Revenue: 3892956.92,
-              Cost: 1661427.09
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '5/31/2013',
-              Revenue: 3883927.82,
-              Cost: 1610235.98
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/1/2013',
-              Revenue: 3840835.51,
-              Cost: 1619765.63
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/2/2013',
-              Revenue: 3803715.03,
-              Cost: 1621362.93
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/3/2013',
-              Revenue: 3807732.69,
-              Cost: 1656153.12
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/4/2013',
-              Revenue: 3800870.4,
-              Cost: 1607146.15
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/5/2013',
-              Revenue: 3751635.84,
-              Cost: 1618429.91
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/6/2013',
-              Revenue: 3730524.12,
-              Cost: 1625863.14
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/7/2013',
-              Revenue: 3700685.31,
-              Cost: 1624820.63
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/8/2013',
-              Revenue: 3675058.1,
-              Cost: 1577386.63
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/9/2013',
-              Revenue: 3678103.35,
-              Cost: 1552635.47
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/10/2013',
-              Revenue: 3699091.17,
-              Cost: 1525174.12
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/11/2013',
-              Revenue: 3538825.56,
-              Cost: 1525701.53
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/12/2013',
-              Revenue: 3553949.33,
-              Cost: 1596956.82
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/13/2013',
-              Revenue: 3606987.64,
-              Cost: 1647852.91
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/14/2013',
-              Revenue: 3625783.31,
-              Cost: 1717306.54
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/15/2013',
-              Revenue: 3639028.77,
-              Cost: 1736622.62
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/16/2013',
-              Revenue: 3659304.17,
-              Cost: 1778705
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/17/2013',
-              Revenue: 3698389.75,
-              Cost: 1799278.57
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/18/2013',
-              Revenue: 3783396.39,
-              Cost: 1877925.83
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/19/2013',
-              Revenue: 3722990.45,
-              Cost: 1891284.75
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/20/2013',
-              Revenue: 3617619.97,
-              Cost: 1836461.76
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/21/2013',
-              Revenue: 3675695.82,
-              Cost: 1860459.15
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/22/2013',
-              Revenue: 3787026.87,
-              Cost: 1881472.38
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/23/2013',
-              Revenue: 3780119.17,
-              Cost: 1870202.8
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/24/2013',
-              Revenue: 3765919.53,
-              Cost: 1882223.7
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/25/2013',
-              Revenue: 3705075.73,
-              Cost: 1821588.65
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/26/2013',
-              Revenue: 3737867.28,
-              Cost: 1844228.2
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/27/2013',
-              Revenue: 3764829.25,
-              Cost: 1806763.43
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/28/2013',
-              Revenue: 3803953.75,
-              Cost: 1827483.04
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/29/2013',
-              Revenue: 3749147.69,
-              Cost: 1729439.23
-            },
-            {
-              FixedLimit: '1000000',
-              FixedLimit2: '3000000',
-              FixedLimit3: '4000000',
-              UPPER_TOLERANCE: 2000000,
-              LOWER_TOLERANCE: 0,
-              Date: '6/30/2013',
-              Revenue: 3784917.64,
-              Cost: 1759307.38
-            }
-          ]
-        };
-        oView.setModel(new JSONModel(oMockData), 'mockdata');
+        oView.setModel(new JSONModel(), 'tareData');
       },
 
-      onBeforeRendering: function(oEvent) {},
+      onBeforeRendering: function (oEvent) {},
 
-      onBeforeRenderingPlugin: function() {
+      onBeforeRenderingPlugin: function () {
         this.subscribe('PageChangeEvent', this.handlePageChangeEvent, this);
 
         //Trigger initial load of chart data
         this._loadChartData();
       },
 
-      onAfterRendering: function(oEvent) {
+      onAfterRendering: function (oEvent) {
         this._initChart(0);
         this._initPopover();
       },
 
-      onExit: function() {
+      onExit: function () {
         this.unsubscribe('PageChangeEvent', this.handlePageChangeEvent, this);
       },
 
-      handlePageChangeEvent: function(sChannelId, sEventId, oData) {
+      handlePageChangeEvent: function (sChannelId, sEventId, oData) {
+        //TODO: Change chart type to 'Consumption'
         if (oData.page === 'CHARTPAGE') {
           this._loadChartData();
         }
       },
 
-      onChartContainerDimensionChange: function(oEvent) {
+      onChartContainerDimensionChange: function (oEvent) {
         var iSelectedKey = parseInt(oEvent.getSource().getSelectedKey());
         switch (iSelectedKey) {
           case 0:
@@ -671,47 +195,47 @@ sap.ui.define(
             break;
 
           case 1:
-            var oMockModel = this.getView().getModel('mockdata');
-            this.getView().getModel('data').setData(oMockModel.getData());
+            // var oMockModel = this.getView().getModel('mockdata');
+            // this.getView().getModel('data').setData(oMockModel.getData());
+            this._loadTareData();
             this._initChart(1);
             break;
         }
       },
 
-      onRefreshIconPress: function() {
+      onRefreshIconPress: function () {
         this._loadChartData();
+        this._loadTareData();
+        this.publish('stelReloadChartData', {
+          source: this,
+          sendToAllPages: true
+        });
       },
 
-      onConsumeChartPress: function() {
+      onConsumeChartPress: function () {
         this._loadChartData();
         this._initChart(0);
       },
-      onTareChartPress: function() {
+      onTareChartPress: function () {
         this._initChart(1);
         // this._loadChartData();
         var oMockModel = this.getView().getModel('mockdata');
         this.getView().getModel('data').setData(oMockModel.getData());
       },
 
-      _initChart: function(iIdx) {
+      _initChart: function (iIdx) {
         var oVizFrame = this.getView().byId('idVizFrame'),
           oModel = this.getView().getModel('data');
 
         oVizFrame.destroyDataset();
         oVizFrame.destroyFeeds();
-        oVizFrame.setModel(oModel);
-
-        var oSelectedChartProps = this.settingsModel.chartType.values[iIdx];
-        oVizFrame.setVizType(oSelectedChartProps.vizType);
-
-        var oDataSet = new FlattenedDataset(oSelectedChartProps.dataset);
-        oVizFrame.setDataset(oDataSet);
-
-        oVizFrame.setVizProperties(oSelectedChartProps.vizProperties);
+        // oVizFrame.setModel(oModel);
 
         var aFeeds = [];
         switch (iIdx) {
           case 0:
+            var oConsumptionModel = this.getView().getModel('data');
+            oVizFrame.setModel(oConsumptionModel);
             aFeeds.push(
               new FeedItem({
                 uid: 'timeAxis',
@@ -728,6 +252,8 @@ sap.ui.define(
             );
             break;
           case 1:
+            var oTareModel = this.getView().getModel('tareData');
+            oVizFrame.setModel(oTareModel);
             aFeeds.push(
               new FeedItem({
                 uid: 'timeAxis',
@@ -739,21 +265,29 @@ sap.ui.define(
               new FeedItem({
                 uid: 'valueAxis',
                 type: 'Measure',
-                values: ['Cost']
+                values: ['Quantity']
               })
             );
             break;
         }
-        aFeeds.forEach(oFeed => oVizFrame.addFeed(oFeed));
+
+        var oSelectedChartProps = this.settingsModel.chartType.values[iIdx];
+        oVizFrame.setVizType(oSelectedChartProps.vizType);
+
+        var oDataSet = new FlattenedDataset(oSelectedChartProps.dataset);
+        oVizFrame.setDataset(oDataSet);
+
+        oVizFrame.setVizProperties(oSelectedChartProps.vizProperties);
+        aFeeds.forEach((oFeed) => oVizFrame.addFeed(oFeed));
       },
 
-      _initPopover: function() {
+      _initPopover: function () {
         var oView = this.getView(),
           oVizFrame = oView.byId('idVizFrame'),
           oPopover = oView.byId('idPopOver');
 
         var oChartFormatter = ChartFormatter.getInstance();
-        oChartFormatter.registerCustomFormatter('quantityKG', function(value) {
+        oChartFormatter.registerCustomFormatter('quantityKG', function (value) {
           return value ? value + ' KG' : '';
         });
 
@@ -766,7 +300,7 @@ sap.ui.define(
         });
       },
 
-      _loadChartData: function() {
+      _loadChartData: function () {
         var oView = this.getView(),
           sUrl = 'https://dbapicall.cfapps.eu20-001.hana.ondemand.com/api/get/realTimeConsumptionData';
 
@@ -787,11 +321,39 @@ sap.ui.define(
         this.ajaxPostRequest(
           sUrl,
           oPayload,
-          oResponse => {
+          (oResponse) => {
             var oModel = oView.getModel('data');
             oModel.setProperty('/data', oResponse);
           },
-          oError => {
+          (oError) => {
+            console.error(...arguments);
+            MessageBox.error(this.getI18nText('dataFetchErrMsg'));
+          }
+        );
+      },
+
+      _loadTareData: function () {
+        var oView = this.getView(),
+          oPodSelectionModel = this.getPodSelectionModel(),
+          oSelectedResource = oPodSelectionModel.stelSelectedResourceData;
+
+        var sUrl = `https://dbapicall.cfapps.eu20-001.hana.ondemand.com/api/get/tareData`;
+        var oParams = {
+          plant: this.getPodController().getUserPlant(),
+          resource: oSelectedResource.resource,
+          operator: oSelectedResource.customData.OPERATOR,
+          orderNo: oSelectedResource.customData.ORDER,
+          component: oSelectedResource.customData.MATERIAL
+        };
+
+        this.ajaxGetRequest(
+          sUrl,
+          oParams,
+          (oResponse) => {
+            var oModel = oView.getModel('tareData');
+            oModel.setProperty('/data', oResponse);
+          },
+          (oError) => {
             console.error(...arguments);
             MessageBox.error(this.getI18nText('dataFetchErrMsg'));
           }
