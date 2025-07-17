@@ -49,6 +49,14 @@ sap.ui.define(
                     name: 'TargetLower',
                     // value: '{LOWER_TOLERANCE}'
                     value: '{LOWER_TOL_IN_KG}'
+                  },
+                  {
+                    name: 'BomUpper',
+                    value: '{BOM_UPPER_TOL}'
+                  },
+                  {
+                    name: 'BomLower',
+                    value: '{BOM_LOWER_TOL}'
                   }
                 ],
                 data: {
@@ -168,6 +176,12 @@ sap.ui.define(
 
         //Trigger initial load of chart data
         this._loadChartData();
+
+        //Auto refresh the data after 5minutes
+        this.refreshInterval = setInterval(()=>{
+          this.onRefreshIconPress();
+          console.log('Refreshing chart data')
+        }, 5*60*1000);
       },
 
       onAfterRendering: function (oEvent) {
@@ -177,6 +191,8 @@ sap.ui.define(
 
       onExit: function () {
         this.unsubscribe('PageChangeEvent', this.handlePageChangeEvent, this);
+        clearInterval(this.refreshInterval);
+        this.refreshInterval = null;
       },
 
       handlePageChangeEvent: function (sChannelId, sEventId, oData) {
@@ -247,7 +263,7 @@ sap.ui.define(
               new FeedItem({
                 uid: 'valueAxis',
                 type: 'Measure',
-                values: ['Actual', 'TargetUpper', 'TargetLower']
+                values: ['Actual', 'TargetUpper', 'TargetLower', 'BomUpper', 'BomLower']
               })
             );
             break;
@@ -296,6 +312,9 @@ sap.ui.define(
           Actual: 'quantityKG',
           TargetUpper: 'quantityKG',
           TargetLower: 'quantityKG',
+          BomUpper: 'quantityKG',
+          BomLower: 'quantityKG',
+          Quantity: 'quantityKG',
           Date: 'dd/MM/yyyy hh:mm:ss'
         });
       },

@@ -67,6 +67,12 @@
                                 <ObjectStatus id="expandedFailPortion" text="{headerData>/failPortion}" />
                             </l:VerticalLayout>
                             <l:VerticalLayout class="sapUiSmallMarginBegin sapUiMediumMarginEnd"
+                                visible="{headerInformationConfig>/consequtiveCountVisible}">
+                                <Label id="expandedPortionCountLabel"
+                                    text="Portion Count:"/>
+                                <ObjectStatus id="expandedPortionCount" text="{headerData>/portionCount}" />
+                            </l:VerticalLayout>
+                            <l:VerticalLayout class="sapUiSmallMarginBegin sapUiMediumMarginEnd"
                                 visible="{headerInformationConfig>/cumulativeCountVisible}">
                                 <Label id="expandedCumulativeCountLabel"
                                     text="Cumulative Count:"/>
@@ -77,6 +83,12 @@
                                 <Label id="expandedConsequtiveCountLabel"
                                     text="Consecutive Count:"/>
                                 <ObjectStatus id="expandedConsequtiveCount" text="{headerData>/consequtiveCount}" />
+                            </l:VerticalLayout>
+                            <l:VerticalLayout class="sapUiSmallMarginBegin sapUiMediumMarginEnd"
+                                visible="{headerInformationConfig>/consequtiveCountVisible}">
+                                <Label id="expandedTareCountLabel"
+                                    text="Tare Count:"/>
+                                <ObjectStatus id="expandedTareCount" text="{headerData>/tareCount}" />
                             </l:VerticalLayout>
                         </HBox>
                     </items>
