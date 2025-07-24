@@ -1,1 +1,9 @@
 /* Enter your custom styles here */
+.headerLabelText{
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.headerStatusText{
+    font-size: 0.9rem;
+}

@@ -30,65 +30,75 @@
                             <l:VerticalLayout class="sapUiSmallMarginBegin sapUiMediumMarginEnd"
                                 visible="{headerInformationConfig>/orderIdFieldVisible}">
                                 <Label id="expandedOrderIdLabel"
-                                    text="Order:"/>
-                                <ObjectStatus id="expandedOrderId" text="{headerData>/order}" />
+                                    text="Order:"
+                                    class="headerLabelText"/>
+                                <ObjectStatus id="expandedOrderId" class="headerStatusText" text="{headerData>/order}" />
                             </l:VerticalLayout>
                             <l:VerticalLayout class="sapUiSmallMarginBegin sapUiMediumMarginEnd"
                                 visible="{headerInformationConfig>/componentIdFieldVisible}">
                                 <Label id="expandedComponentIdLabel"
+                                    class="headerLabelText"
                                     text="Component:"
                                     tooltip="{headerInformationConfig>/orderIdFieldTooltip}" />
-                                <ObjectStatus id="expandedComponentId" text="{headerData>/component}" />
+                                <ObjectStatus id="expandedComponentId" class="headerStatusText" text="{headerData>/component}" />
                             </l:VerticalLayout>
                             <l:VerticalLayout class="sapUiSmallMarginBegin sapUiMediumMarginEnd"
                                 visible="{headerInformationConfig>/operatorIdFieldVisible}">
                                 <Label id="expandedOperatorIdLabel"
+                                    class="headerLabelText"
                                     text="Operator:"/>
-                                <ObjectStatus id="expandedOperatorId" text="{headerData>/operator}" />
+                                <ObjectStatus id="expandedOperatorId" class="headerStatusText" text="{headerData>/operator}" />
                             </l:VerticalLayout>
                             <l:VerticalLayout class="sapUiSmallMarginBegin sapUiMediumMarginEnd"
                                 visible="{headerInformationConfig>/resourceIdFieldVisible}">
                                 <Label id="expandedResourceIdLabel"
+                                    class="headerLabelText"
                                     text="Resource:"/>
-                                <ObjectStatus id="expandedResourceId" text="{headerData>/resource}" />
+                                <ObjectStatus id="expandedResourceId" class="headerStatusText" text="{headerData>/resource}" />
                             </l:VerticalLayout>
                              <l:VerticalLayout class="sapUiSmallMarginBegin sapUiMediumMarginEnd"
                                 visible="{headerInformationConfig>/passPortionVisible}">
                                 <Label id="expandedPassPortionLabel"
+                                    class="headerLabelText"
                                     text="Pass Portion:"
                                     tooltip="{headerInformationConfig>/orderIdFieldTooltip}" />
-                                <ObjectStatus id="expandedPassPortion" text="{headerData>/passPortion}" />
+                                <ObjectStatus id="expandedPassPortion" class="headerStatusText" text="{headerData>/passPortion}" />
                             </l:VerticalLayout>
                             <l:VerticalLayout class="sapUiSmallMarginBegin sapUiMediumMarginEnd"
                                 visible="{headerInformationConfig>/failPortionVisible}">
                                 <Label id="expandedFailPortionLabel"
+                                    class="headerLabelText"
                                     text="Fail Portion:"
                                     tooltip="{headerInformationConfig>/orderIdFieldTooltip}" />
-                                <ObjectStatus id="expandedFailPortion" text="{headerData>/failPortion}" />
+                                <ObjectStatus id="expandedFailPortion" class="headerStatusText" text="{headerData>/failPortion}" />
                             </l:VerticalLayout>
                             <l:VerticalLayout class="sapUiSmallMarginBegin sapUiMediumMarginEnd"
                                 visible="{headerInformationConfig>/consequtiveCountVisible}">
                                 <Label id="expandedPortionCountLabel"
+                                    class="headerLabelText"
                                     text="Portion Count:"/>
-                                <ObjectStatus id="expandedPortionCount" text="{headerData>/portionCount}" />
+                                <ObjectStatus id="expandedPortionCount" class="headerStatusText" text="{headerData>/portionCount}" />
                             </l:VerticalLayout>
                             <l:VerticalLayout class="sapUiSmallMarginBegin sapUiMediumMarginEnd"
                                 visible="{headerInformationConfig>/cumulativeCountVisible}">
                                 <Label id="expandedCumulativeCountLabel"
+                                    class="headerLabelText"
                                     text="Cumulative Count:"/>
-                                <ObjectStatus id="expandedCumulativeCount" text="{headerData>/cumulativeCount}" />
+                                <ObjectStatus id="expandedCumulativeCount" class="headerStatusText" text="{headerData>/cumulativeCount}" />
                             </l:VerticalLayout>
                             <l:VerticalLayout class="sapUiSmallMarginBegin sapUiMediumMarginEnd"
                                 visible="{headerInformationConfig>/consequtiveCountVisible}">
                                 <Label id="expandedConsequtiveCountLabel"
+                                    class="headerLabelText"
                                     text="Consecutive Count:"/>
-                                <ObjectStatus id="expandedConsequtiveCount" text="{headerData>/consequtiveCount}" />
+                                <ObjectStatus id="expandedConsequtiveCount" class="headerStatusText" text="{headerData>/consequtiveCount}" />
                             </l:VerticalLayout>
                             <l:VerticalLayout class="sapUiSmallMarginBegin sapUiMediumMarginEnd"
                                 visible="{headerInformationConfig>/consequtiveCountVisible}">
                                 <Label id="expandedTareCountLabel"
+                                    class="headerLabelText"
                                     text="Tare Count:"/>
-                                <ObjectStatus id="expandedTareCount" text="{headerData>/tareCount}" />
+                                <ObjectStatus id="expandedTareCount" class="headerStatusText" text="{headerData>/tareCount}" />
                             </l:VerticalLayout>
                         </HBox>
                     </items>
