@@ -165,8 +165,10 @@ sap.ui.define(
         Format.numericFormatter(ChartFormatter.getInstance());
 
         var oView = this.getView();
-        oView.setModel(new JSONModel(), 'data');
-        oView.setModel(new JSONModel(), 'tareData');
+        oView.setModel(new JSONModel({ data: [] }), 'data');
+        oView.setModel(new JSONModel({ data: [] }), 'tareData');
+
+        this.selectedChart = 0; //Consumption chart selected by default
       },
 
       onBeforeRendering: function (oEvent) {},
@@ -178,10 +180,11 @@ sap.ui.define(
         this._loadChartData();
 
         //Auto refresh the data after 5minutes
-        this.refreshInterval = setInterval(()=>{
-          this.onRefreshIconPress();
-          console.log('Refreshing chart data')
-        }, 5*60*1000);
+        this.refreshInterval = setInterval(() => {
+          // this.onRefreshIconPress();
+          this._refreshChartData();
+          console.log('Refreshing chart data');
+        }, 5 * 60 * 1000);
       },
 
       onAfterRendering: function (oEvent) {
@@ -204,6 +207,7 @@ sap.ui.define(
 
       onChartContainerDimensionChange: function (oEvent) {
         var iSelectedKey = parseInt(oEvent.getSource().getSelectedKey());
+        this.selectedChart = iSelectedKey;
         switch (iSelectedKey) {
           case 0:
             this._loadChartData();
@@ -220,8 +224,26 @@ sap.ui.define(
       },
 
       onRefreshIconPress: function () {
-        this._loadChartData();
-        this._loadTareData();
+        this._refreshChartData();
+        // this._loadChartData();
+        // this._loadTareData();
+        // this.publish('stelReloadChartData', {
+        //   source: this,
+        //   sendToAllPages: true
+        // });
+      },
+
+      _refreshChartData: function () {
+        switch (this.selectedChart) {
+          case 0:
+            this._loadChartData();
+            break;
+
+          case 1:
+            this._loadTareData();
+            break;
+        }
+
         this.publish('stelReloadChartData', {
           source: this,
           sendToAllPages: true
@@ -341,8 +363,13 @@ sap.ui.define(
           sUrl,
           oPayload,
           (oResponse) => {
-            var oModel = oView.getModel('data');
-            oModel.setProperty('/data', oResponse);
+            // var oModel = oView.getModel('data');
+            // oModel.setProperty('/data', oResponse);
+            // oModel.refresh(true);
+            // this._initChart(this.selectedChart);
+            var oModel = new JSONModel({ data: oResponse });
+            oView.setModel(oModel, 'data');
+            this._initChart(this.selectedChart);
           },
           (oError) => {
             console.error(...arguments);
@@ -369,8 +396,12 @@ sap.ui.define(
           sUrl,
           oParams,
           (oResponse) => {
-            var oModel = oView.getModel('tareData');
-            oModel.setProperty('/data', oResponse);
+            // var oModel = oView.getModel('tareData');
+            // oModel.setProperty('/data', oResponse);
+            // oModel.refresh(true);
+            var oModel = new JSONModel({ data: oResponse });
+            oView.setModel(oModel, 'tareData');
+            this._initChart(this.selectedChart);
           },
           (oError) => {
             console.error(...arguments);
