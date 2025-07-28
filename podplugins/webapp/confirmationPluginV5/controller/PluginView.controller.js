@@ -3178,9 +3178,12 @@ sap.ui.define(
 
       _postConsolidatedConsumption: function() {
         //AD_PT_CONSOLIDATED_CONSUMPTION - CPP_consolidatedConsumptionAndPosting
+        // var sUrl =
+        //   this.getPublicApiRestDataSourceUri() +
+        //   '/pe/api/v1/process/processDefinitions/start?key=REG_1395457a-18fa-4342-9c52-d0269ad871e9&async=false';
         var sUrl =
           this.getPublicApiRestDataSourceUri() +
-          '/pe/api/v1/process/processDefinitions/start?key=REG_1395457a-18fa-4342-9c52-d0269ad871e9&async=false';
+          '/pe/api/v1/process/processDefinitions/start?key=REG_951d852f-0620-4a84-9f60-0eb5407428e1&async=false';
         var oSelection = this.getPodSelectionModel().getSelection();
         var oParams = {
           InPlant: this.getPodController().getUserPlant(),
