@@ -5056,6 +5056,9 @@ sap.ui.define(
       },
       onWeighDialogCancel: function(oEvent) {
         this.oWeighDispenseHandler.closeWeighingDialog(oEvent);
+
+        //Refresh material consumption data on close 
+        this.getMaterialConsumptionData(null, null, this.selectedDataInList);
       },
 
       onSelectScale: async function(oEvent) {
