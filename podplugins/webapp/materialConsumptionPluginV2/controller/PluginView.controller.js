@@ -1364,6 +1364,13 @@ sap.ui.define(
         }
         this.setNumberOfItemsInBatchList();
         this.onSearchBatchListWithValue();
+        
+        //Sort the batches based on expiry date and quantity
+        oTable.getBinding('items').sort([
+          new sap.ui.model.Sorter('expiry', false),
+          new sap.ui.model.Sorter('qtyFormatted', true)
+        ]);
+
         oDialog.setBusy(false);
       },
 
