@@ -854,7 +854,8 @@ sap.ui.define(
               oParameters,
               function(oResponseData) {
                 that.filteredRecords = that.filterRecordsWithZeroQuantity(oResponseData);
-                that.filteredRecords = that.fitlerRecordsWithQualityInspection(oResponseData);
+                that.filteredRecords = that.fitlerRecordsWithQualityInspection(oResponseData);                
+                that.filteredRecords = that.filterRecordsWithExpiredBatch(that.filteredRecords);
                 that.batchDetailsList = that.filteredRecords;
                 if (!that.isInventoryManaged) {
                   that.batchDetailsList = that.filteredRecords.content;
@@ -1515,6 +1516,17 @@ sap.ui.define(
           }
           aFilteredRecords.push(oResponseData[i]);
         }
+        return aFilteredRecords;
+      },
+      
+      filterRecordsWithExpiredBatch: function(oResponseData){
+        let aFilteredRecords = oResponseData.filter(oItem=> {
+          if(!oItem.batch.shelfLifeExpirationDate){
+              return true;
+          }
+          return moment(oItem.batch.shelfLifeExpirationDate).isSameOrAfter(new Date());
+        });
+
         return aFilteredRecords;
       },
 
