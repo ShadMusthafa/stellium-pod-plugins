@@ -9,10 +9,6 @@
                     customIcon="sap-icon://bar-code" class="sapUiTinyMargin" />
                 <f:SimpleForm id="scanWeighMaterialForm" editable="true" layout="ColumnLayout">
                     <f:content>
-                        <Label text="{i18n>LabelOrderNumber}" />
-                        <Text id="inputScanOrderNum" text="{scanWeighingModel>/shopOrder}" />
-                        <Label text="{i18n>LabelPhase}" />
-                        <Text id="inputScanPhaseID" text="{scanWeighingModel>/phaseId}" />
                         <!-- Handling unit scan begin   -->
                         <Label text="{i18n>handlingUnitScanLabel}"/>
                         <Input id="idHandlingUnitScanInput"
@@ -51,6 +47,11 @@
                             <f:ColumnElementData cellsSmall="5" cellsLarge="3" />
                         </layoutData>
                         </Input>
+                        
+                        <Label text="{i18n>LabelOrderNumber}" />
+                        <Text id="inputScanOrderNum" text="{scanWeighingModel>/shopOrder}" />
+                        <Label text="{i18n>LabelPhase}" />
+                        <Text id="inputScanPhaseID" text="{scanWeighingModel>/phaseId}" />
                         <Label text="{i18n>avlQty}" />
                         <Text id="inputScanAvlQty" text="{scanWeighingModel>/avlBatchQty}" />
                         <Label text="{i18n>LabelScale}" />

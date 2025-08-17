@@ -4388,7 +4388,7 @@ sap.ui.define(
         this.byId('inputUnitScan').setValue('');
         this.byId('inputPostedByScan').setValue('');
         this.byId('inputPostingDateScan').setValue('');
-        this.byId('inputCommentsForScan').setValue('');
+        // this.byId('inputCommentsForScan').setValue('');
         this.customFieldJson = [];
 
         this.byId('giConfirmBtnScan').setEnabled(false);
@@ -4397,7 +4397,7 @@ sap.ui.define(
         ErrorHandler.clearErrorState(this.byId('inputBatchIdScan'));
         ErrorHandler.clearErrorState(this.byId('inputPostedByScan'));
         ErrorHandler.clearErrorState(this.byId('inputPostingDateScan'));
-        ErrorHandler.clearErrorState(this.byId('inputCommentsForScan'));
+        // ErrorHandler.clearErrorState(this.byId('inputCommentsForScan'));
       },
 
       onConfirmandNext: function() {

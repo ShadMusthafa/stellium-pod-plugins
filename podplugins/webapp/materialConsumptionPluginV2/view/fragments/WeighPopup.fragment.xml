@@ -7,14 +7,6 @@
             <l:VerticalLayout width="100%">
                 <f:SimpleForm id="weighMaterialForm" editable="true" layout="ColumnLayout">
                     <f:content>
-                        <Label text="{i18n>LabelOrderNumber}" />
-                        <Text text="{weighingModel>/shopOrder}" />
-                        <Label text="{i18n>LabelPhase}" />
-                        <Text text="{weighingModel>/phaseId}" />
-                        <Label text="{i18n>matNum}" />
-                        <Text text="{weighingModel>/material}" class="boldText" />
-                        <Label text="{i18n>materialDescription}" />
-                        <Text text="{weighingModel>/materialDescription}" />
                         <!-- Handling unit scan begin   -->
                         <Label text="{i18n>handlingUnitScanLabel}"/>
                         <Input id="idHandlingUnitScanInput4"
@@ -32,18 +24,27 @@
                             valueHelpRequest="showBatchDetails"
                             valueHelpOnly="{ parts: [ 'configModel>/allowFreeTextForBatch', 'weighingModel>/material' ], formatter: '.oFormatter.getValueHelpOnly' }"
                             change="onBatchChange" liveChange="onBatchLiveChange">
-                        <layoutData>
-                            <f:ColumnElementData cellsSmall="5" cellsLarge="3" />
-                        </layoutData>
+                            <layoutData>
+                                <f:ColumnElementData cellsSmall="5" cellsLarge="3" />
+                            </layoutData>
                         </Input>
                         <Input id="inStorageLocation" textAlign="Right"
                             enabled="{=!${weighingModel>/batchManaged} &amp;&amp; ${weighingModel>/materialType} !== 'PIPELINE'}"
                             showValueHelp="true" valueHelpOnly="true" valueHelpRequest="showStorageLocationDetails"
                             value="{weighingModel>/storageLocation}">
-                        <layoutData>
-                            <f:ColumnElementData cellsSmall="5" cellsLarge="3" />
-                        </layoutData>
+                            <layoutData>
+                                <f:ColumnElementData cellsSmall="5" cellsLarge="3" />
+                            </layoutData>
                         </Input>
+                        
+                        <Label text="{i18n>LabelOrderNumber}" />
+                        <Text text="{weighingModel>/shopOrder}" />
+                        <Label text="{i18n>LabelPhase}" />
+                        <Text text="{weighingModel>/phaseId}" />
+                        <Label text="{i18n>matNum}" />
+                        <Text text="{weighingModel>/material}" class="boldText" />
+                        <Label text="{i18n>materialDescription}" />
+                        <Text text="{weighingModel>/materialDescription}" />
                         <Label text="{i18n>avlQty}" />
                         <Text id="inputAvlQty" text="{weighingModel>/avlBatchQty}" />
                         <Label text="{i18n>LabelScale}" />
@@ -159,10 +160,10 @@
                     <Label text="{i18n>calculateQTYtoConsume.comments.lbl}" />
                     <TextArea id="inWeighingComments" maxLength="2048" rows="3" value="{weighingModel>/comments}"
                         growing="true" liveChange="onChangeOfComments">
-<layoutData>
-<f:ColumnElementData cellsSmall="10" cellsLarge="6"/>
-</layoutData>
-</TextArea>
+                        <layoutData>
+                        <f:ColumnElementData cellsSmall="10" cellsLarge="6"/>
+                        </layoutData>
+                    </TextArea>
                 </f:content>
             </f:SimpleForm>
         </content>

@@ -4,10 +4,6 @@
             labelSpanL="2" labelSpanM="4" labelSpanS="4" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"
             emptySpanM="0" emptySpanS="0" columnsXL="1" columnsL="1" columnsM="1" singleContainerFullSize="true">
             <f:content>
-                <Label text="{i18n>matNum}" />
-                <Text id="inputMatNum" text="{consumeModel>/material}" class="boldText" />
-                <Label text="{i18n>materialDescription}" />
-                <Text id="inputMatDesc" text="{consumeModel>/materialDescription}" />
                 <!-- Handling unit scan begin   -->
                 <Label text="{i18n>handlingUnitScanLabel}"/>
                 <Input id="idHandlingUnitScanInput3"
@@ -26,6 +22,11 @@
                     valueHelpRequest="showBatchDetails"
                     valueHelpOnly="{parts: ['configModel>/allowFreeTextForBatch', 'consumeModel>/material'], formatter: '.oFormatter.getValueHelpOnly'}"
                     change="onBatchChange" liveChange="onBatchLiveChange"> </Input>
+                    
+                <Label text="{i18n>matNum}" />
+                <Text id="inputMatNum" text="{consumeModel>/material}" class="boldText" />
+                <Label text="{i18n>materialDescription}" />
+                <Text id="inputMatDesc" text="{consumeModel>/materialDescription}" />
 
                 <!-- <Label text="{i18n>storageLocation}" required="{parts: ['consumeModel>/batchManaged', 'consumeModel>/material', 'consumeModel>/materialType', 'invManagedModel>/isInventoryManaged', 'consumeModel>/isEWM'], formatter: '.oFormatter.getEnabledStorageLoc'}"/>
 <Input id="storageLocation" textAlign="Right" enabled="{parts: ['consumeModel>/batchManaged', 'consumeModel>/material', 'consumeModel>/materialType', 'invManagedModel>/isInventoryManaged', 'consumeModel>/isEWM'], formatter: '.oFormatter.getEnabledStorageLoc'}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="showStorageLocationDetails" value="{consumeModel>/storageLocation}"> </Input> -->
