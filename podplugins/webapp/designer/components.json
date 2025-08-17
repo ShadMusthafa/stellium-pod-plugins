@@ -147,7 +147,7 @@
       "controller": "sap.dm.dme.plugins.orderPodSelectionPlugin",
       "inclusions": [
         {
-          "pods": ["SMDEV_EXTENSION*", "SMDEV_SUPERVISOR_BATCH"],
+          "pods": ["SMDEV_EXTENSION*", "SMDEV_SUPERVISOR_BATCH", "*BATCH_CORRECTION", "*BATCH CORRECTION*"],
           "plants": ["M206"]
         }
       ]
