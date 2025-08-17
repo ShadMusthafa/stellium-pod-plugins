@@ -232,7 +232,17 @@ sap.ui.define(
       //   );
 
       // },
+      
+      _getResourceWorkcenterData:function(sResource){
+        var sUrl = this.getPublicApiRestDataSourceUri() + 'workcenter/v2/workcenters';
+        var oParamters = {
+          plant: this.getPodController().getUserPlant(),
+          resourceMembers: sResource
+        };
 
+        return new Promise((resolve, reject) => this.ajaxGetRequest(sUrl, oParamters, resolve, reject));
+      },
+      
       _getGoodsIssueSummary: function() {
         var sUrl = this.getPublicApiRestDataSourceUri() + 'processorder/v2/goodsIssue/summary';
         var oParams = {
@@ -1466,6 +1476,17 @@ sap.ui.define(
         var bResourceValid = await this._validateResourceStatus(this.selectedOrderData.resource.resource);
         if (!bResourceValid) {
           MessageBox.error('Resource is not in productive / enabled status');
+          return;
+        }
+
+        var sResource = this.selectedOrderData.resource.resource;
+        var bResourceSchedulingRelevant = await this._getResourceWorkcenterData(sResource).then(oResponse=>{
+          let oResource = oResponse[0].members.find(oMember=> oMember.resource.resource === sResource);
+          return oResource.schedulingRelevant
+        });
+
+        if(!bResourceSchedulingRelevant){
+          MessageBox.error(this.getI18nText('workcenterResourceIsNotOEERelevant'));
           return;
         }
 
