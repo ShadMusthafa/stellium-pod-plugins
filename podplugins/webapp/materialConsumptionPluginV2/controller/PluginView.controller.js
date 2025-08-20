@@ -855,7 +855,7 @@ sap.ui.define(
               function(oResponseData) {
                 that.filteredRecords = that.filterRecordsWithZeroQuantity(oResponseData);
                 that.filteredRecords = that.fitlerRecordsWithQualityInspection(oResponseData);                
-                that.filteredRecords = that.filterRecordsWithExpiredBatch(that.filteredRecords);
+                // that.filteredRecords = that.filterRecordsWithExpiredBatch(that.filteredRecords);
                 that.batchDetailsList = that.filteredRecords;
                 if (!that.isInventoryManaged) {
                   that.batchDetailsList = that.filteredRecords.content;
@@ -1524,7 +1524,7 @@ sap.ui.define(
           if(!oItem.batch.shelfLifeExpirationDate){
               return true;
           }
-          return moment(oItem.batch.shelfLifeExpirationDate).isSameOrAfter(new Date());
+          return moment(oItem.batch.shelfLifeExpirationDate).isSameOrAfter(moment().format('YYYY-MM-DD'));
         });
 
         return aFilteredRecords;
@@ -2663,7 +2663,7 @@ sap.ui.define(
       onCancelConsumeDialog: function() {
         this.isConsumeDialogOpen = false;
         var oFormLength = this.byId('consumeMaterialForm').getContent().length;
-        for (var i = oFormLength; i > 23; i--) {
+        for (var i = oFormLength; i > 25; i--) {
           this.byId('consumeMaterialForm').getContent()[i - 1].destroy();
         }
         this.byId('consumeDialog').close();
@@ -2681,7 +2681,7 @@ sap.ui.define(
         this.byId('inputPostedBy').setValue('');
         this.byId('inputPostingDate').setValue('');
         this.byId('avlQty').setText('');
-        // this.byId('inputCommentsForConsume').setValue('');
+        this.byId('inputCommentsForConsume').setValue('');
         this.customFieldJson = [];
         //this.byId("expDate").setText("");
 
@@ -2693,7 +2693,7 @@ sap.ui.define(
         ErrorHandler.clearErrorState(this.byId('inputBatchId'));
         ErrorHandler.clearErrorState(this.byId('inputPostedBy'));
         ErrorHandler.clearErrorState(this.byId('inputPostingDate'));
-        // ErrorHandler.clearErrorState(this.byId('inputCommentsForConsume'));
+        ErrorHandler.clearErrorState(this.byId('inputCommentsForConsume'));
       },
 
       onQuantityLiveChange: function(oEvent) {

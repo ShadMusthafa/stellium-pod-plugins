@@ -106,10 +106,10 @@
                     width="100%" />
                 <TextArea id="inputCommentsForConsume" maxLength="2048" rows="3" width="100%"
                     value="{consumeModel>/comments}" growing="true" liveChange="onChangeOfComments">
-<layoutData>
-<l:GridData span="XL8 L8 M8 S8"/>
-</layoutData>
-</TextArea>
+                    <layoutData>
+                    <l:GridData span="XL8 L8 M8 S8"/>
+                    </layoutData>
+                </TextArea>
             </f:content>
         </f:SimpleForm>
         <buttons>

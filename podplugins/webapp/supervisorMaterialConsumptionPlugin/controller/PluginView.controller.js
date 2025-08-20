@@ -2620,7 +2620,7 @@ sap.ui.define(
       onCancelConsumeDialog: function() {
         this.isConsumeDialogOpen = false;
         var oFormLength = this.byId('consumeMaterialForm').getContent().length;
-        for (var i = oFormLength; i > 23; i--) {
+        for (var i = oFormLength; i > 25; i--) {
           this.byId('consumeMaterialForm').getContent()[i - 1].destroy();
         }
         this.byId('consumeDialog').close();
@@ -2638,7 +2638,7 @@ sap.ui.define(
         this.byId('inputPostedBy').setValue('');
         this.byId('inputPostingDate').setValue('');
         this.byId('avlQty').setText('');
-        // this.byId('inputCommentsForConsume').setValue('');
+        this.byId('inputCommentsForConsume').setValue('');
         this.customFieldJson = [];
         //this.byId("expDate").setText("");
 
@@ -2650,7 +2650,7 @@ sap.ui.define(
         ErrorHandler.clearErrorState(this.byId('inputBatchId'));
         ErrorHandler.clearErrorState(this.byId('inputPostedBy'));
         ErrorHandler.clearErrorState(this.byId('inputPostingDate'));
-        // ErrorHandler.clearErrorState(this.byId('inputCommentsForConsume'));
+        ErrorHandler.clearErrorState(this.byId('inputCommentsForConsume'));
       },
 
       onQuantityLiveChange: function(oEvent) {
