@@ -25,7 +25,7 @@ sap.ui.define(
     'sap/ui/comp/filterbar/FilterBar',
     'sap/dm/dme/util/InventoryManagementSettings'
   ],
-  function(
+  function (
     ListPluginViewController,
     JSONModel,
     AjaxUtil,
@@ -63,7 +63,7 @@ sap.ui.define(
       oCoBiProduct: {},
       parkedItemList: [],
 
-      onInit: function() {
+      onInit: function () {
         if (ListPluginViewController.prototype.onInit) {
           ListPluginViewController.prototype.onInit.apply(this, arguments);
         }
@@ -129,23 +129,23 @@ sap.ui.define(
         this.workinstructionsLoaded = 0;
         this.alternateBomComponentsLoaded = 0;
       },
-      isSubscribingToNotifications: function() {
+      isSubscribingToNotifications: function () {
         return true;
       },
 
       /*
-         * Return the function to be called when a WD Scale
-         * notification message is received
-         * @override
-         */
-      getNotificationMessageHandler: function(sTopic) {
+       * Return the function to be called when a WD Scale
+       * notification message is received
+       * @override
+       */
+      getNotificationMessageHandler: function (sTopic) {
         if (sTopic === Topic.WD_SCALE) {
           return this.handleWdScaleMessage;
         }
         return null;
       },
 
-      handleWdScaleMessage: function(oMsg) {
+      handleWdScaleMessage: function (oMsg) {
         oLogger.info('Got Scale message: ', oMsg);
         const oScaleList = this.oWeighDispenseHandler.getCurrentWeighScaleList();
         // const sSelectedScale = oScaleList && oScaleList.getSelectedKey();
@@ -160,7 +160,7 @@ sap.ui.define(
         }
       },
 
-      onBeforeRendering: function() {
+      onBeforeRendering: function () {
         this.oPluginConfiguration = this.getConfiguration();
         var viewModel = new JSONModel();
         viewModel.setData(this.oPluginConfiguration);
@@ -181,13 +181,13 @@ sap.ui.define(
             invManagedModel.setData(isInvManaged);
             that.getView().setModel(invManagedModel, 'invManagedModel');
           })
-          .catch(function(sErrorMessage) {
+          .catch(function (sErrorMessage) {
             oLogger.error(sErrorMessage);
           });
         this.getCharcConfigData();
       },
 
-      getCharcConfigData: function() {
+      getCharcConfigData: function () {
         var that = this;
         var sCharcLongString = that.oPluginConfiguration.charcForAdvSearch;
         var charcList = [];
@@ -202,7 +202,7 @@ sap.ui.define(
           AjaxUtil.post(
             sUrl + 'characteristics/findByCharcNames',
             charcList,
-            function(oResponseData) {
+            function (oResponseData) {
               var oResponseCharcList = oResponseData.classificationCharacteristics;
               charcList = [];
               var locale = sap.ui.getCore().getConfiguration().getLocale().getLanguage();
@@ -216,14 +216,14 @@ sap.ui.define(
               }
               that.charcForAdvancedSearch = charcList;
             },
-            function() {
+            function () {
               that.charcForAdvancedSearch = [];
             }
           );
         }
       },
 
-      getLocaleSpecificDescription: function(oCharc, sLocale) {
+      getLocaleSpecificDescription: function (oCharc, sLocale) {
         var sDesc = undefined;
         var sEnDesc = undefined;
         var i;
@@ -239,7 +239,7 @@ sap.ui.define(
         return sDesc || sEnDesc || oCharc.name;
       },
 
-      onBeforeRenderingPlugin: function() {
+      onBeforeRenderingPlugin: function () {
         this.oWeighDispenseHandler = WeighDispenseHandler.getInstance(this);
         // get current user ID from plant user service
         this.loggedInUserDetails = this.getGlobalProperty('loggedInUserDetails') ? this.getGlobalProperty('loggedInUserDetails') : '';
@@ -253,7 +253,7 @@ sap.ui.define(
         });
       },
 
-      onTabItemSelected: function() {
+      onTabItemSelected: function () {
         // just to fix scanner rendering issue on load
         if (this.oPluginConfiguration === undefined) {
           this.oPluginConfiguration = this.getConfiguration();
@@ -266,7 +266,7 @@ sap.ui.define(
         }
       },
 
-      onExit: function() {
+      onExit: function () {
         ListPluginViewController.prototype.onExit.apply(this, arguments);
         this.unsubscribe('phaseSelectionEvent', this.getMaterialConsumptionData, this);
         this.unsubscribe('WorkInstructionChangeEvent', this.getMaterialConsumptionData, this);
@@ -274,7 +274,7 @@ sap.ui.define(
         this.unsubscribe('QuantityConfirmationChangeEvent', this.getMaterialConsumptionData, this);
       },
 
-      isSideContent: function(oControl) {
+      isSideContent: function (oControl) {
         var oParent = oControl.getParent() || oControl.oContainer;
         if (oParent) {
           if (oParent.sParentAggregationName && oParent.sParentAggregationName === 'sideContent') {
@@ -290,7 +290,7 @@ sap.ui.define(
         }
       },
 
-      getCurrentModel: function() {
+      getCurrentModel: function () {
         var oView = this.getView();
         if (this.isScanDialogOpen && this.isScanDialogOpen === true) return oView.getModel('scanModel');
         if (this.isAddDialogOpen && this.isAddDialogOpen === true) return oView.getModel('addModel');
@@ -300,7 +300,7 @@ sap.ui.define(
         // C5278086 Adding changes for W&D End
       },
 
-      getCurrentDialogId: function() {
+      getCurrentDialogId: function () {
         if (this.isScanDialogOpen && this.isScanDialogOpen === true) return 'scanDialog';
         if (this.isAddDialogOpen && this.isAddDialogOpen === true) return 'addDialog';
         if (this.isConsumeDialogOpen && this.isConsumeDialogOpen === true) return 'consumeDialog';
@@ -309,7 +309,7 @@ sap.ui.define(
         // C5278086 Adding changes for W&D End
       },
 
-      getCurrentSaveButton: function() {
+      getCurrentSaveButton: function () {
         var oView = this.getView();
         if (this.isScanDialogOpen && this.isScanDialogOpen === true) return oView.byId('giConfirmBtnScan');
         if (this.isAddDialogOpen && this.isAddDialogOpen === true) return oView.byId('giConfirmBtnAdd');
@@ -319,7 +319,7 @@ sap.ui.define(
         // C5278086 Adding changes for W&D End
       },
 
-      getCurrentCancelButton: function() {
+      getCurrentCancelButton: function () {
         var oView = this.getView();
         if (this.isScanDialogOpen && this.isScanDialogOpen === true) return oView.byId('giCancelBtnScan');
         if (this.isAddDialogOpen && this.isAddDialogOpen === true) return oView.byId('giCancelBtnAdd');
@@ -329,7 +329,7 @@ sap.ui.define(
         // C5278086 Adding changes for W&D End
       },
 
-      getCurrentInputMaterialControl: function() {
+      getCurrentInputMaterialControl: function () {
         var oView = this.getView();
         if (this.isScanDialogOpen && this.isScanDialogOpen === true) return oView.byId('inputMatNumScan');
         if (this.isAddDialogOpen && this.isAddDialogOpen === true) return oView.byId('inputMatNumAdd');
@@ -338,7 +338,7 @@ sap.ui.define(
         //  C5278086 Adding changes for W&D End
       },
 
-      getCurrentInputHuControl: function() {
+      getCurrentInputHuControl: function () {
         var oView = this.getView();
         if (this.isScanDialogOpen && this.isScanDialogOpen === true) return oView.byId('idHandlingUnitScanInput2');
         if (this.isAddDialogOpen && this.isAddDialogOpen === true) return oView.byId('inputMatNumAdd');
@@ -349,7 +349,7 @@ sap.ui.define(
         //  C5278086 Adding changes for W&D End
       },
 
-      getCurrentInputBatchIdControl: function() {
+      getCurrentInputBatchIdControl: function () {
         var oView = this.getView();
         if (this.isScanDialogOpen && this.isScanDialogOpen === true) return oView.byId('inputBatchIdScan');
         if (this.isAddDialogOpen && this.isAddDialogOpen === true) return oView.byId('inputBatchIdAdd');
@@ -359,17 +359,17 @@ sap.ui.define(
         // C5278086 Adding changes for W&D End
       },
 
-      getCurrentInputQuantityControl: function() {
+      getCurrentInputQuantityControl: function () {
         return this.oWeighDispenseHandler.getCurrentInputQuantityControl();
       },
 
-      getFormControl: function() {
+      getFormControl: function () {
         if (this.getCurrentForm()) {
           return this.getCurrentForm().getContent();
         }
       },
 
-      getCurrentForm: function() {
+      getCurrentForm: function () {
         var oView = this.getView();
         if (this.isScanDialogOpen && this.isScanDialogOpen === true) return oView.byId('scanMaterialForm');
         if (this.isAddDialogOpen && this.isAddDialogOpen === true) return oView.byId('addMaterialForm');
@@ -379,7 +379,7 @@ sap.ui.define(
         // C5278086 Adding changes for W&D End
       },
 
-      getCurrentCommentsControl: function() {
+      getCurrentCommentsControl: function () {
         var oView = this.getView();
         if (this.isScanDialogOpen && this.isScanDialogOpen === true) return oView.byId('inputCommentsForScan');
         if (this.isAddDialogOpen && this.isAddDialogOpen === true) return oView.byId('inputCommentsAddMaterial');
@@ -389,7 +389,7 @@ sap.ui.define(
         // C5278086 Adding changes for W&D End
       },
 
-      getMaterialConsumptionData: function(sChannelId, sEventId, oData) {
+      getMaterialConsumptionData: function (sChannelId, sEventId, oData) {
         if (!oData.workInstruction && !oData.goodsReceipt && !oData.quantityConfirmation) {
           this.selectedDataInList = oData;
         }
@@ -423,12 +423,12 @@ sap.ui.define(
       },
 
       // Create an Auth Model for user work center authorization and bind to view
-      setAuthModel: function(oData) {
+      setAuthModel: function (oData) {
         this.authModel = new JSONModel(oData);
         this.getView().setModel(this.authModel, 'authModel');
       },
 
-      onSearch: function(oEvt) {
+      onSearch: function (oEvt) {
         // add filter for search
         var sQuery = oEvt.getParameter('newValue');
         if (sQuery && sQuery.length > 0) {
@@ -444,11 +444,11 @@ sap.ui.define(
         binding.filter(allFilters);
       },
 
-      getCurrentDateInPlantTimeZone: function() {
+      getCurrentDateInPlantTimeZone: function () {
         return moment().tz(this.plantTimeZoneId).format('YYYY-MM-DD');
       },
 
-      onChangePostingDate: function(oEvent) {
+      onChangePostingDate: function (oEvent) {
         var inputFieldId = oEvent.getSource().getId();
         var inputPostingDate = oEvent.getSource().getValue();
         ErrorHandler.clearErrorState(oEvent.getSource());
@@ -471,7 +471,7 @@ sap.ui.define(
         }
       },
 
-      showDetailsOfComponent: function(oEvent) {
+      showDetailsOfComponent: function (oEvent) {
         var oView = this.getView();
         var rowData = oEvent.getSource().getBindingContext().getObject();
         var oController = this;
@@ -480,9 +480,9 @@ sap.ui.define(
             id: oView.getId(),
             name: 'stellium.ext.podplugins.materialConsumptionPlugin.view.fragments.PostingsDialog',
             controller: this
-          }).then(function(oDialog) {
+          }).then(function (oDialog) {
             oDialog.setEscapeHandler(
-              function(oPromise) {
+              function (oPromise) {
                 oController.onClosePostingsDialog();
                 oPromise.resolve();
               }.bind(oController)
@@ -497,7 +497,7 @@ sap.ui.define(
         }
       },
 
-      showDetailsOfComponentCoBy: function(oEvent) {
+      showDetailsOfComponentCoBy: function (oEvent) {
         var selectedOrderData = {
           orderRef: this.selectedDataInList.selectedShopOrderRef,
           order: this.selectedDataInList.selectedShopOrder,
@@ -516,7 +516,7 @@ sap.ui.define(
         this.GRPostController.showGRPostingsDialogs(oParameters);
       },
 
-      showStorageLocationDetails: function(oEvent) {
+      showStorageLocationDetails: function (oEvent) {
         var oView = this.getView();
         var oController = this;
         var oModel = this.getCurrentModel();
@@ -529,7 +529,7 @@ sap.ui.define(
             id: oView.getId(),
             name: 'stellium.ext.podplugins.materialConsumptionPlugin.view.fragments.StorageLocationDialog',
             controller: this
-          }).then(function(oDialog) {
+          }).then(function (oDialog) {
             oView.addDependent(oDialog);
             oDialog.open();
             oController.fetchStorageLocationDetails(sSelectedStorageLocation);
@@ -540,7 +540,7 @@ sap.ui.define(
         }
       },
 
-      handleStorageLocationDetails: function(sStorageLocation) {
+      handleStorageLocationDetails: function (sStorageLocation) {
         var sUrl = '';
         var inventryUrl = this.getInventoryDataSourceUri();
         var oParameters = {};
@@ -564,13 +564,13 @@ sap.ui.define(
         AjaxUtil.get(
           sUrl,
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             that.storageLocationDetailsList = [];
             if (!that.isInventoryManaged) {
               that.handleStorageLocationData(oResponseData);
               oResponseData.content &&
                 oResponseData.content.length > 0 &&
-                oResponseData.content.forEach(e => {
+                oResponseData.content.forEach((e) => {
                   that.storageLocationDetailsList.push({
                     storageLocation: { storageLocation: e.storageLocation },
                     remainingQuantity: e.quantity,
@@ -592,14 +592,14 @@ sap.ui.define(
             }
             that.byId('storageLocationDialog').setBusy(false);
           },
-          function(oError, oHttpErrorMessage) {
+          function (oError, oHttpErrorMessage) {
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
             that.storageLocationDetailsList = {};
           }
         );
       },
-      fetchStorageLocationDetails: function(sStorageLocation) {
+      fetchStorageLocationDetails: function (sStorageLocation) {
         let that = this;
         let oModel = this.getCurrentModel();
         if (oModel.getProperty('/storageLocation')) {
@@ -610,7 +610,7 @@ sap.ui.define(
         this.handleStorageLocationDetails(sStorageLocation);
       },
 
-      onGetStockForStorageLoc: function(oEvent) {
+      onGetStockForStorageLoc: function (oEvent) {
         var oSource = oEvent.getSource();
         var oObject = oSource.getBindingContext('storageLocationModel').getObject();
         var oStorageLocModel = this.byId('storageLocationDialog').getModel('storageLocationModel');
@@ -627,7 +627,7 @@ sap.ui.define(
         AjaxUtil.get(
           sUrl,
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             var stockDetails = oResponseData.content;
             oObject.remainingQuantity = stockDetails && stockDetails[0] ? stockDetails[0].quantity : 0;
             var sUom = stockDetails && stockDetails[0] ? stockDetails[0].materialBaseUnit : '';
@@ -636,7 +636,7 @@ sap.ui.define(
             oStorageLocModel.refresh();
             oController.byId('storageLocationDialog').setBusy(false);
           },
-          function(oError, oHttpErrorMessage) {
+          function (oError, oHttpErrorMessage) {
             var err = oError ? oError : oHttpErrorMessage;
             oController.showErrorMessage(err, true, true);
             oController.byId('storageLocationDialog').setBusy(false);
@@ -645,7 +645,7 @@ sap.ui.define(
         );
       },
 
-      onSearchUserList: function(oEvent) {
+      onSearchUserList: function (oEvent) {
         // add filter for search
         var aFilters = [];
         var oFilterWithAllProperties;
@@ -666,7 +666,7 @@ sap.ui.define(
         oBinding.filter(oFilterWithAllProperties);
       },
 
-      showBatchDetails: function(oEvent) {
+      showBatchDetails: function (oEvent) {
         var oView = this.getView();
         this.characteristicsColumns = [];
         this.multiStorLocs = [];
@@ -686,9 +686,9 @@ sap.ui.define(
             name: 'stellium.ext.podplugins.materialConsumptionPlugin.view.fragments.BatchDialog',
             controller: this
           }).then(
-            function(oDialog) {
+            function (oDialog) {
               oDialog.setEscapeHandler(
-                function(oPromise) {
+                function (oPromise) {
                   this.onCloseBatchDialog();
                   this.characteristicsColumns = [];
                   oPromise.resolve();
@@ -707,16 +707,13 @@ sap.ui.define(
         }
       },
 
-      executeAfterBatchPopupIsOpened: function() {
+      executeAfterBatchPopupIsOpened: function () {
         var oModel = this.getCurrentModel();
         var oDialogId = this.getCurrentDialogId();
         if (
           (oDialogId === 'consumeDialog' ||
             oDialogId === 'weighDialog' ||
-            ((oDialogId === 'scanDialog' ||
-              oDialogId === 'addDialog' ||
-              oDialogId === 'scanWeighDialog' ||
-              oDialogId === 'addWeighDialog') &&
+            ((oDialogId === 'scanDialog' || oDialogId === 'addDialog' || oDialogId === 'scanWeighDialog' || oDialogId === 'addWeighDialog') &&
               this.getCurrentInputMaterialControl().getValue())) &&
           !(!this.isInventoryManaged && (!oModel.getProperty('/storageLocation') || oModel.getProperty('/storageLocation') === ''))
         ) {
@@ -724,9 +721,7 @@ sap.ui.define(
             this.byId('batchDialog').setTitle(this.getI18nText('storageLocationDialogHeader'));
             this.fetchBatchDetails();
           } else {
-            this.byId('batchDialog').setTitle(
-              this.getI18nText('batchDialogHeaderWithMat', this.getCurrentModel().getProperty('/material'))
-            );
+            this.byId('batchDialog').setTitle(this.getI18nText('batchDialogHeaderWithMat', this.getCurrentModel().getProperty('/material')));
             this.fetchBatchDetails();
           }
         } else {
@@ -738,7 +733,7 @@ sap.ui.define(
         }
       },
 
-      fetchBatchDetails: function() {
+      fetchBatchDetails: function () {
         var inventryUrl = this.getInventoryDataSourceUri();
         var oParameters = {};
         var oModel = this.getCurrentModel();
@@ -761,7 +756,7 @@ sap.ui.define(
         this.getBatchDetailsForPopup(sUrl, oParameters);
       },
 
-      _createBatchDetailsServiceCall: function() {
+      _createBatchDetailsServiceCall: function () {
         var inventryUrl = this.getInventoryDataSourceUri();
         var oParameters = {};
         var oModel = this.getCurrentModel();
@@ -785,7 +780,7 @@ sap.ui.define(
         return { sUrl, oParameters };
       },
 
-      prepareInvStockParams: function(oModel) {
+      prepareInvStockParams: function (oModel) {
         var oParameters = {};
         if (this.oSelectedBrowseType === 'StorageLocation') {
           oParameters.material = oModel.getProperty('/material');
@@ -800,7 +795,7 @@ sap.ui.define(
         return oParameters;
       },
 
-      queryNextPageList: function(oEvent) {
+      queryNextPageList: function (oEvent) {
         if (oEvent.getParameters().reason === 'Growing' && this.totalPaginationElems > (this.oPageable.page + 1) * 20) {
           var oDialog = this.byId('batchDialog');
           let oFilterBar = this.byId('filterBar');
@@ -816,13 +811,13 @@ sap.ui.define(
         }
       },
 
-      doInvStockApiCall: function(oDialog, sUrl, oParameters, isGrowing) {
+      doInvStockApiCall: function (oDialog, sUrl, oParameters, isGrowing) {
         var that = this;
         oDialog.setBusy(true);
         AjaxUtil.get(
           sUrl,
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             var oData = oResponseData.content;
             that.prepareStockData(oData);
             that.batchDetailsList = isGrowing ? that.batchDetailsList.concat(oData) : oData;
@@ -836,7 +831,7 @@ sap.ui.define(
             that.batchDetailsModel.updateBindings(true);
             oDialog.setBusy(false);
           },
-          function(oError, oHttpErrorMessage) {
+          function (oError, oHttpErrorMessage) {
             var err = oError ? oError : oHttpErrorMessage;
             oDialog.setBusy(false);
             that.onCloseBatchDialog();
@@ -846,16 +841,16 @@ sap.ui.define(
         );
       },
 
-      getBatchDetailsForPopup: function(sUrl, oParameters) {
+      getBatchDetailsForPopup: function (sUrl, oParameters) {
         var that = this;
         var oDialog = that.byId('batchDialog');
         oDialog.setBusy(true);
         return new Promise(
-          function(resolve, reject) {
+          function (resolve, reject) {
             AjaxUtil.get(
               sUrl,
               oParameters,
-              function(oResponseData) {
+              function (oResponseData) {
                 that.filteredRecords = that.filterRecordsWithZeroQuantity(oResponseData);
                 that.filteredRecords = that.fitlerRecordsWithQualityInspection(oResponseData);
                 // that.filteredRecords = that.filterRecordsWithExpiredBatch(that.filteredRecords);
@@ -874,7 +869,7 @@ sap.ui.define(
                 //storage location and expiry date will be shown.
                 that.createBatchTable(that.batchDetailsList, true);
               },
-              function(oError, oHttpErrorMessage) {
+              function (oError, oHttpErrorMessage) {
                 var err = oError ? oError : oHttpErrorMessage;
                 oDialog.setBusy(false);
                 oDialog.close();
@@ -886,13 +881,13 @@ sap.ui.define(
         );
       },
 
-      getBatchDetails: function(sUrl, oParameters) {
+      getBatchDetails: function (sUrl, oParameters) {
         var that = this;
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
           AjaxUtil.get(
             sUrl,
             oParameters,
-            function(oResponseData) {
+            function (oResponseData) {
               that.filteredRecords = that.filterRecordsWithZeroQuantity(oResponseData);
               that.batchDetailsList = that.filteredRecords;
               if (!that.isInventoryManaged) {
@@ -908,18 +903,18 @@ sap.ui.define(
               that.prepareData(that.batchDetailsList);
               resolve(oResponseData);
             },
-            function() {
+            function () {
               reject(...arguments);
             }
           );
         });
       },
 
-      _enhanceCharacteristicsValues: function(oData) {
+      _enhanceCharacteristicsValues: function (oData) {
         oData.forEach(
-          function(oLineItem) {
+          function (oLineItem) {
             let oBatchCharcValuesMap = this._getBatchCharcValuesMapFromValues(oLineItem);
-            oLineItem.batchCharcValuesMap = this.characteristicsColumns.reduce(function(oPre, oNext) {
+            oLineItem.batchCharcValuesMap = this.characteristicsColumns.reduce(function (oPre, oNext) {
               let oCharcValue = oBatchCharcValuesMap && oBatchCharcValuesMap[oNext.name];
               if (!oPre[oNext.name]) {
                 if (oCharcValue) {
@@ -944,14 +939,14 @@ sap.ui.define(
         );
       },
 
-      _getBatchCharcValuesMapFromValues: function(oLineItem) {
+      _getBatchCharcValuesMapFromValues: function (oLineItem) {
         return (
           oLineItem.batchCharcValues &&
           oLineItem.batchCharcValues
-            .filter(function(oCharc) {
+            .filter(function (oCharc) {
               return oCharc.charcValue !== '' && oCharc.charcValue !== null;
             })
-            .reduce(function(oPre, oNext) {
+            .reduce(function (oPre, oNext) {
               if (!oPre[oNext.charcName]) {
                 oPre[oNext.charcName] = {
                   defaultBatchCharc: oNext,
@@ -966,7 +961,7 @@ sap.ui.define(
         );
       },
 
-      findCharacteristicsToBeShown: function(oData) {
+      findCharacteristicsToBeShown: function (oData) {
         this.characteristicsColumns = [];
         for (var i = 0; i < oData.length; i++) {
           if (oData[i].batchCharcValues && oData[i].batchCharcValues.length !== 0) {
@@ -983,7 +978,7 @@ sap.ui.define(
           }
         }
         //Sort alphanumerically in ascending order.
-        this.characteristicsColumns.sort(function(a, b) {
+        this.characteristicsColumns.sort(function (a, b) {
           if (a.name < b.name) {
             return -1;
           }
@@ -1000,8 +995,8 @@ sap.ui.define(
         return oData;
       },
 
-      isCharacteristicAlreadyPresent: function(charcName) {
-        var isPresent = this.characteristicsColumns.find(function(charcDetails) {
+      isCharacteristicAlreadyPresent: function (charcName) {
+        var isPresent = this.characteristicsColumns.find(function (charcDetails) {
           return charcDetails.name === charcName;
         });
 
@@ -1010,7 +1005,7 @@ sap.ui.define(
         return false;
       },
 
-      setCharacteristicsDetails: function(oData) {
+      setCharacteristicsDetails: function (oData) {
         for (var i = 0; i < oData.length; i++) {
           for (var j = 1; j <= this.characteristicsColumns.length; j++) {
             let sCharcName = this.characteristicsColumns[j - 1].name;
@@ -1022,14 +1017,14 @@ sap.ui.define(
         return oData;
       },
 
-      buildCharacteristicsData: function(oData, i, j, assignmentValue) {
+      buildCharacteristicsData: function (oData, i, j, assignmentValue) {
         oData[i]['charcValue' + j] = assignmentValue.charcValue ? assignmentValue.charcValue : undefined;
         oData[i]['charcUom' + j] = assignmentValue.uom;
         oData[i]['dataType' + j] = assignmentValue.dataType;
         return oData;
       },
 
-      createBatchTable: function(oData, bMaterialGiven) {
+      createBatchTable: function (oData, bMaterialGiven) {
         if (!this.batchDetailsModel) {
           this.batchDetailsModel = new JSONModel();
         }
@@ -1043,7 +1038,7 @@ sap.ui.define(
         if (this.isInventoryManaged) {
           oBasicSearchField = new sap.m.SearchField({
             showSearchButton: false,
-            liveChange: function(oEvent) {
+            liveChange: function (oEvent) {
               this.onSearchBatchListWithValue(oEvent.getParameter('newValue'));
             }.bind(this)
           });
@@ -1071,7 +1066,7 @@ sap.ui.define(
         }
       },
 
-      createStorLocFilter: function(oFilterBar, oData) {
+      createStorLocFilter: function (oFilterBar, oData) {
         var oFilterGroupItem = [];
         var oInput = [];
         oFilterGroupItem[0] = new sap.ui.comp.filterbar.FilterGroupItem();
@@ -1090,14 +1085,14 @@ sap.ui.define(
           oInput[0].addToken(new sap.m.Token({ text: oModel.getProperty('/storageLocation') }));
         }
         oInput[0].attachValueHelpRequest(
-          function() {
+          function () {
             StorageLocationBrowse.openMulti(
               oInput[0],
               '',
-              function(oSelectedObjects) {
+              function (oSelectedObjects) {
                 oInput[0].destroyTokens();
                 if (oSelectedObjects.length > 0) {
-                  oSelectedObjects.forEach(function(item) {
+                  oSelectedObjects.forEach(function (item) {
                     oInput[0].addToken(new sap.m.Token({ text: item }));
                   });
                   oInput[0].setValueState('None');
@@ -1115,10 +1110,10 @@ sap.ui.define(
         this.setNumberOfItemsInBatchList();
       },
 
-      setSelectedDefaults: function() {
+      setSelectedDefaults: function () {
         var selectedItems = this.byId('resultTable').getSelectedItems();
-        this.multiStorLocs.forEach(function(storLoc) {
-          selectedItems.forEach(function(item) {
+        this.multiStorLocs.forEach(function (storLoc) {
+          selectedItems.forEach(function (item) {
             if (storLoc === item.getBindingContext().getObject().storageLocation) {
               item.setSelected(true);
             }
@@ -1126,7 +1121,7 @@ sap.ui.define(
         });
       },
 
-      createAdvancedFilters: function(oFilterBar, oData) {
+      createAdvancedFilters: function (oFilterBar, oData) {
         if (this.charcForAdvancedSearch.length > 0) {
           var charcFromConfig = this.charcForAdvancedSearch;
           var oFilterGroupItem = [];
@@ -1143,11 +1138,11 @@ sap.ui.define(
           oInput[0].setValueHelpOnly(true);
           oInput[0].setShowValueHelp(true);
           oInput[0].attachValueHelpRequest(
-            function() {
+            function () {
               StorageLocationBrowse.open(
                 oInput[0],
                 '',
-                function(oSelectedObject) {
+                function (oSelectedObject) {
                   if (oSelectedObject) {
                     oInput[0].setValue(oSelectedObject.name);
                     oInput[0].setValueState('None');
@@ -1184,7 +1179,7 @@ sap.ui.define(
         }
       },
 
-      setDataInBatchTable: function(oData, bMaterialGiven) {
+      setDataInBatchTable: function (oData, bMaterialGiven) {
         var oDialog = this.byId('batchDialog');
         var oTableMetadata = {
           visible: true,
@@ -1307,9 +1302,7 @@ sap.ui.define(
             }
           }).addStyleClass('sapUiTinyMarginEnd');
           oColumnListItem.addCell(this._createBatchCharacteristicsColumn(oColumnListItemControl, sCharcName));
-          var columnHeaderText = this.characteristicsColumns[i - 1].desc
-            ? this.characteristicsColumns[i - 1].desc
-            : this.characteristicsColumns[i - 1].name;
+          var columnHeaderText = this.characteristicsColumns[i - 1].desc ? this.characteristicsColumns[i - 1].desc : this.characteristicsColumns[i - 1].name;
           var oColumn = new sap.m.Column({
             hAlign: 'Left',
             vAlign: 'Middle'
@@ -1346,21 +1339,13 @@ sap.ui.define(
         oTable.bindItems('batchDetailsModel>/', oColumnListItem, null, null);
         oDialog.addContent(oTable);
         oTable.setModel(this.batchDetailsModel, 'batchDetailsModel');
-        if (
-          !this.isInventoryManaged &&
-          this.getCurrentModel().getProperty('/material') !== '' &&
-          this.totalPaginationElems > (this.oPageable.page + 1) * 20
-        ) {
-          oTable.getBindingInfo('items').binding.isLengthFinal = function() {
+        if (!this.isInventoryManaged && this.getCurrentModel().getProperty('/material') !== '' && this.totalPaginationElems > (this.oPageable.page + 1) * 20) {
+          oTable.getBindingInfo('items').binding.isLengthFinal = function () {
             return false;
           };
           oTable.setGrowingThreshold((this.oPageable.page + 1) * 20);
-        } else if (
-          !this.isInventoryManaged &&
-          this.getCurrentModel().getProperty('/material') !== '' &&
-          this.totalPaginationElems <= (this.oPageable.page + 1) * 20
-        ) {
-          oTable.getBindingInfo('items').binding.isLengthFinal = function() {
+        } else if (!this.isInventoryManaged && this.getCurrentModel().getProperty('/material') !== '' && this.totalPaginationElems <= (this.oPageable.page + 1) * 20) {
+          oTable.getBindingInfo('items').binding.isLengthFinal = function () {
             return true;
           };
           oTable.setGrowing(false);
@@ -1370,15 +1355,12 @@ sap.ui.define(
         this.onSearchBatchListWithValue();
 
         //Sort the batches based on expiry date and quantity
-        oTable.getBinding('items').sort([
-          new sap.ui.model.Sorter('expiryDate', false),
-          new sap.ui.model.Sorter('qtyFormatted', false)
-        ]);
+        oTable.getBinding('items').sort([new sap.ui.model.Sorter('expiryDate', false), new sap.ui.model.Sorter('qtyFormatted', false)]);
 
         oDialog.setBusy(false);
       },
 
-      _createBatchCharacteristicsColumn: function(oColumn, sCharcName) {
+      _createBatchCharacteristicsColumn: function (oColumn, sCharcName) {
         let that = this;
         return new sap.m.VBox({
           displayInline: true,
@@ -1390,7 +1372,7 @@ sap.ui.define(
                 oColumn,
                 new sap.m.Link({
                   text: `{batchDetailsModel>batchCharcValuesMap/${sCharcName}/batchCharcValuesLength} ${that.getI18nText('more')}`,
-                  press: function(oEvent) {
+                  press: function (oEvent) {
                     that._onMoreLinkPress(oEvent, sCharcName);
                   },
                   visible: `{batchDetailsModel>batchCharcValuesMap/${sCharcName}/morePopoverLinkVisibility}`
@@ -1401,7 +1383,7 @@ sap.ui.define(
         });
       },
 
-      _onMoreLinkPress: function(oEvent, sCharcName) {
+      _onMoreLinkPress: function (oEvent, sCharcName) {
         let oCtx = oEvent.getSource().getBindingContext('batchDetailsModel'),
           oControl = oEvent.getSource(),
           oView = this.getView();
@@ -1418,20 +1400,20 @@ sap.ui.define(
               name: 'sap.dm.dme.browse.view.BatchPopover',
               controller: this
             }).then(
-              function(oPopover) {
+              function (oPopover) {
                 oView.addDependent(oPopover);
                 return oPopover;
               }.bind(this)
             );
           }
           oView.setModel(new JSONModel(oCharcValue), 'batchMorePopoverModel');
-          this._batchCharcPopover.then(function(oPopover) {
+          this._batchCharcPopover.then(function (oPopover) {
             oPopover.openBy(oControl);
           });
         }
       },
 
-      _charcNumberFormat: function(sValue, sUom, nDecimalPlaces) {
+      _charcNumberFormat: function (sValue, sUom, nDecimalPlaces) {
         let options = {
           maxFractionDigits: nDecimalPlaces,
           minFractionDigits: nDecimalPlaces
@@ -1440,7 +1422,7 @@ sap.ui.define(
         return sFormatedValue && sUom ? sFormatedValue + ' ' + sUom : sFormatedValue;
       },
 
-      prepareStockData: function(oData) {
+      prepareStockData: function (oData) {
         for (var i = 0; i < oData.length; i++) {
           var uomObj = {
             uom: oData[i].materialBaseUnit || null
@@ -1459,7 +1441,7 @@ sap.ui.define(
         }
       },
 
-      prepareData: function(oData, bHealScen0Flag) {
+      prepareData: function (oData, bHealScen0Flag) {
         var i, sQtyFormatted, sExpiry;
         for (i = 0; i < oData.length; i++) {
           if (bHealScen0Flag) {
@@ -1473,10 +1455,7 @@ sap.ui.define(
             oData[i].unitOfMeasure = uomObj;
             oData[i].storageLocation = storLocObj;
           }
-          sQtyFormatted = Formatter.formatBatchQuantityAdv(
-            oData[i].remainingQuantity,
-            oData[i].unitOfMeasure ? oData[i].unitOfMeasure.uom : null
-          );
+          sQtyFormatted = Formatter.formatBatchQuantityAdv(oData[i].remainingQuantity, oData[i].unitOfMeasure ? oData[i].unitOfMeasure.uom : null);
           oData[i].qtyFormatted = sQtyFormatted;
           if (oData[i].batch && oData[i].batch.shelfLifeExpirationDate) {
             sExpiry = Formatter.formatDate(oData[i].batch.shelfLifeExpirationDate);
@@ -1488,11 +1467,11 @@ sap.ui.define(
             sExpiry = '';
           }
           oData[i].expiry = sExpiry;
-          oData[i].expiryDate = sExpiry ? moment(sExpiry).toDate(): null;
+          oData[i].expiryDate = sExpiry ? moment(sExpiry).toDate() : null;
         }
       },
 
-      filterRecordsWithZeroQuantity: function(oResponseData) {
+      filterRecordsWithZeroQuantity: function (oResponseData) {
         let i;
         let filteredRecords = [];
 
@@ -1507,15 +1486,13 @@ sap.ui.define(
         return oResponseData;
       },
 
-      fitlerRecordsWithQualityInspection: function(oResponseData) {
+      fitlerRecordsWithQualityInspection: function (oResponseData) {
         let aFilteredRecords = [];
         if (!this.isInventoryManaged) return oResponseData;
 
         for (var i = 0; i < oResponseData.length; i++) {
           if (oResponseData[i].batchCharcValues) {
-            var oQaStatus = oResponseData[i].batchCharcValues.find(
-              oCharc => oCharc.charcName === 'ZQASTAT' && (oCharc.charcValue === 'Q' || oCharc.charcValue === 'B')
-            );
+            var oQaStatus = oResponseData[i].batchCharcValues.find((oCharc) => oCharc.charcName === 'ZQASTAT' && (oCharc.charcValue === 'Q' || oCharc.charcValue === 'B'));
             if (oQaStatus) continue;
           }
           aFilteredRecords.push(oResponseData[i]);
@@ -1523,10 +1500,10 @@ sap.ui.define(
         return aFilteredRecords;
       },
 
-      filterRecordsWithExpiredBatch: function(oResponseData){
-        let aFilteredRecords = oResponseData.filter(oItem=> {
-          if(!oItem.batch.shelfLifeExpirationDate){
-              return true;
+      filterRecordsWithExpiredBatch: function (oResponseData) {
+        let aFilteredRecords = oResponseData.filter((oItem) => {
+          if (!oItem.batch.shelfLifeExpirationDate) {
+            return true;
           }
 
           return moment(oItem.batch.shelfLifeExpirationDate).isSameOrAfter(moment().format('YYYY-MM-DD'));
@@ -1535,7 +1512,7 @@ sap.ui.define(
         return aFilteredRecords;
       },
 
-      onGoAdvSearch: function(oEvent) {
+      onGoAdvSearch: function (oEvent) {
         // validate and prepare payload
         var oDialog = this.byId('batchDialog');
         var oFilterBar = this.byId('filterBar');
@@ -1584,7 +1561,7 @@ sap.ui.define(
           AjaxUtil.post(
             sUrl,
             payload,
-            function(oResponseData) {
+            function (oResponseData) {
               that.batchDetailsList = oResponseData;
               that.batchDetailsModel = new JSONModel();
               that.batchDetailsModel.setSizeLimit(that.batchDetailsList.length);
@@ -1595,7 +1572,7 @@ sap.ui.define(
               //Create table dynamically where characteristics values along with batchId, quantity,
               that.setDataInBatchTable(that.batchDetailsList, false);
             },
-            function(oError, oHttpErrorMessage) {
+            function (oError, oHttpErrorMessage) {
               var err = oError ? oError : oHttpErrorMessage;
               that.showErrorMessage(err, true, true);
               oDialog.setBusy(false);
@@ -1606,7 +1583,7 @@ sap.ui.define(
         }
       },
 
-      fetchBatchesWithStock: function(oDialog, oFilterBar) {
+      fetchBatchesWithStock: function (oDialog, oFilterBar) {
         if (oFilterBar.getFilterGroupItems()[0].getControl().getTokens().length < 1) {
           oFilterBar.getFilterGroupItems()[0].getControl().setValueState('Error');
           oFilterBar.getFilterGroupItems()[0].getControl().setValueStateText(this.getI18nText('REQUIRED_STORAGE_LOC'));
@@ -1616,9 +1593,13 @@ sap.ui.define(
         this.oPageable.page = 0;
         var oParameters = this.prepareInvStockParams(this.getCurrentModel());
         var storLocs = [];
-        oFilterBar.getFilterGroupItems()[0].getControl().getTokens().forEach(function(token) {
-          storLocs.push(token.getText());
-        });
+        oFilterBar
+          .getFilterGroupItems()[0]
+          .getControl()
+          .getTokens()
+          .forEach(function (token) {
+            storLocs.push(token.getText());
+          });
         this.multiStorLocs = storLocs;
         oParameters.storageLocations = storLocs.join(',');
 
@@ -1630,14 +1611,14 @@ sap.ui.define(
         this.doInvStockApiCall(oDialog, sUrl, oParameters, false);
       },
 
-      onSeachStorageLocationList: function(oEvt) {
+      onSeachStorageLocationList: function (oEvt) {
         let sQuery = '';
         if (oEvt) {
           sQuery = oEvt.getParameter('value');
         }
         sQuery === '' ? this.handleStorageLocationDetails(sQuery) : this.onSearchStorageLocationListWithValue(sQuery);
       },
-      onSeachStorageLocationListLiveChange: function(oEvt) {
+      onSeachStorageLocationListLiveChange: function (oEvt) {
         let sQuery = '';
         if (oEvt) {
           sQuery = oEvt.getParameter('value');
@@ -1647,7 +1628,7 @@ sap.ui.define(
         }
       },
 
-      onSearchStorageLocationListWithValue: function(oValue) {
+      onSearchStorageLocationListWithValue: function (oValue) {
         var properties = ['inventoryId', 'storageLocation/storageLocation'];
         var list;
         var sLocBindings;
@@ -1658,7 +1639,7 @@ sap.ui.define(
         }
       },
 
-      onSearchBatchListWithValue: function(oValue) {
+      onSearchBatchListWithValue: function (oValue) {
         var properties = ['batchNumber', 'storageLocation/storageLocation', 'qtyFormatted', 'expiry'];
         //Search by characteristics values and uoms.
         for (var i = 1; i <= this.characteristicsColumns.length; i++) {
@@ -1672,13 +1653,13 @@ sap.ui.define(
         this.handleSearch(oValue, properties, batchBindings);
       },
 
-      handleSearchSloc: function(oValue, propertiesArray, oBinding) {
+      handleSearchSloc: function (oValue, propertiesArray, oBinding) {
         var aFilters = [],
           aCombinedFilters = [],
           filter,
           oFilterWithAllProperties;
         if (oValue && oValue.length > 0) {
-          $.each(propertiesArray, function(oIndex, oObj) {
+          $.each(propertiesArray, function (oIndex, oObj) {
             filter = new sap.ui.model.Filter(oObj, sap.ui.model.FilterOperator.Contains, oValue);
             aFilters.push(filter);
           });
@@ -1710,13 +1691,13 @@ sap.ui.define(
         // oBinding.filter(oFilterWithAllProperties);
       },
 
-      handleSearch: function(oValue, propertiesArray, oBinding) {
+      handleSearch: function (oValue, propertiesArray, oBinding) {
         var aFilters = [],
           aCombinedFilters = [],
           filter,
           oFilterWithAllProperties;
         if (oValue && oValue.length > 0) {
-          $.each(propertiesArray, function(oIndex, oObj) {
+          $.each(propertiesArray, function (oIndex, oObj) {
             filter = new sap.ui.model.Filter(oObj, sap.ui.model.FilterOperator.Contains, oValue);
             aFilters.push(filter);
           });
@@ -1751,17 +1732,20 @@ sap.ui.define(
         this.setNumberOfItemsInBatchList();
       },
 
-      setNumberOfItemsInBatchList: function() {
+      setNumberOfItemsInBatchList: function () {
         let oTable = sap.ui.getCore().byId('batchListTable');
         let iLength = this.totalPaginationElems || oTable.getItems().length;
         if (iLength === 0) {
           sap.ui.getCore().byId('batchTableTitle').setText(this.getI18nText('items'));
         } else {
-          sap.ui.getCore().byId('batchTableTitle').setText(this.getI18nText('items') + ' (' + iLength + ')');
+          sap.ui
+            .getCore()
+            .byId('batchTableTitle')
+            .setText(this.getI18nText('items') + ' (' + iLength + ')');
         }
       },
 
-      onSelectBatch: function(oEvent) {
+      onSelectBatch: function (oEvent) {
         var oModel = this.getCurrentModel();
         var batchData = oEvent.getSource().getSelectedItem().getBindingContext('batchDetailsModel').getObject();
         sap.ui.getCore().byId('batchListTable').removeSelections(true);
@@ -1769,29 +1753,17 @@ sap.ui.define(
         this.onCloseBatchDialog();
       },
 
-      batchDataUpdateInModel: function(batchData, oModel) {
+      batchDataUpdateInModel: function (batchData, oModel) {
         if (batchData.unitOfMeasure) {
-          oModel.setProperty(
-            '/avlBatchQty',
-            this.oFormatter.formatBatchQuantityAdv(batchData.remainingQuantity, batchData.unitOfMeasure.uom)
-          );
+          oModel.setProperty('/avlBatchQty', this.oFormatter.formatBatchQuantityAdv(batchData.remainingQuantity, batchData.unitOfMeasure.uom));
         } else {
           oModel.setProperty('/avlBatchQty', this.oFormatter.formatBatchQuantityAdv(batchData.remainingQuantity, null));
         }
         oModel.setProperty('/expDate', batchData.modifiedDateTime);
         oModel.setProperty('/batchNumber', batchData.batchNumber);
-        oModel.setProperty(
-          '/storageLocation',
-          batchData.storageLocation && batchData.storageLocation.storageLocation ? batchData.storageLocation.storageLocation : null
-        );
-        oModel.setProperty(
-          '/storageLocationDesc',
-          batchData.storageLocation && batchData.storageLocation.description ? batchData.storageLocation.description : null
-        );
-        oModel.setProperty(
-          '/storageLocationRef',
-          batchData.storageLocation && batchData.storageLocation.ref ? batchData.storageLocation.ref : null
-        );
+        oModel.setProperty('/storageLocation', batchData.storageLocation && batchData.storageLocation.storageLocation ? batchData.storageLocation.storageLocation : null);
+        oModel.setProperty('/storageLocationDesc', batchData.storageLocation && batchData.storageLocation.description ? batchData.storageLocation.description : null);
+        oModel.setProperty('/storageLocationRef', batchData.storageLocation && batchData.storageLocation.ref ? batchData.storageLocation.ref : null);
         oModel.setProperty('/shopOrderLocationRef', batchData.shopOrderLocRef);
         oModel.setProperty('/inventory', batchData.inventoryId);
         if (this.byId('filterBar') && this.byId('filterBar').getShowGoButton() && this.byId('filterBar').getFilterGroupItems().length > 1) {
@@ -1805,7 +1777,7 @@ sap.ui.define(
         this._enableConfirmButton();
       },
 
-      setMaterialAndOtherDetailsInModel: function(oMaterial, oModel) {
+      setMaterialAndOtherDetailsInModel: function (oMaterial, oModel) {
         if (!oMaterial.ref) {
           this.fetchDetailsOfMaterial(oMaterial, oModel);
         } else {
@@ -1813,7 +1785,7 @@ sap.ui.define(
         }
       },
 
-      fetchDetailsOfMaterial: function(oMaterial, oModel) {
+      fetchDetailsOfMaterial: function (oMaterial, oModel) {
         let that = this;
         let url =
           that.getProductDataSourceUri() +
@@ -1824,13 +1796,13 @@ sap.ui.define(
         AjaxUtil.get(
           url,
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             oMaterial.description = oResponseData.value[0].description;
             oMaterial.ref = oResponseData.value[0].ref;
             oMaterial.version = oResponseData.value[0].version;
             that.proceedSetMaterialAndOtherDetailsInModel(oMaterial, oModel);
           },
-          function(oError, oHttpErrorMessage) {
+          function (oError, oHttpErrorMessage) {
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
             that.byId('consumptionList').setBusy(false);
@@ -1838,7 +1810,7 @@ sap.ui.define(
         );
       },
 
-      proceedSetMaterialAndOtherDetailsInModel: function(oMaterial, oModel) {
+      proceedSetMaterialAndOtherDetailsInModel: function (oMaterial, oModel) {
         var sDialogId = this.getCurrentDialogId();
         this.byId(sDialogId).setBusy(true);
         var selectedMaterial = oMaterial.material;
@@ -1860,9 +1832,7 @@ sap.ui.define(
         var bomComponentRef, isBatchManaged, defaultBatchId, oRemainingQuantity, selectedUom;
         var loggedInUser = this.loggedInUserDetails ? this.loggedInUserDetails.userId : '';
         isBatchManaged = true;
-        this.getCurrentDialogId() === 'addDialog'
-          ? this.byId('storageLocationAdd').setEnabled(false)
-          : this.byId('storageLocationScan').setEnabled(false);
+        this.getCurrentDialogId() === 'addDialog' ? this.byId('storageLocationAdd').setEnabled(false) : this.byId('storageLocationScan').setEnabled(false);
 
         // UOM Model
         if (!this.alternateUomForSelectedMaterial.hasOwnProperty(selectedMaterial)) {
@@ -1895,8 +1865,7 @@ sap.ui.define(
 
         // Set the default values
         oModel.setProperty('/shopOrder', this.selectedDataInList.selectedShopOrder);
-        if (this.selectedDataInList.orderSelectionType === 'PROCESS')
-          oModel.setProperty('/operationActivity', this.selectedDataInList.phaseId);
+        if (this.selectedDataInList.orderSelectionType === 'PROCESS') oModel.setProperty('/operationActivity', this.selectedDataInList.phaseId);
         else oModel.setProperty('/operationActivity', this.selectedDataInList.operation.operation);
         oModel.setProperty('/bomComponentRef', bomComponentRef);
         oModel.setProperty('/batchId', this.selectedDataInList.selectedSfc);
@@ -1919,15 +1888,12 @@ sap.ui.define(
         this.byId(sDialogId).setBusy(false);
       },
 
-      onSelectStorageLocation: function(oEvent) {
+      onSelectStorageLocation: function (oEvent) {
         var oModel = this.getCurrentModel();
         var sLocData = oEvent.getParameters().selectedItem.getBindingContext('storageLocationModel').getObject();
         if (this.isInventoryManaged || (!this.isInventoryManaged && !oModel.getProperty('/batchManaged'))) {
           if (sLocData.unitOfMeasure) {
-            oModel.setProperty(
-              '/avlBatchQty',
-              this.oFormatter.formatBatchQuantityAdv(sLocData.remainingQuantity, sLocData.unitOfMeasure.uom)
-            );
+            oModel.setProperty('/avlBatchQty', this.oFormatter.formatBatchQuantityAdv(sLocData.remainingQuantity, sLocData.unitOfMeasure.uom));
           } else {
             oModel.setProperty('/avlBatchQty', this.oFormatter.formatBatchQuantityAdv(sLocData.remainingQuantity, null));
           }
@@ -1940,7 +1906,7 @@ sap.ui.define(
         this._enableConfirmButton();
       },
 
-      onClosePostingsDialog: function() {
+      onClosePostingsDialog: function () {
         var oTable = this.getView().byId('postingsTable');
         var oColumnListItem = this.getView().byId('postingDetailsCLItem');
         var oTableLength = oTable.getColumns().length;
@@ -1954,18 +1920,18 @@ sap.ui.define(
         this.getView().byId('postingsDialog').close();
       },
 
-      onCloseBatchDialog: function() {
+      onCloseBatchDialog: function () {
         if (sap.ui.getCore().byId('batchListTable')) {
           sap.ui.getCore().byId('batchListTable').destroy();
         }
         this.getView().byId('batchDialog').close();
       },
 
-      onCloseUserDialog: function() {
+      onCloseUserDialog: function () {
         this.getView().byId('userDialog').close();
       },
 
-      showConsumePopup: async function(oEvent) {
+      showConsumePopup: async function (oEvent) {
         this.isConsumeDialogOpen = true;
         var oView = this.getView();
         var oBindingObject = oEvent.getSource().getBindingContext().getObject();
@@ -1975,7 +1941,7 @@ sap.ui.define(
           return;
         }
 
-        if (!await this._validateResourceStatus(this.selectedDataInList.resource.resource)) {
+        if (!(await this._validateResourceStatus(this.selectedDataInList.resource.resource))) {
           MessageBox.error(this.getI18nText('resourceStatusInvalid'));
           return;
         }
@@ -2019,15 +1985,12 @@ sap.ui.define(
             ? oCalculatableQuantities.consumedQuantity.value
             : 0;
         var targetQuantity =
-          oCalculatableQuantities && oCalculatableQuantities.targetQuantity && oCalculatableQuantities.targetQuantity.value
-            ? oCalculatableQuantities.targetQuantity.value
-            : 0;
+          oCalculatableQuantities && oCalculatableQuantities.targetQuantity && oCalculatableQuantities.targetQuantity.value ? oCalculatableQuantities.targetQuantity.value : 0;
 
         var oRemainingQuantity = consumedQuantity < targetQuantity ? targetQuantity - consumedQuantity : '';
 
         var isBatchManaged =
-          oEvent.getSource().getBindingContext().getObject().batchManaged === undefined ||
-          oEvent.getSource().getBindingContext().getObject().batchManaged === 'NONE'
+          oEvent.getSource().getBindingContext().getObject().batchManaged === undefined || oEvent.getSource().getBindingContext().getObject().batchManaged === 'NONE'
             ? false
             : true;
         var defaultBatchId;
@@ -2047,13 +2010,7 @@ sap.ui.define(
 
         // UOM Model
         if (!this.alternateUomForSelectedMaterial.hasOwnProperty(selectedMaterial)) {
-          this.getAlternateUoms(
-            this.alternateUomForSelectedMaterial,
-            selectedMaterial,
-            selectedMaterialRef,
-            selectedMaterialVersion,
-            'consume'
-          );
+          this.getAlternateUoms(this.alternateUomForSelectedMaterial, selectedMaterial, selectedMaterialRef, selectedMaterialVersion, 'consume');
         } else {
           this.alternateUomsModel.setData(this.alternateUomForSelectedMaterial[selectedMaterial]);
           this.getView().setModel(this.alternateUomsModel, 'unitModel');
@@ -2061,8 +2018,7 @@ sap.ui.define(
         }
         // Set the default values
         oView.getModel('consumeModel').setProperty('/shopOrder', this.selectedDataInList.selectedShopOrder);
-        if (this.selectedDataInList.orderSelectionType === 'PROCESS')
-          oView.getModel('consumeModel').setProperty('/operationActivity', this.selectedDataInList.phaseId);
+        if (this.selectedDataInList.orderSelectionType === 'PROCESS') oView.getModel('consumeModel').setProperty('/operationActivity', this.selectedDataInList.phaseId);
         else oView.getModel('consumeModel').setProperty('/operationActivity', this.selectedDataInList.operation.operation);
         oView.getModel('consumeModel').setProperty('/bomComponentRef', bomComponentRef);
         oView.getModel('consumeModel').setProperty('/batchId', this.selectedDataInList.selectedSfc);
@@ -2097,16 +2053,11 @@ sap.ui.define(
           this.onQuantityLiveChange();
         }
 
-        if (
-          this.isInventoryManaged &&
-          ((defaultBatchId && defaultBatchId !== this.getI18nText('notBatchManaged')) ||
-            (!isBatchManaged && storageLocation && storageLocationRef))
-        ) {
+        if (this.isInventoryManaged && ((defaultBatchId && defaultBatchId !== this.getI18nText('notBatchManaged')) || (!isBatchManaged && storageLocation && storageLocationRef))) {
           this.prepareInventoryUrl(selectedMaterialRef, defaultBatchId, storageLocationRef, 'consumeDialog', false);
         } else if (
           !this.isInventoryManaged &&
-          ((!isBatchManaged && storageLocation) ||
-            (storageLocation && defaultBatchId && defaultBatchId !== this.getI18nText('notBatchManaged')))
+          ((!isBatchManaged && storageLocation) || (storageLocation && defaultBatchId && defaultBatchId !== this.getI18nText('notBatchManaged')))
         ) {
           this.isBatchNumberValid = true;
           this.getStockForDefaults(selectedMaterial, storageLocation, defaultBatchId, 'consumeDialog');
@@ -2116,7 +2067,7 @@ sap.ui.define(
         this._enableDisableCalculation();
       },
 
-      showConsumePopupCoBy: function(oEvent) {
+      showConsumePopupCoBy: function (oEvent) {
         var selectedComponent = oEvent.getSource().getBindingContext('coBiProductModel').getObject();
         var selectedMaterial = selectedComponent.materialId ? selectedComponent.materialId.material : null;
         var selectedMaterialVersion = selectedComponent.materialId ? selectedComponent.materialId.version : null;
@@ -2149,7 +2100,7 @@ sap.ui.define(
         oLogger.info('Calling GRController to handle consume popup for Co and By products');
         this.GRPostController.showGoodsReceiptDialog(
           oGRData,
-          function(oSelectedObject) {
+          function (oSelectedObject) {
             var oData = {
               selectedShopOrder: oSelectedObject.orderNumber,
               selectedSfc: this.selectedDataInList.selectedSfc,
@@ -2166,7 +2117,7 @@ sap.ui.define(
         );
       },
 
-      getStockForDefaults: function(material, storageLocation, batch, sDialogId) {
+      getStockForDefaults: function (material, storageLocation, batch, sDialogId) {
         var that = this;
         if (that.byId(sDialogId)) {
           that.byId(sDialogId).setBusy(true);
@@ -2187,7 +2138,7 @@ sap.ui.define(
         AjaxUtil.get(
           sUrl,
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             var stockDetails = oResponseData.content;
             var remainingQuantity = stockDetails && stockDetails[0] ? stockDetails[0].quantity : 0;
             var sUom = stockDetails && stockDetails[0] ? stockDetails[0].materialBaseUnit : '';
@@ -2198,7 +2149,7 @@ sap.ui.define(
             that.byId('consumptionList').setBusy(false);
             that._enableConfirmButton();
           },
-          function(oError, oHttpErrorMessage) {
+          function (oError, oHttpErrorMessage) {
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
             if (that.byId(sDialogId)) {
@@ -2211,7 +2162,7 @@ sap.ui.define(
         );
       },
 
-      prepareInventoryUrl: function(materialRef, batchId, storageLocationRef, oDialogId, isBatchChangeFlag) {
+      prepareInventoryUrl: function (materialRef, batchId, storageLocationRef, oDialogId, isBatchChangeFlag) {
         var inventryUrl = this.getInventoryDataSourceUri();
         var oParameters = {};
         oParameters.materialRef = materialRef;
@@ -2226,7 +2177,7 @@ sap.ui.define(
         this.getBatchDetailsForDefaultBatch(sUrl, oParameters, oDialogId, batchId, isBatchChangeFlag);
       },
 
-      getBatchDetailsForDefaultBatch: function(sUrl, oParameters, sDialogId, defaultBatchId, isBatchChangeFlag) {
+      getBatchDetailsForDefaultBatch: function (sUrl, oParameters, sDialogId, defaultBatchId, isBatchChangeFlag) {
         var that = this;
         if (that.byId(sDialogId)) {
           that.byId(sDialogId).setBusy(true);
@@ -2237,7 +2188,7 @@ sap.ui.define(
         AjaxUtil.get(
           sUrl,
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             that.BatchDetails = oResponseData;
             if (that.BatchDetails.length > 0) {
               var oBatchToUse = that.getFirstCreatedBatch(that.BatchDetails);
@@ -2246,10 +2197,7 @@ sap.ui.define(
                 oModel.setProperty('/batchNumber', oBatchToUse.batchNumber);
               }
               if (oBatchToUse.unitOfMeasure) {
-                oModel.setProperty(
-                  '/avlBatchQty',
-                  that.oFormatter.formatBatchQuantityAdv(oBatchToUse.remainingQuantity, oBatchToUse.unitOfMeasure.uom)
-                );
+                oModel.setProperty('/avlBatchQty', that.oFormatter.formatBatchQuantityAdv(oBatchToUse.remainingQuantity, oBatchToUse.unitOfMeasure.uom));
               } else {
                 oModel.setProperty('/avlBatchQty', that.oFormatter.formatBatchQuantityAdv(oBatchToUse.remainingQuantity, null));
               }
@@ -2284,7 +2232,7 @@ sap.ui.define(
             that.isFreeText = false;
             that.byId('consumptionList').setBusy(false);
           },
-          function(oError, oHttpErrorMessage) {
+          function (oError, oHttpErrorMessage) {
             var err = oError ? oError : oHttpErrorMessage;
             if (that.byId(sDialogId).isOpen()) {
               that.showErrorMessage(err, true, true);
@@ -2296,7 +2244,7 @@ sap.ui.define(
         );
       },
 
-      setValueToSLoc: function(sDialogId, oBatchToUse) {
+      setValueToSLoc: function (sDialogId, oBatchToUse) {
         if (oBatchToUse.storageLocation) {
           // set value in the sloc input with the sorted batch sloc
           let sLoc = oBatchToUse.storageLocation.storageLocation;
@@ -2350,29 +2298,26 @@ sap.ui.define(
         }
       },
 
-      getFirstCreatedBatch: function(batches) {
+      getFirstCreatedBatch: function (batches) {
         var oFirstCreatedBatch = batches[0];
         for (var i = 1; i < batches.length; i++) {
-          if (
-            !oFirstCreatedBatch.receiveDatetime ||
-            (batches[i].receiveDatetime && oFirstCreatedBatch.receiveDatetime > batches[i].receiveDatetime)
-          ) {
+          if (!oFirstCreatedBatch.receiveDatetime || (batches[i].receiveDatetime && oFirstCreatedBatch.receiveDatetime > batches[i].receiveDatetime)) {
             oFirstCreatedBatch = batches[i];
           }
         }
         return oFirstCreatedBatch;
       },
 
-      openMaterialConsumptionPopup: function(oView) {
+      openMaterialConsumptionPopup: function (oView) {
         if (!this.byId('consumeDialog')) {
           Fragment.load({
             id: oView.getId(),
             name: 'stellium.ext.podplugins.materialConsumptionPlugin.view.fragments.ConsumeDialog',
             controller: this
           }).then(
-            function(oDialog) {
+            function (oDialog) {
               oDialog.setEscapeHandler(
-                function(oPromise) {
+                function (oPromise) {
                   this.onCancelConsumeDialog();
                   oPromise.resolve();
                 }.bind(this)
@@ -2393,7 +2338,7 @@ sap.ui.define(
         }
       },
 
-      buildCustomFieldFormContent: function() {
+      buildCustomFieldFormContent: function () {
         var currentForm = this.getCurrentForm();
         if (this.oPluginConfiguration && this.oPluginConfiguration.customField1) {
           var customFieldLabel1 = new sap.m.Label('customFieldLabel1', {
@@ -2410,7 +2355,7 @@ sap.ui.define(
         }
       },
 
-      onCustomFieldLiveChange: function(oEvent) {
+      onCustomFieldLiveChange: function (oEvent) {
         var oView = this.getView();
         var customFieldId = oEvent.getSource().getId();
         var customFieldData = oEvent.getSource().getValue();
@@ -2425,7 +2370,7 @@ sap.ui.define(
         }
       },
 
-      buildCustomFieldData: function(customFieldId, customFieldValue) {
+      buildCustomFieldData: function (customFieldId, customFieldValue) {
         if (!customFieldValue) {
           for (var i = 0; this.customFieldJson && i < this.customFieldJson.length; i++) {
             if (this.customFieldJson[i].id === customFieldId) {
@@ -2457,7 +2402,7 @@ sap.ui.define(
           }
         }
         if (this.customFieldJson) {
-          this.customFieldJson.sort(function(x, y) {
+          this.customFieldJson.sort(function (x, y) {
             var a = x.id.toUpperCase();
             var b = y.id.toUpperCase();
             return a === b ? 0 : a > b ? 1 : -1;
@@ -2465,7 +2410,7 @@ sap.ui.define(
         }
       },
 
-      onConfirmConsumeDialog: function(oEvent) {
+      onConfirmConsumeDialog: function (oEvent) {
         this._enableConfirmButton();
         // If the validation fails, do not proceed with posting
         if (!oEvent.getSource().getEnabled()) return;
@@ -2513,8 +2458,7 @@ sap.ui.define(
           }
         }
         var quantityToBeconsumed = oModel.getProperty('/quantity/value') * (numerator / denominator);
-        var totalQuantityToBeConsumed =
-          (this.consumedQuantityForSelectedMaterial ? this.consumedQuantityForSelectedMaterial : 0) + quantityToBeconsumed;
+        var totalQuantityToBeConsumed = (this.consumedQuantityForSelectedMaterial ? this.consumedQuantityForSelectedMaterial : 0) + quantityToBeconsumed;
         var upperThreshold = this.upperThresholdForSelectedMaterial
           ? this.convertToUom(selectedMaterial, this.upperThresholdForSelectedMaterial.value, this.upperThresholdForSelectedMaterial.uom)
           : null;
@@ -2523,7 +2467,7 @@ sap.ui.define(
           if (totalQuantityToBeConsumed > upperThreshold) {
             this.confirmPageLeave(
               oModel,
-              function() {
+              function () {
                 this.setDataToModelAndPostGi(oModel);
               }.bind(this)
             );
@@ -2535,8 +2479,8 @@ sap.ui.define(
         }
       },
 
-      confirmPageLeave: function(oModel, fnProceed, fnCancel) {
-        this._showMessageBox(oModel, function(bProceed) {
+      confirmPageLeave: function (oModel, fnProceed, fnCancel) {
+        this._showMessageBox(oModel, function (bProceed) {
           if (bProceed) {
             fnProceed();
           } else if (fnCancel) {
@@ -2545,22 +2489,22 @@ sap.ui.define(
         });
       },
 
-      _showMessageBox: function(oModel, fnCallback) {
+      _showMessageBox: function (oModel, fnCallback) {
         var oWarningMsg = this.getOverConsumptionWarningMessage(oModel);
         MessageBox.warning(oWarningMsg.message, {
           styleClass: 'sapUiSizeCompact',
           actions: [oWarningMsg.button, MessageBox.Action.CANCEL],
-          onClose: function(oAction) {
+          onClose: function (oAction) {
             fnCallback(oAction === oWarningMsg.button);
           }
         });
       },
 
       /***
-         * Returns the Unsaved Warning Message
-         * @returns
-         */
-      getOverConsumptionWarningMessage: function(oModel) {
+       * Returns the Unsaved Warning Message
+       * @returns
+       */
+      getOverConsumptionWarningMessage: function (oModel) {
         var sWarningMsg = this.getI18nText('warningMessage', oModel.getProperty('/material'));
         return {
           message: sWarningMsg,
@@ -2568,7 +2512,7 @@ sap.ui.define(
         };
       },
 
-      setDataToModelAndPostGi: function(oModel) {
+      setDataToModelAndPostGi: function (oModel) {
         //this.currentSaveBtn = this.getCurrentSaveButton();
         //this.currentSaveBtn.setEnabled(false);
         // Explanation: In the Weighing Screen are two Confirm Buttons so both have to be handled not only one.
@@ -2590,14 +2534,8 @@ sap.ui.define(
           operationActivity: this.consumeData.operationActivity,
           bomComponentRef: this.consumeData.bomComponentRef,
           material: this.consumeData.material,
-          batchNumber:
-            this.consumeData.batchNumber === this.getI18nText('notBatchManaged') || !this.consumeData.batchNumber
-              ? null
-              : this.consumeData.batchNumber,
-          shopOrderLocationRef:
-            this.consumeData.shopOrderLocationRef === undefined || this.consumeData.shopOrderLocationRef === ''
-              ? null
-              : this.consumeData.shopOrderLocationRef,
+          batchNumber: this.consumeData.batchNumber === this.getI18nText('notBatchManaged') || !this.consumeData.batchNumber ? null : this.consumeData.batchNumber,
+          shopOrderLocationRef: this.consumeData.shopOrderLocationRef === undefined || this.consumeData.shopOrderLocationRef === '' ? null : this.consumeData.shopOrderLocationRef,
           workCenter: this.consumeData.workCenter,
           inventory: this.consumeData.inventory === '' || this.consumeData.materialType === 'PIPELINE' ? null : this.consumeData.inventory,
           isBomComponent: this.consumeData.isBomComponent,
@@ -2632,11 +2570,9 @@ sap.ui.define(
         }
       },
 
-      _postGiForHuItem: function(oData) {
+      _postGiForHuItem: function (oData) {
         //CPP_HandlingConsumedPost
-        var sUrl =
-          this.getPublicApiRestDataSourceUri() +
-          '/pe/api/v1/process/processDefinitions/start?key=REG_b33a8b60-ab8a-46f9-8175-3f7abe3c5a67&async=false';
+        var sUrl = this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_b33a8b60-ab8a-46f9-8175-3f7abe3c5a67&async=false';
         var oPayload = {
           items: [
             {
@@ -2662,12 +2598,12 @@ sap.ui.define(
             }
           ]
         };
-        this.ajaxPostRequest(sUrl, oPayload, oResponse => {
+        this.ajaxPostRequest(sUrl, oPayload, (oResponse) => {
           oLogger.info('Post consumption to S4 response: ', oResponse);
         });
       },
 
-      onCancelConsumeDialog: function() {
+      onCancelConsumeDialog: function () {
         this.isConsumeDialogOpen = false;
         var oFormLength = this.byId('consumeMaterialForm').getContent().length;
         for (var i = oFormLength; i > 25; i--) {
@@ -2678,7 +2614,7 @@ sap.ui.define(
         this._resetFields();
       },
 
-      _resetFields: function() {
+      _resetFields: function () {
         this.byId('inputMatNum').setText('');
         this.byId('inputMatDesc').setText('');
         this.byId('inputBatchId').setValue('');
@@ -2703,7 +2639,7 @@ sap.ui.define(
         ErrorHandler.clearErrorState(this.byId('inputCommentsForConsume'));
       },
 
-      onQuantityLiveChange: function(oEvent) {
+      onQuantityLiveChange: function (oEvent) {
         var oModel = this.getCurrentModel();
         var oSaveBtn = this.getCurrentSaveButton();
         var oInputQuantityBtn = this.getCurrentInputQuantityControl();
@@ -2721,7 +2657,7 @@ sap.ui.define(
         setTimeout(this._enableConfirmButton.bind(this), 500);
       },
 
-      _enableConfirmButton: async function() {
+      _enableConfirmButton: async function () {
         var isErrorStateExist = false;
         var oModel = this.getCurrentModel();
 
@@ -2771,15 +2707,7 @@ sap.ui.define(
         var bEnabledState = null;
         // Explanation: In the Weighing Screen are two Confirm Buttons so both have to be handled not only one.
         if (oModel.getProperty('/batchManaged')) {
-          if (
-            this.isBatchNumberValid &&
-            batchNumber &&
-            this.isQuantityValid &&
-            this.isPostedByValid &&
-            postedBy &&
-            this.isCommentValid &&
-            !isErrorStateExist
-          ) {
+          if (this.isBatchNumberValid && batchNumber && this.isQuantityValid && this.isPostedByValid && postedBy && this.isCommentValid && !isErrorStateExist) {
             bEnabledState = true;
           } else {
             bEnabledState = false;
@@ -2820,19 +2748,13 @@ sap.ui.define(
             // Normal Button Update
             oSaveBtn.setEnabled(bEnabledState);
           }
-        } else if (
-          oModel.getProperty('/useFullHandlingUnit') &&
-          this.isPostedByValid &&
-          postedBy &&
-          this.isCommentValid &&
-          !isErrorStateExist
-        ) {
+        } else if (oModel.getProperty('/useFullHandlingUnit') && this.isPostedByValid && postedBy && this.isCommentValid && !isErrorStateExist) {
           oSaveBtn.setEnabled(true);
         } else {
           oSaveBtn.setEnabled(false);
         }
       },
-      getCoAndByProductInformation: function(oParameters, sUrl) {
+      getCoAndByProductInformation: function (oParameters, sUrl) {
         this.grQtyPromise = jQuery.Deferred();
         oLogger.info('Fetching GR Quantity data');
         this.byId('consumptionList').setBusy(true);
@@ -2840,13 +2762,13 @@ sap.ui.define(
         this.getGRQuantity(oParameters, this.handleCoBiProductData.bind(this));
         this.grQtyPromise
           .done(
-            function(sResponse) {
+            function (sResponse) {
               oLogger.info('Success: Fetched GR Quantity data. Fetching Gi Material Data');
               this.fetchGiMaterialData(sUrl, oParameters);
             }.bind(this)
           )
           .fail(
-            function() {
+            function () {
               oLogger.info('Failed to fetch GR Quantity data');
               this.byId('consumptionList').setBusy(false);
               this.byId('cOBigoodsReceiptList').setBusy(false);
@@ -2854,16 +2776,16 @@ sap.ui.define(
           );
       },
 
-      parseCoByProductDisplayData: function(oResponseData, that) {
-        var aBiCoProducts = oResponseData.lineItems.filter(function(item) {
+      parseCoByProductDisplayData: function (oResponseData, that) {
+        var aBiCoProducts = oResponseData.lineItems.filter(function (item) {
           return item.componentType === 'C' || item.componentType === 'B';
         });
         var oAllBiCoProducts = that.getView().getModel('coBiProductSummaryList').getData();
 
         //Apply the correction entries
         if (this.batchCorrItems.length > 0) {
-          aBiCoProducts.forEach(oItem => {
-            var oCorrItem = this.batchCorrItems.find(val => val.component === oItem.materialId.material);
+          aBiCoProducts.forEach((oItem) => {
+            var oCorrItem = this.batchCorrItems.find((val) => val.component === oItem.materialId.material);
             if (!oCorrItem) return;
 
             // oItem.toleranceOver = oCorrItem.approvedTUpper;
@@ -2876,7 +2798,7 @@ sap.ui.define(
           });
         }
 
-        aBiCoProducts.forEach(function(e, i) {
+        aBiCoProducts.forEach(function (e, i) {
           var thresholdValuesToBeDisplayed = that.oFormatter.getUpperAndLowerThresholdValues(
             e.recipeComponentToleranceOver,
             e.recipeComponentToleranceUnder,
@@ -2907,7 +2829,7 @@ sap.ui.define(
         aBiCoProducts && that.getView().getModel('coBiProductModel').setData(aBiCoProducts);
         return aBiCoProducts;
       },
-      getGiMaterialData: function(oData) {
+      getGiMaterialData: function (oData) {
         var assemblyUrl = this.getAssemblyDataSourceUri();
         var oParameters = {};
         var order = oData.selectedShopOrder;
@@ -2927,12 +2849,12 @@ sap.ui.define(
           }
         }
       },
-      handleCoBiProductData: function(oResponseData) {
+      handleCoBiProductData: function (oResponseData) {
         var that = this;
-        var aCoProducts = oResponseData.lineItems.filter(function(item) {
+        var aCoProducts = oResponseData.lineItems.filter(function (item) {
           return item.type === 'C';
         });
-        var aBiProducts = oResponseData.lineItems.filter(function(item) {
+        var aBiProducts = oResponseData.lineItems.filter(function (item) {
           return item.type === 'B';
         });
         that.getView().getModel('coBiProductSummaryList').setData({
@@ -2941,7 +2863,7 @@ sap.ui.define(
         });
         that.grQtyPromise.resolve('Done');
       },
-      getGRQuantity: function(oSelectedOrder, oCallBack) {
+      getGRQuantity: function (oSelectedOrder, oCallBack) {
         var inventoryUrl = this.getInventoryDataSourceUri();
         var oParameters = {};
         oParameters.shopOrder = oSelectedOrder.shopOrder;
@@ -2949,10 +2871,10 @@ sap.ui.define(
         var sUrl = inventoryUrl + 'order/goodsReceipt/summary';
         this.fetchGrData(sUrl, oParameters, oCallBack);
       },
-      fetchGrData: function(sUrl, oParameters, oCallBack) {
+      fetchGrData: function (sUrl, oParameters, oCallBack) {
         var that = this;
         oLogger.info('Requesting GR Quantity data');
-        AjaxUtil.get(sUrl, oParameters, oCallBack, function(oError, oHttpErrorMessage) {
+        AjaxUtil.get(sUrl, oParameters, oCallBack, function (oError, oHttpErrorMessage) {
           var err = oError ? oError : oHttpErrorMessage;
           that.showErrorMessage(err, true, true);
           that.itemtList = {};
@@ -2960,7 +2882,7 @@ sap.ui.define(
         });
       },
 
-      formatMaterialConsumptionStatus: function(statusKey) {
+      formatMaterialConsumptionStatus: function (statusKey) {
         if (!statusKey) {
           return '';
         } else {
@@ -2968,14 +2890,14 @@ sap.ui.define(
         }
       },
 
-      fetchGiMaterialData: async function(sUrl, oParameters) {
+      fetchGiMaterialData: async function (sUrl, oParameters) {
         var that = this;
         this.allWorkInstructionsLoaded = false;
         this.allAlternateComponentsLoaded = false;
         var i, lineItem;
         oLogger.info('----->Executing fetchGiMaterialData');
 
-        var oBatchCorrectionInfo = await that._getBatchCorrectionData().catch(oError => {
+        var oBatchCorrectionInfo = await that._getBatchCorrectionData().catch((oError) => {
           return [];
         });
 
@@ -2983,13 +2905,13 @@ sap.ui.define(
         this.batchCorrItems = [];
         if (oBatchCorrectionInfo && oBatchCorrectionInfo.content && oBatchCorrectionInfo.content.length > 0) {
           var sStepId = this.getPodSelectionModel().selectedPhaseData.stepId;
-          this.batchCorrItems = oBatchCorrectionInfo.content.filter(oItem => oItem.phase === sStepId);
+          this.batchCorrItems = oBatchCorrectionInfo.content.filter((oItem) => oItem.phase === sStepId);
         }
 
         AjaxUtil.get(
           sUrl,
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             that.itemList = oResponseData;
             that.coAndByProducts = [];
             if (that.oPluginConfiguration.showCoByProduct) {
@@ -3008,8 +2930,8 @@ sap.ui.define(
 
             //Apply the correction entries
             if (that.batchCorrItems.length > 0) {
-              that.itemList.lineItems.forEach(oItem => {
-                var oCorrItem = that.batchCorrItems.find(val => val.component === oItem.materialId.material);
+              that.itemList.lineItems.forEach((oItem) => {
+                var oCorrItem = that.batchCorrItems.find((val) => val.component === oItem.materialId.material);
                 if (!oCorrItem) return;
 
                 // oItem.toleranceOver = oCorrItem.approvedTUpper;
@@ -3022,7 +2944,7 @@ sap.ui.define(
               });
             }
 
-            that.itemList.lineItems.forEach(e => {
+            that.itemList.lineItems.forEach((e) => {
               var thresholdValuesToBeDisplayed = that.getUpperAndLowerThresholdValues(
                 e.recipeComponentToleranceOver,
                 e.recipeComponentToleranceUnder,
@@ -3084,10 +3006,7 @@ sap.ui.define(
             that.giModel.setData(that.itemList);
             that.byId('consumptionList').setModel(that.giModel);
             that.byId('consumptionList').focus();
-            if (
-              that.itemList.lineItems.length === 0 ||
-              (!that.oPluginConfiguration.selectActionButtonId && !that.oPluginConfiguration.showAlternateBomComponents)
-            ) {
+            if (that.itemList.lineItems.length === 0 || (!that.oPluginConfiguration.selectActionButtonId && !that.oPluginConfiguration.showAlternateBomComponents)) {
               that.byId('consumptionList').setBusy(false);
             }
             that.byId('cOBigoodsReceiptList').setBusy(false);
@@ -3112,7 +3031,7 @@ sap.ui.define(
 
             that._checkBatchCorrectionCondition();
           },
-          function(oError, oHttpErrorMessage) {
+          function (oError, oHttpErrorMessage) {
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
             that.itemList = {};
@@ -3126,7 +3045,7 @@ sap.ui.define(
         );
       },
 
-      findWorkinstructions: function(itemDetails, itemListCount) {
+      findWorkinstructions: function (itemDetails, itemListCount) {
         var that = this;
         var componentRef = itemDetails.materialId.ref;
         var oParameters = {};
@@ -3138,7 +3057,7 @@ sap.ui.define(
         AjaxUtil.post(
           sUri + 'workInstructions/findByNonProductionContext',
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             that.workinstructionsLoaded++;
             if (oResponseData && oResponseData.length > 0) {
               itemDetails.showWorkInstructions = true;
@@ -3149,7 +3068,7 @@ sap.ui.define(
             that.giModel.refresh();
             that.closeBusyIndicatorAfterWorkInstructionsLoad(itemListCount);
           },
-          function(oError, oHttpErrorMessage) {
+          function (oError, oHttpErrorMessage) {
             that.workinstructionsLoaded++;
             itemDetails.showWorkInstructions = false;
             that.giModel.refresh();
@@ -3158,7 +3077,7 @@ sap.ui.define(
         );
       },
 
-      closeBusyIndicatorAfterWorkInstructionsLoad: function(itemListCount) {
+      closeBusyIndicatorAfterWorkInstructionsLoad: function (itemListCount) {
         if (this.workinstructionsLoaded === itemListCount) {
           this.workinstructionsLoaded = 0; //Resetting the value because the next summary load trigger start count again from 0.
           this.allWorkInstructionsLoaded = true;
@@ -3174,7 +3093,7 @@ sap.ui.define(
         }
       },
 
-      findAlternateBomComponents: function(itemDetails, itemListCount) {
+      findAlternateBomComponents: function (itemDetails, itemListCount) {
         let that = this;
         if (itemDetails.bomComponentRef) {
           let productDataSourceUri = this.getProductDataSourceUri();
@@ -3187,7 +3106,7 @@ sap.ui.define(
           AjaxUtil.get(
             sUri,
             null,
-            function(oResponseData) {
+            function (oResponseData) {
               that.alternateBomComponentsLoaded++;
               if (oResponseData && oResponseData.alternates.length > 0) {
                 itemDetails.showAlternateBomComponents = true;
@@ -3198,7 +3117,7 @@ sap.ui.define(
               that.giModel.refresh();
               that.closeBusyIndicatorAfterAlternateComponentsLoad(itemListCount);
             },
-            function(oError, oHttpErrorMessage) {
+            function (oError, oHttpErrorMessage) {
               that.alternateBomComponentsLoaded++;
               itemDetails.showAlternateBomComponents = false;
               that.giModel.refresh();
@@ -3213,7 +3132,7 @@ sap.ui.define(
         }
       },
 
-      closeBusyIndicatorAfterAlternateComponentsLoad: function(itemListCount) {
+      closeBusyIndicatorAfterAlternateComponentsLoad: function (itemListCount) {
         if (this.alternateBomComponentsLoaded === itemListCount) {
           this.alternateBomComponentsLoaded = 0; //Resetting the value because the next summary load should trigger count again from 0.
           this.allAlternateComponentsLoaded = true;
@@ -3229,19 +3148,19 @@ sap.ui.define(
         }
       },
 
-      getProductDetailsByComponentType: function(oAllBiCoProducts, materialRef, componentType) {
+      getProductDetailsByComponentType: function (oAllBiCoProducts, materialRef, componentType) {
         if (componentType === 'C') {
-          return oAllBiCoProducts.coProducts.filter(function(oProduct) {
+          return oAllBiCoProducts.coProducts.filter(function (oProduct) {
             return materialRef === oProduct.materialId;
           });
         } else if (componentType === 'B') {
-          return oAllBiCoProducts.biProducts.filter(function(oProduct) {
+          return oAllBiCoProducts.biProducts.filter(function (oProduct) {
             return materialRef === oProduct.materialId;
           });
         }
       },
 
-      isMatchingTabCriterion: function() {
+      isMatchingTabCriterion: function () {
         var ownerComponent = this.getOwnerComponent();
         if (ownerComponent.getId().indexOf('icontabfilter') !== -1) {
           var selectedKey = ownerComponent.oContainer.getParent().getParent().getSelectedKey() || '';
@@ -3253,7 +3172,7 @@ sap.ui.define(
         return true;
       },
 
-      getParameters: function(oData, rowData) {
+      getParameters: function (oData, rowData) {
         var oParameters = {};
         var order = oData.selectedShopOrder;
         var batchId = oData.selectedSfc;
@@ -3274,7 +3193,7 @@ sap.ui.define(
         return oParameters;
       },
 
-      fetchGiPostingDetails: function(rowData) {
+      fetchGiPostingDetails: function (rowData) {
         this.byId('postingsTable').setBusy(true);
         this.iCurrentPage = 1;
         this.iCurrentOffset = 40;
@@ -3289,13 +3208,13 @@ sap.ui.define(
         this.byId('postingsDialog') && this.byId('postingsDialog').setModel(oPostingsCountModel, 'postingsCountModel');
       },
 
-      getGiPostings: function(sUrl, oParameters, batchManaged) {
+      getGiPostings: function (sUrl, oParameters, batchManaged) {
         var that = this;
 
         AjaxUtil.get(
           sUrl,
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             var oPostingTable = that.byId('postingsTable');
             that.postingsList = { details: oResponseData.content };
             //Show most recent GI posting on the top
@@ -3312,7 +3231,7 @@ sap.ui.define(
             that.buildCustomFieldColumns(that.postingsList, that.oPostingsModel);
             oPostingTable.setBusy(false);
           },
-          function(oError, oHttpErrorMessage) {
+          function (oError, oHttpErrorMessage) {
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
             that.byId('postingsTable').setBusy(false);
@@ -3321,7 +3240,7 @@ sap.ui.define(
         );
       },
 
-      fetchMoreGiPostingDetails: function(oEvent) {
+      fetchMoreGiPostingDetails: function (oEvent) {
         var that = this;
         if (oEvent.getParameter('reason').toLowerCase() === 'growing' && !that.byId('postingsTable').getBusy()) {
           var sUrl = this.getAssemblyDataSourceUri() + 'order/goodsIssue/details';
@@ -3331,15 +3250,15 @@ sap.ui.define(
           AjaxUtil.get(
             sUrl,
             oParameters,
-            function(oResponseData) {
-              oResponseData.content.forEach(e => that.postingsList.details.push(e));
+            function (oResponseData) {
+              oResponseData.content.forEach((e) => that.postingsList.details.push(e));
               var oPostingsModel = that.byId('postingsTable').getOwnModels()['postingsModel'];
               oPostingsModel.setSizeLimit(that.postingsList.details.length);
               oPostingsModel.setData(that.postingsList);
               that.buildCustomFieldColumns(that.postingsList, oPostingsModel);
               that.byId('postingsTable').setBusy(false);
             },
-            function(oError, oHttpErrorMessage) {
+            function (oError, oHttpErrorMessage) {
               var err = oError ? oError : oHttpErrorMessage;
               that.showErrorMessage(err, true, true);
               that.byId('postingsTable').setBusy(false);
@@ -3348,17 +3267,17 @@ sap.ui.define(
         }
       },
 
-      handlePostingsUpdateFinished: function(oEvent) {
+      handlePostingsUpdateFinished: function (oEvent) {
         if (oEvent.getParameter('reason').toLowerCase() === 'growing') {
           this.fetchMoreGiPostingDetails(this.oCurrentRowData);
         }
       },
 
-      buildCustomFieldColumns: function(giPostingsData, oPostingsModel) {
+      buildCustomFieldColumns: function (giPostingsData, oPostingsModel) {
         giPostingsData.hasCustomColumn =
           giPostingsData.hasCustomColumn === true
             ? giPostingsData.hasCustomColumn
-            : giPostingsData.details.find(item => ![null, undefined, ''].includes(item.customFieldData)) !== undefined;
+            : giPostingsData.details.find((item) => ![null, undefined, ''].includes(item.customFieldData)) !== undefined;
         giPostingsData.customColumnName = this.oPluginConfiguration.customField1;
         oPostingsModel.updateBindings();
         oPostingsModel.refresh();
@@ -3422,7 +3341,7 @@ sap.ui.define(
              */
       },
 
-      updateInventoryStock: function() {
+      updateInventoryStock: function () {
         const oCurrentModel = this.getView().getModel('weighingModel');
         let sDefaultBatchId = oCurrentModel.getProperty('/batchNumber'),
           bIsBatchManaged = oCurrentModel.getProperty('/batchManaged'),
@@ -3430,22 +3349,15 @@ sap.ui.define(
           sStorageLocationRef = oCurrentModel.getProperty('/storageLocationRef'),
           sSelectedMaterialRef = oCurrentModel.getProperty('/materialRef'),
           sSelectedMaterial = oCurrentModel.getProperty('/material');
-        this.getInventoryStockData(
-          sDefaultBatchId,
-          bIsBatchManaged,
-          sStorageLocation,
-          sStorageLocationRef,
-          sSelectedMaterialRef,
-          sSelectedMaterial
-        );
+        this.getInventoryStockData(sDefaultBatchId, bIsBatchManaged, sStorageLocation, sStorageLocationRef, sSelectedMaterialRef, sSelectedMaterial);
       },
 
-      postGiData: function(sUrl, oRequestData) {
+      postGiData: function (sUrl, oRequestData) {
         var that = this;
         AjaxUtil.post(
           sUrl,
           oRequestData,
-          function(oResponseData) {
+          function (oResponseData) {
             //that.byId(that.currentDialogId).setBusy(false);
             // C5278086 Adding changes for W&D Start
             if (
@@ -3455,11 +3367,7 @@ sap.ui.define(
             ) {
               if (that.sPopupClosingMethod !== 'AddWeight') {
                 that.oWeighDispenseHandler.closeWeighingDialog();
-              } else if (
-                that.getCurrentModel() &&
-                that.getCurrentModel().getProperty('/batchManaged') &&
-                that.getCurrentModel().getProperty('/batchManaged') === true
-              ) {
+              } else if (that.getCurrentModel() && that.getCurrentModel().getProperty('/batchManaged') && that.getCurrentModel().getProperty('/batchManaged') === true) {
                 that.openBatchClearPopup(oResponseData);
                 that.updateInventoryStock();
               } else {
@@ -3476,7 +3384,7 @@ sap.ui.define(
             MessageToast.show(that.getI18nText('GI_POST_SUCCESS'));
             that.getGiMaterialData(that.selectedDataInList);
           },
-          function(oError, oHttpErrorMessage) {
+          function (oError, oHttpErrorMessage) {
             var oModel = that.getCurrentModel();
             var postedDateTime = oModel.getProperty('/dateTime').replace(' 00:00:00', '');
             oModel.setProperty('/dateTime', postedDateTime);
@@ -3497,20 +3405,20 @@ sap.ui.define(
         );
       },
 
-      getAlternateUoms: function(alternateUomForSelectedMaterial, material, materialRef, version, sFlag) {
+      getAlternateUoms: function (alternateUomForSelectedMaterial, material, materialRef, version, sFlag) {
         var that = this;
         this.byId('consumptionList').setBusy(true);
         this.fetchAlternateUoms(alternateUomForSelectedMaterial, material, materialRef, version, sFlag);
       },
 
-      fetchAlternateUoms: function(alternateUomForSelectedMaterial, material, materialRef, version, sFlag) {
+      fetchAlternateUoms: function (alternateUomForSelectedMaterial, material, materialRef, version, sFlag) {
         let that = this;
         let url = that.getProductRestDataSourceUri() + 'materials/uoms';
         let oParameters = { material: material, version: version };
         AjaxUtil.get(
           url,
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             alternateUomForSelectedMaterial[material] = oResponseData;
             if (alternateUomForSelectedMaterial[material].length > 0) {
               that.getConversionDetailsForUoms(alternateUomForSelectedMaterial, material, materialRef);
@@ -3522,7 +3430,7 @@ sap.ui.define(
               that.checkMaterialEWMManaged(materialRef);
             }
           },
-          function(oError, oHttpErrorMessage) {
+          function (oError, oHttpErrorMessage) {
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
             that.byId('consumptionList').setBusy(false);
@@ -3530,7 +3438,7 @@ sap.ui.define(
         );
       },
 
-      getConversionDetailsForUoms: function(alternateUomForSelectedMaterial, material, materialRef) {
+      getConversionDetailsForUoms: function (alternateUomForSelectedMaterial, material, materialRef) {
         let that = this;
         let url =
           that.getProductDataSourceUri() +
@@ -3542,7 +3450,7 @@ sap.ui.define(
         AjaxUtil.get(
           url,
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             allUoms = oResponseData.alternateUnitsOfMeasure;
             for (i = 0; i < alternateUomForSelectedMaterial[material].length; i++) {
               alternateUomForSelectedMaterial[material][i].numerator = 1;
@@ -3556,7 +3464,7 @@ sap.ui.define(
               }
             }
           },
-          function(oError, oHttpErrorMessage) {
+          function (oError, oHttpErrorMessage) {
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
             that.byId('consumptionList').setBusy(false);
@@ -3565,7 +3473,7 @@ sap.ui.define(
       },
 
       //handleOpenAddDialog: function() {
-      handleOpenAddDialog: async function() {
+      handleOpenAddDialog: async function () {
         var oView = this.getView();
         //  Extend WeighingScreen
         var sWorkcenter = oView.getModel('WorkcenterInfo').getProperty('/workcenter');
@@ -3576,7 +3484,7 @@ sap.ui.define(
           return;
         }
 
-        if (!await this._validateResourceStatus(this.selectedDataInList.resource.resource)) {
+        if (!(await this._validateResourceStatus(this.selectedDataInList.resource.resource))) {
           MessageBox.error(this.getI18nText('resourceStatusInvalid'));
           return;
         }
@@ -3601,7 +3509,7 @@ sap.ui.define(
         //  Extend WeighingScreen
       },
 
-      openAddDialog: function() {
+      openAddDialog: function () {
         this.isAddDialogOpen = true;
         var oView = this.getView();
         var loggedInUser = this.loggedInUserDetails ? this.loggedInUserDetails.userId : '';
@@ -3612,9 +3520,9 @@ sap.ui.define(
             name: 'stellium.ext.podplugins.materialConsumptionPlugin.view.fragments.AddMaterial',
             controller: this
           }).then(
-            function(oDialog) {
+            function (oDialog) {
               oDialog.setEscapeHandler(
-                function(oPromise) {
+                function (oPromise) {
                   this.onCancelAddDialog();
                   oPromise.resolve();
                 }.bind(this)
@@ -3636,7 +3544,7 @@ sap.ui.define(
         }
       },
 
-      onCancelAddDialog: function() {
+      onCancelAddDialog: function () {
         this.resetFieldVerificationFlags();
         this.resetAddDialogFields();
         this.isAddDialogOpen = false;
@@ -3650,7 +3558,7 @@ sap.ui.define(
       },
 
       //handleOpenScanDialog: function() {
-      handleOpenScanDialog: async function() {
+      handleOpenScanDialog: async function () {
         var oView = this.getView();
         //  Extend WeighingScreen
         var sWorkcenter = oView.getModel('WorkcenterInfo').getProperty('/workcenter');
@@ -3661,7 +3569,7 @@ sap.ui.define(
           return;
         }
 
-        if (!await this._validateResourceStatus(this.selectedDataInList.resource.resource)) {
+        if (!(await this._validateResourceStatus(this.selectedDataInList.resource.resource))) {
           MessageBox.error(this.getI18nText('resourceStatusInvalid'));
           return;
         }
@@ -3686,7 +3594,7 @@ sap.ui.define(
         //  Extend WeighingScreen
       },
 
-      openScanDialog: function() {
+      openScanDialog: function () {
         var oView = this.getView();
         this.isScanDialogOpen = true;
         // create dialog lazily
@@ -3697,10 +3605,10 @@ sap.ui.define(
             name: 'stellium.ext.podplugins.materialConsumptionPlugin.view.fragments.ScannerDialog',
             controller: this
           }).then(
-            function(oDialog) {
+            function (oDialog) {
               // connect dialog to the root view of this component (models, lifecycle)
               oDialog.setEscapeHandler(
-                function(oPromise) {
+                function (oPromise) {
                   this.onCancelScanDialog();
                   oPromise.resolve();
                 }.bind(this)
@@ -3711,7 +3619,7 @@ sap.ui.define(
               this.byId('inputPostingDateScan').setValue(this.getCurrentDateInPlantTimeZone());
               this.buildCustomFieldFormContent();
               setTimeout(
-                function() {
+                function () {
                   this.byId('inputMatNumScan').focus();
                 }.bind(this),
                 300
@@ -3724,7 +3632,7 @@ sap.ui.define(
           this.byId('inputPostingDateScan').setValue(this.getCurrentDateInPlantTimeZone());
           this.buildCustomFieldFormContent();
           setTimeout(
-            function() {
+            function () {
               this.byId('inputMatNumScan').focus();
             }.bind(this),
             300
@@ -3732,7 +3640,7 @@ sap.ui.define(
         }
       },
 
-      setDetailedModel: function() {
+      setDetailedModel: function () {
         var oView = this.getView();
         var oModel = this.getCurrentModel();
         this.resetModel(oModel);
@@ -3747,7 +3655,7 @@ sap.ui.define(
         this.focusHandlingUnitInput();
       },
 
-      onBatchLiveChange: function(oEvent) {
+      onBatchLiveChange: function (oEvent) {
         if (this.isInventoryManaged) {
           var flag = oEvent.getParameters().value === '';
           this.getCurrentCancelButton().setEnabled(flag);
@@ -3758,7 +3666,7 @@ sap.ui.define(
         }
       },
 
-      onBatchChange: function() {
+      onBatchChange: function () {
         var sCurrentDialogId = this.getCurrentDialogId();
         this.byId(sCurrentDialogId).setBusy(true);
         var oBatchIdControl = this.getCurrentInputBatchIdControl();
@@ -3804,7 +3712,7 @@ sap.ui.define(
           }
         }
         setTimeout(
-          function() {
+          function () {
             //this.getCurrentCancelButton().setEnabled(true)
             //  Extend WeighingScreen
             var oBtnCancel = this.getCurrentCancelButton();
@@ -3815,7 +3723,7 @@ sap.ui.define(
         );
       },
 
-      validateMaterialInputRegEx: function(sInputValue) {
+      validateMaterialInputRegEx: function (sInputValue) {
         //Regex for Valid Characters
         const regex = /^[A-Z0-9)(\/_@~#+.!$*=^\- ]+$/;
         let isValidInput = true;
@@ -3827,7 +3735,7 @@ sap.ui.define(
         return isValidInput;
       },
 
-      validateInputRegEx: function(sInputValue) {
+      validateInputRegEx: function (sInputValue) {
         //Regex for Valid Characters
         var regex = /^[A-Za-z0-9_@\-. ]+$/;
         var isValidInput = true;
@@ -3839,7 +3747,7 @@ sap.ui.define(
         return isValidInput;
       },
 
-      handleHUScanChange: async function(oEvent) {
+      handleHUScanChange: async function (oEvent) {
         var oScanControl = oEvent.getSource(),
           sScannedValue = oScanControl.getValue(),
           oScannedValue;
@@ -3883,37 +3791,35 @@ sap.ui.define(
         this.focusHandlingUnitInput();
       },
 
-      _resetHandlingUnitScanData: function() {
+      _resetHandlingUnitScanData: function () {
         var oModel = this.getCurrentModel();
         oModel.setProperty('/scannedHu', '');
         oModel.setProperty('/batchNumber', '');
         oModel.setProperty('/avlBatchQty', 0);
       },
 
-      _getHandlingUnitDataFromS4: function(sHuNo) {
+      _getHandlingUnitDataFromS4: function (sHuNo) {
         //CPP_GetPackingDataFromS4
-        var sUrl =
-          this.getPublicApiRestDataSourceUri() +
-          '/pe/api/v1/process/processDefinitions/start?key=REG_57bd9fbd-5f78-4ac0-ba6b-7577d0bf7a57&async=false';
+        var sUrl = this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_57bd9fbd-5f78-4ac0-ba6b-7577d0bf7a57&async=false';
         var oPayload = {
           items: [{ huno: sHuNo }]
         };
         return new Promise((resolve, reject) => this.ajaxPostRequest(sUrl, oPayload, resolve, reject));
       },
 
-      _getConsumptionItemFromHu: async function(sHandlingUnit, sMaterial) {
+      _getConsumptionItemFromHu: async function (sHandlingUnit, sMaterial) {
         var oCurrentDialog = this.byId(this.getCurrentDialogId());
         oCurrentDialog.setBusy(true);
 
         var aHuItems = await this._getHandlingUnitDataFromS4(sHandlingUnit)
-          .then(oResponse => {
+          .then((oResponse) => {
             if (!oResponse || !oResponse.content || oResponse.content.length === 0) {
               return null;
             }
 
             var aItems = oResponse.content;
             if (sMaterial) {
-              aItems = oResponse.content.filter(oItem => oItem.material === sMaterial);
+              aItems = oResponse.content.filter((oItem) => oItem.material === sMaterial);
             }
             // return oResponse.content;
             return aItems;
@@ -3927,7 +3833,7 @@ sap.ui.define(
         }
 
         var oLineItemMaterial = this.getCurrentModel().getData().material;
-        var oItem = aHuItems.find(oHuItem => oHuItem.material === oLineItemMaterial);
+        var oItem = aHuItems.find((oHuItem) => oHuItem.material === oLineItemMaterial);
 
         //If HU is open, check if there is openQuantity for that material
         if (oItem && oItem.openindicator === 'X' && oItem.openQuantity <= 0) return null;
@@ -3960,7 +3866,7 @@ sap.ui.define(
         // return null;
       },
 
-      handleLiveChangeScan: async function(oEvent) {
+      handleLiveChangeScan: async function (oEvent) {
         var that = this;
         var flag = true;
         //  Extend WeighingScreen
@@ -3998,7 +3904,7 @@ sap.ui.define(
           }
         } else {
           this.scannedMaterial = {};
-          var oMaterial = await this._getMaterialForEAN(scannedMat).catch(e => {});
+          var oMaterial = await this._getMaterialForEAN(scannedMat).catch((e) => {});
           if (!oMaterial) {
             this.showErrorMessage(that.getI18nText('INVALID_MATERIAL'));
             oMaterialInput.setValue('');
@@ -4017,21 +3923,21 @@ sap.ui.define(
             that.showErrorMessage(that.getI18nText('INVALID_MATERIAL'));
           }
           setTimeout(
-            function() {
+            function () {
               that.byId('inputMatNumScan').focus();
             }.bind(that),
             300
           );
           that.byId(oDialogSelected).setBusy(false);
         } else if (that.coAndByProducts.length > 0) {
-          that.coAndByProducts.forEach(function(e) {
+          that.coAndByProducts.forEach(function (e) {
             if (e === scannedMat) {
               flag = false;
               scannedMatDetails = {};
               that.setDetailedModel();
               that.showErrorMessage(that.getI18nText('consumeWarningForCoBy'));
               setTimeout(
-                function() {
+                function () {
                   that.byId('inputMatNumScan').focus();
                 }.bind(that),
                 300
@@ -4046,7 +3952,7 @@ sap.ui.define(
           AjaxUtil.get(
             sUrl,
             oParameters,
-            function(oResponseData) {
+            function (oResponseData) {
               if (oResponseData.value.length === 0) {
                 scannedMatDetails = {};
                 that.setDetailedModel();
@@ -4054,7 +3960,7 @@ sap.ui.define(
                   that.showErrorMessage(that.getI18nText('INVALID_MATERIAL'));
                 }
                 setTimeout(
-                  function() {
+                  function () {
                     that.byId('inputMatNumScan').focus();
                   }.bind(that),
                   300
@@ -4073,7 +3979,7 @@ sap.ui.define(
                     that.showErrorMessage(that.getI18nText('INVALID_MATERIAL'));
                   }
                   setTimeout(
-                    function() {
+                    function () {
                       that.byId('inputMatNumScan').focus();
                     }.bind(that),
                     300
@@ -4084,7 +3990,7 @@ sap.ui.define(
               }
               that.byId(oDialogSelected).setBusy(false);
             },
-            function(oError, oHttpErrorMessage) {
+            function (oError, oHttpErrorMessage) {
               that.byId(oDialogSelected).setBusy(false);
               var err = oError ? oError : oHttpErrorMessage;
               that.showErrorMessage(err, true, true);
@@ -4094,7 +4000,7 @@ sap.ui.define(
         }
       },
 
-      _getMaterialDetails: function(scannedMat) {
+      _getMaterialDetails: function (scannedMat) {
         let that = this;
         let oDialogSelected = this.getCurrentDialogId();
         let sUrl = that.getProductDataSourceUri() + "Materials?$filter=material eq '" + encodeURIComponent(scannedMat) + "'";
@@ -4104,7 +4010,7 @@ sap.ui.define(
         AjaxUtil.get(
           sUrl,
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             if (oResponseData.value.length === 0) {
               scannedMatDetails = {};
               that.setDetailedModel();
@@ -4112,7 +4018,7 @@ sap.ui.define(
                 that.showErrorMessage(that.getI18nText('INVALID_MATERIAL'));
               }
               setTimeout(
-                function() {
+                function () {
                   that.byId('inputMatNumScan').focus();
                 }.bind(that),
                 300
@@ -4131,7 +4037,7 @@ sap.ui.define(
                   that.showErrorMessage(that.getI18nText('INVALID_MATERIAL'));
                 }
                 setTimeout(
-                  function() {
+                  function () {
                     that.byId('inputMatNumScan').focus();
                   }.bind(that),
                   300
@@ -4142,7 +4048,7 @@ sap.ui.define(
             }
             that.byId(oDialogSelected).setBusy(false);
           },
-          function(oError, oHttpErrorMessage) {
+          function (oError, oHttpErrorMessage) {
             that.byId(oDialogSelected).setBusy(false);
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
@@ -4151,7 +4057,7 @@ sap.ui.define(
         );
       },
 
-      setPostMaterialSelectionDetails: function(oMaterial, oModel, sDialogId) {
+      setPostMaterialSelectionDetails: function (oMaterial, oModel, sDialogId) {
         var selectedMaterial = oMaterial.material;
         var selectedMaterialRef = oMaterial.ref;
         var selectedMaterialDesc = oMaterial.description;
@@ -4184,9 +4090,7 @@ sap.ui.define(
               ? oCalculatableQuantities.consumedQuantity.value
               : 0;
           var targetQuantity =
-            oCalculatableQuantities && oCalculatableQuantities.targetQuantity && oCalculatableQuantities.targetQuantity.value
-              ? oCalculatableQuantities.targetQuantity.value
-              : 0;
+            oCalculatableQuantities && oCalculatableQuantities.targetQuantity && oCalculatableQuantities.targetQuantity.value ? oCalculatableQuantities.targetQuantity.value : 0;
           oRemainingQuantity = consumedQuantity < targetQuantity ? targetQuantity - consumedQuantity : '';
           //  Extend WeighingScreen
           var oInStorageLocation = this.getCurrentStorageLocationInput();
@@ -4248,8 +4152,7 @@ sap.ui.define(
 
         // Set the default values
         oModel.setProperty('/shopOrder', this.selectedDataInList.selectedShopOrder);
-        if (this.selectedDataInList.orderSelectionType === 'PROCESS')
-          oModel.setProperty('/operationActivity', this.selectedDataInList.phaseId);
+        if (this.selectedDataInList.orderSelectionType === 'PROCESS') oModel.setProperty('/operationActivity', this.selectedDataInList.phaseId);
         else oModel.setProperty('/operationActivity', this.selectedDataInList.operation.operation);
         oModel.setProperty('/bomComponentRef', bomComponentRef);
         oModel.setProperty('/batchId', this.selectedDataInList.selectedSfc);
@@ -4288,11 +4191,7 @@ sap.ui.define(
           this.getView().setModel(this.alternateUomsModel, 'unitModel');
         }
 
-        if (
-          this.isInventoryManaged &&
-          ((defaultBatchId && defaultBatchId !== this.getI18nText('notBatchManaged')) ||
-            (!isBatchManaged && storageLocation && storageLocationRef))
-        ) {
+        if (this.isInventoryManaged && ((defaultBatchId && defaultBatchId !== this.getI18nText('notBatchManaged')) || (!isBatchManaged && storageLocation && storageLocationRef))) {
           this.prepareInventoryUrl(selectedMaterialRef, defaultBatchId, storageLocationRef, sDialogId, false);
         }
 
@@ -4301,10 +4200,7 @@ sap.ui.define(
           // Quantity Info
           var dConsumedQuantity = bomItem !== undefined ? (bomItem.consumedQuantity.value ? bomItem.consumedQuantity.value : 0) : 0;
           // C5278086 CHanges for Traget Quantity.
-          var dTargetQuantity =
-            bomItem !== undefined
-              ? this.oFormatter.getValidQty(bomItem.totalQtyEntryUom, bomItem.totalQtyBaseUom, bomItem.targetQuantity)
-              : 0;
+          var dTargetQuantity = bomItem !== undefined ? this.oFormatter.getValidQty(bomItem.totalQtyEntryUom, bomItem.totalQtyBaseUom, bomItem.targetQuantity) : 0;
           //var dTargetQuantity = (bomItem !== undefined) ?  (bomItem.targetQuantity.value) ? bomItem.targetQuantity.value : 0 : 0;
           this.consumedQuantityForSelectedMaterial = dConsumedQuantity;
           this.targetQuantityForSelectedMaterial = dTargetQuantity.value;
@@ -4314,10 +4210,8 @@ sap.ui.define(
           var dLowerMaterialThresholdValue = bomItem !== undefined ? (bomItem.lowerThresholdValue ? bomItem.lowerThresholdValue : 0) : 0;
           this.upperThresholdForSelectedMaterial = dUpperMaterialThresholdValue;
           //Weighing Popup
-          var dComponentToleranceOver =
-            bomItem !== undefined ? (bomItem.recipeComponentToleranceOver ? bomItem.recipeComponentToleranceOver : 0) : 0;
-          var dComponentToleranceUnder =
-            bomItem !== undefined ? (bomItem.recipeComponentToleranceUnder ? bomItem.recipeComponentToleranceUnder : 0) : 0;
+          var dComponentToleranceOver = bomItem !== undefined ? (bomItem.recipeComponentToleranceOver ? bomItem.recipeComponentToleranceOver : 0) : 0;
+          var dComponentToleranceUnder = bomItem !== undefined ? (bomItem.recipeComponentToleranceUnder ? bomItem.recipeComponentToleranceUnder : 0) : 0;
           oModel.setProperty('/tolerance', {
             upper: dComponentToleranceOver,
             upperThresholdValue: dUpperMaterialThresholdValue,
@@ -4361,7 +4255,7 @@ sap.ui.define(
         //this._enableDisableCalculation();
       },
 
-      onCancelScanDialog: function() {
+      onCancelScanDialog: function () {
         this.resetFieldVerificationFlags();
         this.resetScanDialogFields();
         this.isScanDialogOpen = false;
@@ -4374,12 +4268,12 @@ sap.ui.define(
         this.byId('scanDialog').close();
       },
 
-      resetFieldVerificationFlags: function() {
+      resetFieldVerificationFlags: function () {
         this.isBatchNumberValid = false;
         this.isPostedByValid = false;
       },
 
-      resetScanDialogFields: function() {
+      resetScanDialogFields: function () {
         this.byId('inputMatNumScan').setValue('');
         this.byId('inputMatDescScan').setText('');
         this.byId('inputBatchIdScan').setValue('');
@@ -4401,15 +4295,14 @@ sap.ui.define(
         // ErrorHandler.clearErrorState(this.byId('inputCommentsForScan'));
       },
 
-      onConfirmandNext: function() {
+      onConfirmandNext: function () {
         this.resetScanDialogFields();
       },
 
-      resetModel: function(oModel) {
+      resetModel: function (oModel) {
         var oView = this.getView();
         oModel.setProperty('/shopOrder', this.selectedDataInList.selectedShopOrder);
-        if (this.selectedDataInList.orderSelectionType === 'PROCESS')
-          oModel.setProperty('/operationActivity', this.selectedDataInList.phaseId);
+        if (this.selectedDataInList.orderSelectionType === 'PROCESS') oModel.setProperty('/operationActivity', this.selectedDataInList.phaseId);
         else oModel.setProperty('/operationActivity', this.selectedDataInList.operation.operation);
         oModel.setProperty('/bomComponentRef', '');
         oModel.setProperty('/batchId', this.selectedDataInList.selectedSfc);
@@ -4449,13 +4342,13 @@ sap.ui.define(
         this.scannedHuItem = null;
       },
 
-      onMaterialBrowse: function(oEvent) {
+      onMaterialBrowse: function (oEvent) {
         var oMaterialNoField = oEvent.getSource();
         var flag = true;
         var oController = this;
-        MaterialBrowse.open(oMaterialNoField, oMaterialNoField.getValue(), function(oSelectedObject) {
+        MaterialBrowse.open(oMaterialNoField, oMaterialNoField.getValue(), function (oSelectedObject) {
           if (oController.coAndByProducts.length > 0) {
-            oController.coAndByProducts.forEach(function(e) {
+            oController.coAndByProducts.forEach(function (e) {
               if (e === oSelectedObject.material) {
                 flag = false;
                 oMaterialNoField.setValue('');
@@ -4488,7 +4381,7 @@ sap.ui.define(
         });
       },
 
-      resetAddDialogFields: function() {
+      resetAddDialogFields: function () {
         this.byId('inputMatNumAdd').focus();
         this.byId('inputMatNumAdd').setValue('');
         this.byId('inputMatDescAdd').setText('');
@@ -4512,9 +4405,9 @@ sap.ui.define(
       },
 
       /**
-         * Open Calculate Quantity to Consume Dialog screen
-         */
-      onCalculateDialog: function(oEvent) {
+       * Open Calculate Quantity to Consume Dialog screen
+       */
+      onCalculateDialog: function (oEvent) {
         var oView = this.getView();
         var aComponents = oView.byId('consumptionList').getModel().getData().lineItems;
         var oFormula = oView.getModel('consumeModel').getData().formula;
@@ -4523,7 +4416,7 @@ sap.ui.define(
         CalculateDialog.open(oView, oFormula, aComponents, this._calculateDialogCallBack.bind(this));
       },
 
-      _calculateDialogCallBack: function(oResult) {
+      _calculateDialogCallBack: function (oResult) {
         var oView = this.getView();
         oView.getModel('consumeModel').setProperty('/quantity/value', oResult.result.toString());
         oView.getModel('consumeModel').setProperty('/calculatedData', oResult);
@@ -4534,10 +4427,10 @@ sap.ui.define(
       },
 
       /**
-         * Enable/Disable Calculate button
-         * @private
-         */
-      _enableDisableCalculation: function() {
+       * Enable/Disable Calculate button
+       * @private
+       */
+      _enableDisableCalculation: function () {
         var that = this;
         var oView = that.getView();
         var sBomcomponentRef = oView.getModel('consumeModel').getProperty('/bomComponentRef');
@@ -4552,12 +4445,12 @@ sap.ui.define(
           AjaxUtil.get(
             sUrl,
             oParameters,
-            function(oResponseData) {
+            function (oResponseData) {
               var oFormula = that._getFormula(oResponseData);
               oView.getModel('consumeModel').setProperty('/formula', oFormula.formula);
               oView.getModel('consumeModel').setProperty('/recalculationEnabled', oFormula.enableFormula);
             },
-            function(oError, oHttpErrorMessage) {
+            function (oError, oHttpErrorMessage) {
               oView.getModel('consumeModel').setProperty('/formula', null);
               oView.getModel('consumeModel').setProperty('/recalculationEnabled', false);
               var err = oError ? oError : oHttpErrorMessage;
@@ -4568,18 +4461,18 @@ sap.ui.define(
       },
 
       /**
-         * Determine assigned formula to FORMULA data field
-         * @param {oResponseData} Response of Bom Component ODATA request
-         * @private
-         */
-      _getFormula: function(oResponseData) {
+       * Determine assigned formula to FORMULA data field
+       * @param {oResponseData} Response of Bom Component ODATA request
+       * @private
+       */
+      _getFormula: function (oResponseData) {
         var oFormula = {
           formula: null,
           enableFormula: false
         };
         if (oResponseData && oResponseData.assemblyDataType && oResponseData.assemblyDataType.dataFieldList) {
           var aDataFieldList = oResponseData.assemblyDataType.dataFieldList;
-          var aFormulaDataFields = aDataFieldList.filter(function(oItem) {
+          var aFormulaDataFields = aDataFieldList.filter(function (oItem) {
             if (oItem.dataField.type === 'FORMULA') {
               return oItem.dataField;
             }
@@ -4587,14 +4480,14 @@ sap.ui.define(
 
           if (aFormulaDataFields.length > 0) {
             var aFormulas = [];
-            aFormulaDataFields.forEach(function(oItem) {
+            aFormulaDataFields.forEach(function (oItem) {
               if (oItem.dataField.formula) {
                 aFormulas.push(oItem.dataField.formula);
               }
             });
 
             if (aFormulas && aFormulas.length > 0) {
-              aFormulas.sort(function(x, y) {
+              aFormulas.sort(function (x, y) {
                 var a = x.formulaName.toUpperCase();
                 var b = y.formulaName.toUpperCase();
                 return a === b ? 0 : a > b ? 1 : -1;
@@ -4614,14 +4507,14 @@ sap.ui.define(
         return oFormula;
       },
 
-      onCalculateIconPress: function(oEvent) {
+      onCalculateIconPress: function (oEvent) {
         var sPath = oEvent.getSource().getParent().getParent().getParent().getBindingContextPath();
         var oCalculatedResult = oEvent.getSource().getModel('postingsModel').getObject(sPath).calculatedData;
 
         FormulaCalculatedInfo.openPopover(this.getOwnerComponent(), this.getView(), oEvent.getSource(), oCalculatedResult);
       },
 
-      onChangeOfComments: function(oEvent) {
+      onChangeOfComments: function (oEvent) {
         var oCommentsControl = this.getCurrentCommentsControl();
         var sComment = oCommentsControl.getValue() || '';
         if (sComment === '' || sComment) {
@@ -4630,15 +4523,7 @@ sap.ui.define(
         }
         this._enableConfirmButton();
       },
-      getUpperAndLowerThresholdValues: function(
-        compThresholdUpper,
-        compThresholdLower,
-        bomThresholdUpper,
-        bomThresholdLower,
-        totalQtyEntryUom,
-        totalQtyBaseUom,
-        targetQuantity
-      ) {
+      getUpperAndLowerThresholdValues: function (compThresholdUpper, compThresholdLower, bomThresholdUpper, bomThresholdLower, totalQtyEntryUom, totalQtyBaseUom, targetQuantity) {
         var upperValue = 0,
           lowerValue = 0,
           thresholdValues = {};
@@ -4662,7 +4547,7 @@ sap.ui.define(
         thresholdValues.selectedTargetValue = targetValue;
         return thresholdValues;
       },
-      determineTargetAndConsumedQty: function(oSelectedMaterial) {
+      determineTargetAndConsumedQty: function (oSelectedMaterial) {
         var returnObject = {
           targetQuantity: {
             type: 'totalQtyEntryUom',
@@ -4690,11 +4575,7 @@ sap.ui.define(
           returnObject.targetQuantity.uom = oSelectedMaterial.targetQuantity.unitOfMeasure;
         }
 
-        if (
-          returnObject.targetQuantity.type === 'totalQtyEntryUom' &&
-          oSelectedMaterial.consumedQtyEntryUom &&
-          oSelectedMaterial.consumedQtyEntryUom.value
-        ) {
+        if (returnObject.targetQuantity.type === 'totalQtyEntryUom' && oSelectedMaterial.consumedQtyEntryUom && oSelectedMaterial.consumedQtyEntryUom.value) {
           // Take consumedQtyEntryUom's values
           returnObject.consumedQuantity.type = 'consumedQtyEntryUom';
           returnObject.consumedQuantity.value = oSelectedMaterial.consumedQtyEntryUom.value;
@@ -4703,12 +4584,11 @@ sap.ui.define(
           // Take consumedQuantity for all other cases
           returnObject.consumedQuantity.type = 'other';
           returnObject.consumedQuantity.value = (oSelectedMaterial.consumedQuantity && oSelectedMaterial.consumedQuantity.value) || 0;
-          returnObject.consumedQuantity.uom =
-            (oSelectedMaterial.consumedQuantity && oSelectedMaterial.consumedQuantity.unitOfMeasure) || '';
+          returnObject.consumedQuantity.uom = (oSelectedMaterial.consumedQuantity && oSelectedMaterial.consumedQuantity.unitOfMeasure) || '';
         }
         return returnObject;
       },
-      convertToUom: function(selectedMaterial, value, selectedUom) {
+      convertToUom: function (selectedMaterial, value, selectedUom) {
         var i, currentUoms;
         var numerator = 1;
         var denominator = 1;
@@ -4726,7 +4606,7 @@ sap.ui.define(
       },
 
       // Handling Unit related functions
-      checkMaterialEWMManaged: function(sMaterialRef) {
+      checkMaterialEWMManaged: function (sMaterialRef) {
         var oView = this.getView();
         var that = this;
         var sUrl = this.getInventoryDataSourceUri() + 'inventory/hasEwmManagedInventories';
@@ -4735,7 +4615,7 @@ sap.ui.define(
         AjaxUtil.get(
           sUrl,
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             var bIsEWM = false;
             if (oResponseData && oResponseData.hasEwmManagedInventories) {
               bIsEWM = true;
@@ -4743,14 +4623,14 @@ sap.ui.define(
             oView.getModel('consumeModel').setProperty('/isEWM', bIsEWM);
             that.openMaterialConsumptionPopup(oView);
           },
-          function(oError, oHttpErrorMessage) {
+          function (oError, oHttpErrorMessage) {
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
           }
         );
       },
 
-      onHULiveChange: function(oEvent) {
+      onHULiveChange: function (oEvent) {
         var oModel = this.getCurrentModel();
         oModel.setProperty('/batchNumber', '');
         oModel.setProperty('/inventory', '');
@@ -4761,7 +4641,7 @@ sap.ui.define(
         this.getCurrentSaveButton().setEnabled(false);
       },
 
-      onFindHUInv: function() {
+      onFindHUInv: function () {
         let oView = this.getView();
         let oController = this;
         let oModel = oController.getCurrentModel();
@@ -4769,7 +4649,7 @@ sap.ui.define(
           id: oView.getId(),
           name: 'stellium.ext.podplugins.materialConsumptionPlugin.view.fragments.HandlingUnitDialog',
           controller: this
-        }).then(function(oDialog) {
+        }).then(function (oDialog) {
           oView.addDependent(oDialog);
           oDialog.open();
           oDialog.setTitle(oController.getI18nText('batchDialogHeaderWithMat', oController.getCurrentModel().getProperty('/material')));
@@ -4778,21 +4658,21 @@ sap.ui.define(
         });
       },
 
-      fetchInvWithHU: function() {
+      fetchInvWithHU: function () {
         let HUModel = new JSONModel();
         this.getView().setModel(HUModel, 'HUModel');
         this.pageHU = 0;
         this.doHuApiCall(HUModel, false);
       },
 
-      queryNextPageHU: function(oEvent) {
+      queryNextPageHU: function (oEvent) {
         if (oEvent.getParameters().reason === 'Growing' && this.totalPaginationElemsHU > (this.pageHU + 1) * 20) {
           this.pageHU++;
           this.doHuApiCall(this.getView().getModel('HUModel'), true);
         }
       },
 
-      doHuApiCall: function(HUModel, isGrowing) {
+      doHuApiCall: function (HUModel, isGrowing) {
         let that = this;
         let oTable = this.byId('HUList');
         let sUrl = this.getInventoryDataSourceUri() + 'inventory/findAvailable';
@@ -4802,16 +4682,16 @@ sap.ui.define(
         AjaxUtil.get(
           sUrl,
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             if (oResponseData && oResponseData.content && oResponseData.content.length > 0) {
               that.totalPaginationElemsHU = oResponseData.totalElements;
               if (that.totalPaginationElemsHU > (that.pageHU + 1) * 20) {
-                oTable.getBindingInfo('items').binding.isLengthFinal = function() {
+                oTable.getBindingInfo('items').binding.isLengthFinal = function () {
                   return false;
                 };
                 oTable.setGrowingThreshold((that.pageHU + 1) * 20);
               } else {
-                oTable.getBindingInfo('items').binding.isLengthFinal = function() {
+                oTable.getBindingInfo('items').binding.isLengthFinal = function () {
                   return true;
                 };
                 oTable.setGrowing(false);
@@ -4829,7 +4709,7 @@ sap.ui.define(
             that.onInvHUChange();
             oDialog.setBusy(false);
           },
-          function(oError, oHttpErrorMessage) {
+          function (oError, oHttpErrorMessage) {
             oDialog.setBusy(false);
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
@@ -4837,7 +4717,7 @@ sap.ui.define(
         );
       },
 
-      prepareHUParams: function() {
+      prepareHUParams: function () {
         var oModel = this.getCurrentModel();
         var oParameters = {};
         oParameters.material = oModel.getProperty('/material');
@@ -4849,8 +4729,7 @@ sap.ui.define(
           oParameters.crossFieldsSearchingKey = crossFieldsSearchingKey;
         }
         oParameters.shopOrder = oModel.getProperty('/shopOrder');
-        oParameters.operationRef =
-          this.selectedDataInList && this.selectedDataInList.operation ? this.selectedDataInList.operation.ref : '';
+        oParameters.operationRef = this.selectedDataInList && this.selectedDataInList.operation ? this.selectedDataInList.operation.ref : '';
         oParameters.phaseId = this.selectedDataInList ? this.selectedDataInList.phaseId : '';
         oParameters.stepId = this.selectedDataInList ? this.selectedDataInList.stepId : '';
         oParameters.page = this.pageHU;
@@ -4860,11 +4739,11 @@ sap.ui.define(
 
       //We are supporting fuzzy search here. With each and every input key, immediately the call will be triggered to
       //get the filtered data with pagination functionality intact.
-      onSearchHUListWithVal: function() {
+      onSearchHUListWithVal: function () {
         this.fetchInvWithHU();
       },
 
-      updateTableHeaderHUCount: function() {
+      updateTableHeaderHUCount: function () {
         if (this.totalPaginationElemsHU === 0) {
           this.byId('HUListTitle').setText(this.getI18nText('items'));
         } else {
@@ -4872,7 +4751,7 @@ sap.ui.define(
         }
       },
 
-      onInvHUChange: function() {
+      onInvHUChange: function () {
         var okHUBtn = this.byId('okHU');
         var useFullHuBtn = this.byId('useFullHU');
         if (this.byId('HUList').getSelectedItems().length === 1) {
@@ -4889,7 +4768,7 @@ sap.ui.define(
         }
       },
 
-      onOkHU: function() {
+      onOkHU: function () {
         var selectedHU = this.byId('HUList').getSelectedItem().getBindingContext('HUModel').getObject();
         var oModel = this.getCurrentModel();
         oModel.setProperty('/batchNumber', selectedHU.batchNumber);
@@ -4898,10 +4777,7 @@ sap.ui.define(
         oModel.setProperty('/handlingUnitNumber', selectedHU.handlingUnitNumber);
         oModel.setProperty('/useFullHandlingUnit', false);
         if (selectedHU.availableQuantity.unitOfMeasure) {
-          oModel.setProperty(
-            '/avlBatchQty',
-            this.oFormatter.formatBatchQuantityAdv(selectedHU.availableQuantity.value, selectedHU.availableQuantity.unitOfMeasure.uom)
-          );
+          oModel.setProperty('/avlBatchQty', this.oFormatter.formatBatchQuantityAdv(selectedHU.availableQuantity.value, selectedHU.availableQuantity.unitOfMeasure.uom));
         } else {
           oModel.setProperty('/avlBatchQty', this.oFormatter.formatBatchQuantityAdv(selectedHU.availableQuantity.value, null));
         }
@@ -4909,7 +4785,7 @@ sap.ui.define(
         this._enableConfirmButton();
       },
 
-      onClickUseFullHU: function() {
+      onClickUseFullHU: function () {
         var oModel = this.getCurrentModel();
         oModel.setProperty('/batchNumber', '');
         oModel.setProperty('/inventory', '');
@@ -4924,19 +4800,19 @@ sap.ui.define(
         this._enableConfirmButton();
       },
 
-      onCancelHU: function() {
+      onCancelHU: function () {
         this.getView().byId('HUDialog').close();
         this.getView().byId('HUDialog').destroy();
       },
 
-      onPressViewWorkinstructions: function(oEvent) {
+      onPressViewWorkinstructions: function (oEvent) {
         var oBindingObject = oEvent.getSource().getBindingContext().getObject();
         var selectedComponentRef = oBindingObject.materialId.ref;
         this.setGlobalProperty('compRefMatConsPlugin', selectedComponentRef);
         this.handleSelectAction(this.oPluginConfiguration);
       },
 
-      onPressViewAlternateBoms: function(oEvent) {
+      onPressViewAlternateBoms: function (oEvent) {
         var oView = this.getView();
         var oBindingObject = oEvent.getSource().getBindingContext().getObject();
         var oController = this;
@@ -4945,9 +4821,9 @@ sap.ui.define(
             id: oView.getId(),
             name: 'stellium.ext.podplugins.materialConsumptionPlugin.view.fragments.AlternateComponentsDialog',
             controller: this
-          }).then(function(oDialog) {
+          }).then(function (oDialog) {
             oDialog.setEscapeHandler(
-              function(oPromise) {
+              function (oPromise) {
                 oController.onCloseAlternateComponentsDialog();
                 oPromise.resolve();
               }.bind(oController)
@@ -4964,11 +4840,11 @@ sap.ui.define(
         }
       },
 
-      onCloseAlternateComponentsDialog: function() {
+      onCloseAlternateComponentsDialog: function () {
         this.getView().byId('alternateComponentsDialog').close();
       },
       // C5278086 Adding changes for W&D Start
-      showWeighingPopup: async function(oEvent) {
+      showWeighingPopup: async function (oEvent) {
         this.isWeighingDialogOpen = true;
         var oBindingObject = oEvent.getSource().getBindingContext().getObject();
         this._initWeighingHeaderModel(oBindingObject);
@@ -4978,7 +4854,7 @@ sap.ui.define(
           return;
         }
 
-        if (!await this._validateResourceStatus(this.selectedDataInList.resource.resource)) {
+        if (!(await this._validateResourceStatus(this.selectedDataInList.resource.resource))) {
           MessageBox.error(this.getI18nText('resourceStatusInvalid'));
           return;
         }
@@ -5011,11 +4887,11 @@ sap.ui.define(
         this.openWeighingDialog();
       },
 
-      openWeighingDialog: function() {
+      openWeighingDialog: function () {
         this.oWeighDispenseHandler.openWeighingDialog();
       },
 
-      getScaleTareData: function(oView) {
+      getScaleTareData: function (oView) {
         //TODO:
         var oScale = oView.byId('cmbScaleList');
         if (oScale.getItems().length > 0) {
@@ -5030,59 +4906,50 @@ sap.ui.define(
         }
       },
 
-      getScaleEquipmentID: function(sUrl, oParameters, oResource) {
+      getScaleEquipmentID: function (sUrl, oParameters, oResource) {
         var that = this;
         AjaxUtil.get(
           sUrl,
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             oResource.equipment = oResponseData.resourceEquipmentAssignments;
           },
-          function(oError) {
+          function (oError) {
             var sErroMsg = that.getI18nTextByKey('ErrMsgNoRelevantResourceType');
             that.showErrorMessage(sErroMsg);
           }
         );
       },
 
-      afterWeighingDialogOpened: function(oEvent) {
+      afterWeighingDialogOpened: function (oEvent) {
         this.oWeighDispenseHandler._initScale();
       },
 
-      getInventoryStockData: function(
-        sDefaultBatchId,
-        bIsBatchManaged,
-        sStorageLocation,
-        sStorageLocationRef,
-        sSelectedMaterialRef,
-        sSelectedMaterial
-      ) {
+      getInventoryStockData: function (sDefaultBatchId, bIsBatchManaged, sStorageLocation, sStorageLocationRef, sSelectedMaterialRef, sSelectedMaterial) {
         if (
           this.isInventoryManaged &&
-          ((sDefaultBatchId && sDefaultBatchId !== this.getI18nText('notBatchManaged')) ||
-            (!bIsBatchManaged && sStorageLocation && sStorageLocationRef))
+          ((sDefaultBatchId && sDefaultBatchId !== this.getI18nText('notBatchManaged')) || (!bIsBatchManaged && sStorageLocation && sStorageLocationRef))
         ) {
           this.prepareInventoryUrl(sSelectedMaterialRef, sDefaultBatchId, sStorageLocationRef, 'weighDialog', false);
         } else if (
           !this.isInventoryManaged &&
-          ((!bIsBatchManaged && sStorageLocation) ||
-            (sStorageLocation && sDefaultBatchId && sDefaultBatchId !== this.getI18nText('notBatchManaged')))
+          ((!bIsBatchManaged && sStorageLocation) || (sStorageLocation && sDefaultBatchId && sDefaultBatchId !== this.getI18nText('notBatchManaged')))
         ) {
           this.getStockForDefaults(sSelectedMaterial, sStorageLocation, sDefaultBatchId, 'weighDialog');
         }
       },
 
-      _initWeighingHeaderModel: function(oBindingObject) {
+      _initWeighingHeaderModel: function (oBindingObject) {
         this.oWeighDispenseHandler._initWeighingHeaderModel(oBindingObject);
       },
-      onWeighDialogCancel: function(oEvent) {
+      onWeighDialogCancel: function (oEvent) {
         this.oWeighDispenseHandler.closeWeighingDialog(oEvent);
 
-        //Refresh material consumption data on close 
+        //Refresh material consumption data on close
         this.getMaterialConsumptionData(null, null, this.selectedDataInList);
       },
 
-      onSelectScale: async function(oEvent) {
+      onSelectScale: async function (oEvent) {
         var oScaleInput = this.oWeighDispenseHandler.getCurrentWeighScaleList();
         var sSelectedScale = oScaleInput.getValue();
 
@@ -5100,7 +4967,7 @@ sap.ui.define(
         //Validate resource
         var oModel = this.getCurrentModel(),
           aScaleList = oModel.getProperty('/scaleList');
-        var oResource = aScaleList.find(oScale => oScale.resource === sSelectedScale);
+        var oResource = aScaleList.find((oScale) => oScale.resource === sSelectedScale);
 
         if (!oResource) {
           oScaleInput.setValueState('Error');
@@ -5134,7 +5001,7 @@ sap.ui.define(
         //     }.bind(this)
         //   );
       },
-      onSetScaleZero: function(oEvent) {
+      onSetScaleZero: function (oEvent) {
         var oPluginConfiguration = this.oPluginConfiguration,
           sIndicatorName = oPluginConfiguration.charcSetZeroIndicator;
         if (sIndicatorName.length > 0) {
@@ -5148,7 +5015,7 @@ sap.ui.define(
         }
       },
 
-      onSetScaleTare: function(oEvent) {
+      onSetScaleTare: function (oEvent) {
         var oPluginConfiguration = this.oPluginConfiguration,
           sIndicatorName = oPluginConfiguration.charcSetTareIndicator;
         if (sIndicatorName.length > 0) {
@@ -5162,14 +5029,14 @@ sap.ui.define(
         }
       },
 
-      convertQuantityForCurrentMaterial: function(sFromUOM, sToUOM) {
+      convertQuantityForCurrentMaterial: function (sFromUOM, sToUOM) {
         var dConversionFactor = 1;
         if (sFromUOM !== sToUOM) {
           var sCurrMaterial = this.consumeData.material,
             aAlternativeUOMS = this.alternateUomForSelectedMaterial[sCurrMaterial];
           if (aAlternativeUOMS.length > 0) {
-            var oFromConversionObject = aAlternativeUOMS.find(oData => oData.internalUom === sFromUOM),
-              oToConversionObject = aAlternativeUOMS.find(oData => oData.uom === sToUOM);
+            var oFromConversionObject = aAlternativeUOMS.find((oData) => oData.internalUom === sFromUOM),
+              oToConversionObject = aAlternativeUOMS.find((oData) => oData.uom === sToUOM);
             if (oFromConversionObject !== undefined && oToConversionObject !== undefined) {
               var dSourceFactorFrom = oFromConversionObject.numerator / oFromConversionObject.denominator;
               var dTargetFactorTo = oToConversionObject.numerator / oToConversionObject.denominator;
@@ -5186,30 +5053,30 @@ sap.ui.define(
         return dConversionFactor;
       },
 
-      onWeighDialogConfirm: function(oEvent) {
+      onWeighDialogConfirm: function (oEvent) {
         this.confirmWeight('Confirm');
       },
 
-      onWeighDialogAddWeight: function(oEvent) {
+      onWeighDialogAddWeight: function (oEvent) {
         this.confirmWeight('AddWeight');
       },
 
-      getConversionFactor: function(sSelectedMaterial, sSelectedUom) {
+      getConversionFactor: function (sSelectedMaterial, sSelectedUom) {
         const oConversionFactor = this.getInternalUom(sSelectedMaterial, sSelectedUom);
         if (oConversionFactor) {
           return oConversionFactor.numerator / oConversionFactor.denominator;
         }
         return 1;
       },
-      getInternalUom: function(sSelectedMaterial, sSelectedUom) {
+      getInternalUom: function (sSelectedMaterial, sSelectedUom) {
         if (this.alternateUomForSelectedMaterial[sSelectedMaterial]) {
           const aCurrentUoms = this.alternateUomForSelectedMaterial[sSelectedMaterial];
-          return aCurrentUoms.find(currentUom => currentUom.uom === sSelectedUom);
+          return aCurrentUoms.find((currentUom) => currentUom.uom === sSelectedUom);
         }
         oLogger.error('Cannot find conversion information' + sSelectedMaterial + ',' + sSelectedUom);
         return null;
       },
-      confirmWeight: function(sPopup) {
+      confirmWeight: function (sPopup) {
         var that = this;
 
         this.sPopupClosingMethod = sPopup;
@@ -5222,18 +5089,13 @@ sap.ui.define(
         var dConversionFactor = this.getConversionFactor(selectedMaterial, sSelectedUom);
         const oInternalUom = this.getInternalUom(selectedMaterial, sSelectedUom);
         if (!oInternalUom) {
-          const sErrorMessage = this.getI18nTextByKey('ErrMsgNoInternalUOMsConversionFactorMaintainedForMaterial', [
-            selectedMaterial,
-            sSelectedUom
-          ]);
+          const sErrorMessage = this.getI18nTextByKey('ErrMsgNoInternalUOMsConversionFactorMaintainedForMaterial', [selectedMaterial, sSelectedUom]);
           this.showErrorMessage(sErrorMessage);
           return;
         }
         this.consumeData.quantity.unitOfMeasure = JSON.parse(JSON.stringify(oInternalUom));
         var dQuantityToBeConsumed = parseFloat(oModel.getProperty('/quantity/value')) * dConversionFactor;
-        var dActQuantityConsumed = this.consumedQuantityForSelectedMaterial
-          ? this.consumedQuantityForSelectedMaterial * dConversionFactor
-          : 0;
+        var dActQuantityConsumed = this.consumedQuantityForSelectedMaterial ? this.consumedQuantityForSelectedMaterial * dConversionFactor : 0;
         var dTotalQuantityToBeConsumed = dActQuantityConsumed + dQuantityToBeConsumed;
 
         var oToleranceInfo = oModel.getProperty('/tolerance'),
@@ -5261,7 +5123,7 @@ sap.ui.define(
               MessageBox.warning(sWarningMsg, {
                 styleClass: 'sapUiSizeCompact',
                 actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
-                onClose: function(sAction) {
+                onClose: function (sAction) {
                   if (sAction === 'OK') {
                     consumeSetQuantity();
                   }
@@ -5276,14 +5138,14 @@ sap.ui.define(
         }
       },
 
-      _refreshWeighingDialog: function(oResponseData) {
+      _refreshWeighingDialog: function (oResponseData) {
         var oView = this.getView();
         let oWeighingModel = this.getCurrentModel();
         oWeighingModel.setProperty('/quantity/value', '');
         this.isQuantityValid = false;
 
         let sBOMComponentRef = this.consumeData.bomComponentRef;
-        var oMaterialObj = oResponseData.lineItems.find(oData => oData.bomComponentRef === sBOMComponentRef);
+        var oMaterialObj = oResponseData.lineItems.find((oData) => oData.bomComponentRef === sBOMComponentRef);
 
         if (oMaterialObj) {
           let dNewConsumedQty = oMaterialObj.consumedQuantity.value;
@@ -5300,7 +5162,7 @@ sap.ui.define(
           this.oWeighDispenseHandler._initializeScale();
         }
       },
-      _resetBatchWeighingDialog: function() {
+      _resetBatchWeighingDialog: function () {
         var oView = this.getView();
         var oWeighingModel = this.getCurrentModel();
         var oInputBatch = this.getCurrentInputBatchIdControl();
@@ -5310,7 +5172,7 @@ sap.ui.define(
         oWeighingModel.setProperty('/avlBatchQty', '');
       },
 
-      getWorkCenters: function() {
+      getWorkCenters: function () {
         const sWorkCenterObjectId = 'WorkCenterBO:' + PlantSettings.getCurrentPlant() + ',' + this.consumeData.workCenter;
         const sRequestURL =
           this.getPlantDataSourceUri() +
@@ -5322,7 +5184,7 @@ sap.ui.define(
         this.readWorkCenters(sRequestURL, {});
       },
 
-      getResourceWithScaleEquipmentId: function(aMemberArray, aResourceArray) {
+      getResourceWithScaleEquipmentId: function (aMemberArray, aResourceArray) {
         var that = this;
         for (var i in aMemberArray) {
           var oCurrResource = aMemberArray[i].childResource;
@@ -5338,7 +5200,7 @@ sap.ui.define(
         }
       },
 
-      readWorkCenters: function(sUrl, oParameters) {
+      readWorkCenters: function (sUrl, oParameters) {
         var that = this;
         var oWeighingModel = this.getCurrentModel();
 
@@ -5346,7 +5208,7 @@ sap.ui.define(
         AjaxUtil.get(
           sUrl,
           oParameters,
-          function(oResponseData) {
+          function (oResponseData) {
             var aMemberArray = oResponseData.members,
               aResourceArray = [];
 
@@ -5372,14 +5234,14 @@ sap.ui.define(
               }
             }
           },
-          function(oError) {
+          function (oError) {
             var sErroMsg = that.getI18nTextByKey('ErrMsgNoRelevantResourceType');
             that.showErrorMessage(sErroMsg);
           }
         );
       },
 
-      getI18nTextByKey: function(sTextKey, aParamArray) {
+      getI18nTextByKey: function (sTextKey, aParamArray) {
         var sText = '';
         let oResourceBundle = this.getView().getModel('i18n').getResourceBundle();
 
@@ -5400,7 +5262,7 @@ sap.ui.define(
         return sText;
       },
 
-      _setWorkcenterData: function() {
+      _setWorkcenterData: function () {
         var oView = this.getView();
         if (!oView.getModel('WorkcenterInfo')) {
           oView.setModel(new JSONModel(), 'WorkcenterInfo');
@@ -5413,15 +5275,15 @@ sap.ui.define(
         oWorkcenterModel.setData(oWorkcenterInfo);
       },
 
-      weighingBatchChanged: function() {
+      weighingBatchChanged: function () {
         this.oWeighDispenseHandler._checkUpdateScale();
       },
 
-      onSimulateData: function(oEvent) {
+      onSimulateData: function (oEvent) {
         this.openQuantityDialog();
       },
 
-      openQuantityDialog: function() {
+      openQuantityDialog: function () {
         if (!this.oQuantitySimulationDialog) {
           var that = this;
 
@@ -5468,14 +5330,14 @@ sap.ui.define(
             beginButton: new sap.m.Button({
               type: sap.m.ButtonType.Emphasized,
               text: 'Set Quantity',
-              press: function() {
+              press: function () {
                 updateQuantityScale();
                 closeDialog();
               }.bind(this)
             }),
             endButton: new sap.m.Button({
               text: 'Cancle',
-              press: function() {
+              press: function () {
                 closeDialog();
               }.bind(this)
             })
@@ -5485,27 +5347,27 @@ sap.ui.define(
         this.oQuantitySimulationDialog.open();
       },
       // Scan Weighing Dialog
-      getCurrentStorageLocationInput: function() {
+      getCurrentStorageLocationInput: function () {
         return this.oWeighDispenseHandler.getCurrentStorageLocationInput();
       },
 
-      getCurrentWeighSimulateButton: function() {
+      getCurrentWeighSimulateButton: function () {
         var oView = this.getView();
         if (this.isWeighingDialogOpen && this.isWeighingDialogOpen === true) return oView.byId('btnSimulate');
         if (this.isScanWeighDialogOpen && this.isScanWeighDialogOpen === true) return oView.byId('btnScanWeighSimulate');
         if (this.isAddWeighDialogOpen && this.isAddWeighDialogOpen === true) return oView.byId('btnAddWeighSimulate');
       },
 
-      openWeighingScanDialog: function() {
+      openWeighingScanDialog: function () {
         this.oWeighDispenseHandler.openWeighingScanDialog();
       },
-      openWeighingAddDialog: function() {
+      openWeighingAddDialog: function () {
         this.oWeighDispenseHandler.openWeighingAddDialog();
       },
 
-      focusHandlingUnitInput: function() {
+      focusHandlingUnitInput: function () {
         setTimeout(
-          function() {
+          function () {
             var oInputField = this.getCurrentInputHuControl();
             oInputField.focus();
           }.bind(this),
@@ -5513,9 +5375,9 @@ sap.ui.define(
         );
       },
 
-      focusMaterialInput: function() {
+      focusMaterialInput: function () {
         setTimeout(
-          function() {
+          function () {
             var oInputField = this.getCurrentInputMaterialControl();
             oInputField.focus();
           }.bind(this),
@@ -5523,9 +5385,9 @@ sap.ui.define(
         );
       },
 
-      focusBatchInputField: function() {
+      focusBatchInputField: function () {
         setTimeout(
-          function() {
+          function () {
             var oInputBatchField = this.oWeighDispenseHandler.getCurrentWeighBatchInput();
             oInputBatchField.focus();
           }.bind(this),
@@ -5533,7 +5395,7 @@ sap.ui.define(
         );
       },
 
-      openBatchClearPopup: function(oResponseData) {
+      openBatchClearPopup: function (oResponseData) {
         var that = this;
         // Check Planned Batch
         let sInfoMsg = this.getI18nTextByKey('InfoBatchResetMessage');
@@ -5542,7 +5404,7 @@ sap.ui.define(
           actions: [MessageBox.Action.YES, MessageBox.Action.NO],
           emphasizedAction: MessageBox.Action.YES,
           initialFocus: MessageBox.Action.YES,
-          onClose: function(sAction) {
+          onClose: function (sAction) {
             if (sAction === 'YES') {
               that._resetBatchWeighingDialog(oResponseData);
               that.focusBatchInputField();
@@ -5551,17 +5413,16 @@ sap.ui.define(
         });
       },
 
-      setWeighRelevantFlag: function(oData) {
+      setWeighRelevantFlag: function (oData) {
         const oNotificationConfig = this.getNotificationsConfiguration();
         const bIsWeighDispenseTopicSubscribed = oNotificationConfig && oNotificationConfig.weighDispenseScaleNotification;
         const stepId = oData.stepId;
         const recipeArr = oData.recipeArray || [];
-        const recipe = recipeArr.find(item => item.stepId === stepId);
-        oData.weighRelevant =
-          (bIsWeighDispenseTopicSubscribed && recipe && recipe.recipeOperation && recipe.recipeOperation.weighRelevant) || false;
+        const recipe = recipeArr.find((item) => item.stepId === stepId);
+        oData.weighRelevant = (bIsWeighDispenseTopicSubscribed && recipe && recipe.recipeOperation && recipe.recipeOperation.weighRelevant) || false;
       },
       // C5278086 Adding changes for W&D End.
-      formatCharacteristics: function(sValueField, sUomField, sDataType) {
+      formatCharacteristics: function (sValueField, sUomField, sDataType) {
         if (['CHAR', 'NUM'].includes(sDataType) && sUomField) {
           return Formatter.showValueUptoThreeDecimalWithUom(sValueField, sUomField);
         } else if (sDataType === 'CHAR' && !sUomField) {
@@ -5575,19 +5436,19 @@ sap.ui.define(
           return sValueField;
         }
       },
-      formatCustomField: function(sCustomFieldPayload) {
+      formatCustomField: function (sCustomFieldPayload) {
         return ![null, undefined, ''].includes(sCustomFieldPayload) ? JSON.parse(sCustomFieldPayload)[0].value : '';
       },
-      getStorageLocations: function(oResponseData) {
+      getStorageLocations: function (oResponseData) {
         let aStorageLocations = [];
         oResponseData.value &&
           oResponseData.value.length > 0 &&
-          oResponseData.value.forEach(e => {
+          oResponseData.value.forEach((e) => {
             aStorageLocations.push(e.storageLocation);
           });
         return aStorageLocations;
       },
-      handleStorageLocationData: function(oResponseData) {
+      handleStorageLocationData: function (oResponseData) {
         let aStorageLocations = [];
         aStorageLocations = this.getStorageLocations(oResponseData, aStorageLocations);
         //Now we have storagelocations, call and get the remaining quantities
@@ -5595,7 +5456,7 @@ sap.ui.define(
       },
 
       // To set Validation of lower expiry Batch - AD-006
-      _validateBatchSelection: async function() {
+      _validateBatchSelection: async function () {
         var oModel = this.getCurrentModel(),
           bIsBatchManaged = oModel.getProperty('/batchManaged'),
           sDefaultSloc = oModel.getProperty('/storageLocation'),
@@ -5614,19 +5475,13 @@ sap.ui.define(
         }
 
         //Fetch batch data if model is not set
-        if (
-          !this.batchDetailsModel ||
-          (this.scannedMaterial && this.scannedMaterial.StockID) ||
-          (this.scannedHuItem && this.scannedHuItem.batch)
-        ) {
+        if (!this.batchDetailsModel || (this.scannedMaterial && this.scannedMaterial.StockID) || (this.scannedHuItem && this.scannedHuItem.batch)) {
           var { sUrl, oParameters } = this._createBatchDetailsServiceCall();
           await this.getBatchDetails(sUrl, oParameters);
         }
 
         var aBatchDetails = this.batchDetailsModel.getData(),
-          oSelectedBatch = aBatchDetails.find(
-            oBatch => oBatch.batchNumber === sSelectedBatchId && oBatch.storageLocation.storageLocation === sDefaultSloc
-          );
+          oSelectedBatch = aBatchDetails.find((oBatch) => oBatch.batchNumber === sSelectedBatchId && oBatch.storageLocation.storageLocation === sDefaultSloc);
         // && oBatch.inventoryId === sSelectedInventoryId
 
         //Check if selected batch exists in the model
@@ -5662,10 +5517,10 @@ sap.ui.define(
         }
 
         //Check if selected batch has lowest expiry in the batch list
-        var aBatches = aBatchDetails.filter(oBatch => !!oBatch.expiry && oBatch.storageLocation.storageLocation === sDefaultSloc);
-        var aDates = aBatches.map(oBatch => new Date(oBatch.expiry));
+        var aBatches = aBatchDetails.filter((oBatch) => !!oBatch.expiry && oBatch.storageLocation.storageLocation === sDefaultSloc);
+        var aDates = aBatches.map((oBatch) => new Date(oBatch.expiry));
         var oLowestExpiryDate = new Date(Math.min(...aDates));
-        var oLowestExpiryBatch = aBatches.find(oBatch => moment(oBatch.expiry).isSame(oLowestExpiryDate));
+        var oLowestExpiryBatch = aBatches.find((oBatch) => moment(oBatch.expiry).isSame(oLowestExpiryDate));
 
         if (!moment(oLowestExpiryDate).isSame(oSelectedBatch.expiry)) {
           sMessage = this.getI18nText('errorLowerBatchExpiry', [sSelectedMaterial, oLowestExpiryBatch.batchNumber]);
@@ -5686,7 +5541,7 @@ sap.ui.define(
         };
       },
 
-      _validateAsset: function(sResourceId, sAssetId) {
+      _validateAsset: function (sResourceId, sAssetId) {
         var sUrl = this.getPublicApiRestDataSourceUri() + '/resource/v2/resources';
         var oParams = {
           plant: this.getPodController().getUserPlant(),
@@ -5694,11 +5549,11 @@ sap.ui.define(
         };
 
         return new Promise(
-          function(resolve, reject) {
+          function (resolve, reject) {
             this.ajaxGetRequest(
               sUrl,
               oParams,
-              function(oResponse) {
+              function (oResponse) {
                 var bIsResourceValid = false;
                 if (oResponse && oResponse.length > 0 && oResponse[0].asset.name === sAssetId) {
                   bIsResourceValid = true;
@@ -5715,7 +5570,7 @@ sap.ui.define(
 
                 resolve(bIsResourceValid);
               }.bind(this),
-              function() {
+              function () {
                 reject(...arguments);
               }
             );
@@ -5724,10 +5579,10 @@ sap.ui.define(
       },
 
       /**
-         * If any of the table items have bom components meeting the 'Park' or 'Batch Correction' criteria,
-         * show error message and navigate user back to order selection screen
-         */
-      _checkBatchCorrectionCondition: function() {
+       * If any of the table items have bom components meeting the 'Park' or 'Batch Correction' criteria,
+       * show error message and navigate user back to order selection screen
+       */
+      _checkBatchCorrectionCondition: async function () {
         if (!this.giModel) return;
 
         var sShopOrder = this.giModel.getProperty('/shopOrder'),
@@ -5738,6 +5593,16 @@ sap.ui.define(
         var aParkedItems = [],
           bBatchCorrectionFlag = false,
           oBatchCorrectionItem;
+
+        //Check if the workcenter is a formulation workcenter. If not, then no batch correction logic will apply
+        var bIsFormulationWC = await this._getWorkCenterData().then((aWorkCenters) => {
+          var oWorkCenterType = aWorkCenters[0].customValues.find((oValue) => oValue.attribute === 'WORKCENTER_ TYPE');
+          return oWorkCenterType && oWorkCenterType.value === 'FORMULATION';
+        });
+
+        if (!bIsFormulationWC) {
+          return;
+        }
 
         for (var i = 0; i < aLineItems.length; i++) {
           //If there is no consumed qty or if consumed qty is 0 then continue
@@ -5774,7 +5639,7 @@ sap.ui.define(
             this._setOrderCustomData('BATCH_CORRECTION', 'YES');
           }
           MessageBox.error(sErrorMessage, {
-            onClose: function() {
+            onClose: function () {
               window.history.go(-1);
             }.bind(this)
           });
@@ -5789,7 +5654,7 @@ sap.ui.define(
         }
       },
 
-      _setSfcHoldStatus: function() {
+      _setSfcHoldStatus: function () {
         var sUrl = this.getPublicApiRestDataSourceUri() + 'sfc/v1/sfcs/hold';
         var oRequestBody = {
           plant: this.getPodController().getUserPlant(),
@@ -5801,10 +5666,9 @@ sap.ui.define(
         this.ajaxPostRequest(sUrl, oRequestBody);
       },
 
-      _raiseAlert: function(oItem) {
+      _raiseAlert: function (oItem) {
         //DJN_ALERT_BATCH_CORECTION - DJN_ALERT
-        var sUrl =
-          this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_e59863c1-35d9-46df-b7c6-47a09dd80790';
+        var sUrl = this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_e59863c1-35d9-46df-b7c6-47a09dd80790';
         var oPayload = {
           plant: this.getPodController().getUserPlant(),
           order: this.selectedDataInList.selectedShopOrder,
@@ -5820,38 +5684,36 @@ sap.ui.define(
       },
 
       /**
-         * Checks the phase status and returns a boolean value
-         *  - If phase is COMPLETED and there are parked items, then true
-         *  - If phase is in ACTIVE status, then true
-         *  - Else false
-         * @returns Boolean
-         */
-      _validatePhaseStatus: function() {
+       * Checks the phase status and returns a boolean value
+       *  - If phase is COMPLETED and there are parked items, then true
+       *  - If phase is in ACTIVE status, then true
+       *  - Else false
+       * @returns Boolean
+       */
+      _validatePhaseStatus: function () {
         if (this._hasParkedItems() && this.selectedDataInList.status === 'COMPLETED') return true;
         if (this.selectedDataInList.status === 'ACTIVE') return true;
         return false;
       },
 
-      _hasParkedItems: function() {
+      _hasParkedItems: function () {
         return this.parkedItemList && this.parkedItemList.length > 0;
       },
 
-      _checkIfItemIsParked: function(sMaterial) {
-        return this.parkedItemList.find(oItem => oItem.materialId.material === sMaterial) ? true : false;
+      _checkIfItemIsParked: function (sMaterial) {
+        return this.parkedItemList.find((oItem) => oItem.materialId.material === sMaterial) ? true : false;
       },
 
-      _getParkedMaterialList: function() {
+      _getParkedMaterialList: function () {
         if (!this.parkedItemList && this.parkedItemList.length === 0) {
           return '';
         }
 
-        return this.parkedItemList.map(oItem => oItem.materialId.material).join(',');
+        return this.parkedItemList.map((oItem) => oItem.materialId.material).join(',');
       },
 
-      _getMaterialForEAN: function(sEAN) {
-        var sUrl =
-          this.getPublicApiRestDataSourceUri() +
-          '/pe/api/v1/process/processDefinitions/start?key=REG_35d60bbd-14c1-443d-b7a2-c724261d94ef&async=false';
+      _getMaterialForEAN: function (sEAN) {
+        var sUrl = this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_35d60bbd-14c1-443d-b7a2-c724261d94ef&async=false';
         var oPayload = {
           ean: sEAN
         };
@@ -5861,10 +5723,8 @@ sap.ui.define(
         });
       },
 
-      _getBatchCorrectionData: function() {
-        var sUrl =
-          this.getPublicApiRestDataSourceUri() +
-          '/pe/api/v1/process/processDefinitions/start?key=REG_04527345-c48f-44c1-9424-5b65503c18ed&async=false';
+      _getBatchCorrectionData: function () {
+        var sUrl = this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_04527345-c48f-44c1-9424-5b65503c18ed&async=false';
         var oSelection = this.getPodSelectionModel().getSelection();
         var oParams = {
           order: oSelection.getShopOrder().shopOrder,
@@ -5875,12 +5735,12 @@ sap.ui.define(
         });
       },
 
-      _getBomInfoForComponent: function(sMaterial) {
+      _getBomInfoForComponent: function (sMaterial) {
         var oSelectedPhaseData = this.getPodSelectionModel().selectedPhaseData,
           oComponentData;
 
         for (let i = 0; i < oSelectedPhaseData.recipeArray.length; i++) {
-          oComponentData = oSelectedPhaseData.recipeArray[i].routingStepComponentList.find(oComponent => {
+          oComponentData = oSelectedPhaseData.recipeArray[i].routingStepComponentList.find((oComponent) => {
             return oComponent.bomComponent.material.material === sMaterial;
           });
           if (oComponentData) {
@@ -5891,7 +5751,7 @@ sap.ui.define(
         return oComponentData;
       },
 
-      _assignOperator: function(sResource) {
+      _assignOperator: function (sResource) {
         var oModel = this.getCurrentModel(),
           oModelData = oModel.getData(),
           sMaterial = oModel.getProperty('/material'),
@@ -5963,22 +5823,21 @@ sap.ui.define(
           InPackingMaterialDesc: sPackingMaterialDesc
         };
 
-        var sUrl =
-          this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_f5badcb9-a6df-45dc-bb98-0ee8449cbd2d';
-        this.ajaxPostRequest(sUrl, oPayload, null, function(oError, sErrorMessage) {
+        var sUrl = this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_f5badcb9-a6df-45dc-bb98-0ee8449cbd2d';
+        this.ajaxPostRequest(sUrl, oPayload, null, function (oError, sErrorMessage) {
           console.error(oError, sErrorMessage);
         });
       },
 
-      _validateResourceStatus: function(sResource) {
+      _validateResourceStatus: function (sResource) {
         var aValidStatuses = ['PRODUCTIVE', 'ENABLED'];
-        return this._getResourceData(sResource).then(aResource => {
+        return this._getResourceData(sResource).then((aResource) => {
           if (!aResource || aResource.length < 0) return false;
-          return aResource.find(oResource => aValidStatuses.includes(oResource.status));
+          return aResource.find((oResource) => aValidStatuses.includes(oResource.status));
         });
       },
 
-      _getResourceData: function(sResource) {
+      _getResourceData: function (sResource) {
         var sUrl = this.getPublicApiRestDataSourceUri() + '/resource/v2/resources';
         var oParamters = {
           plant: this.getPodController().getUserPlant(),
@@ -5988,7 +5847,7 @@ sap.ui.define(
         return new Promise((resolve, reject) => this.ajaxGetRequest(sUrl, oParamters, resolve, reject));
       },
 
-      _getNonconformances: function() {
+      _getNonconformances: function () {
         var sUrl = this.getPublicApiRestDataSourceUri() + 'nonconformance/v1/nonconformances';
         var oParams = {
           plant: this.getPodController().getUserPlant(),
@@ -5997,8 +5856,8 @@ sap.ui.define(
         return new Promise((resolve, reject) => this.ajaxGetRequest(sUrl, oParams, resolve, reject));
       },
 
-      _hasNonConformances: async function() {
-        var aNonconformances = await this._getNonconformances().catch(oError => {
+      _hasNonConformances: async function () {
+        var aNonconformances = await this._getNonconformances().catch((oError) => {
           console.error(oError);
         });
 
@@ -6011,12 +5870,12 @@ sap.ui.define(
           };
 
         //Filter the response. If there are NC in OPEN state, return true
-        var aOpenNC = aNonconformances.filter(oNC => oNC.state === 'OPEN');
+        var aOpenNC = aNonconformances.filter((oNC) => oNC.state === 'OPEN');
         if (aOpenNC && aOpenNC.length > 0) {
           var sFormattedText =
             '<p><strong>Open Nonconformance:</strong></p>' +
             '<ul>' +
-            aOpenNC.map(oNC => `<li>${oNC.incidentNumber.incidentNumber} - ${oNC.code.code} - ${oNC.code.description}</li>`).join('') +
+            aOpenNC.map((oNC) => `<li>${oNC.incidentNumber.incidentNumber} - ${oNC.code.code} - ${oNC.code.description}</li>`).join('') +
             '</ul>';
 
           return {
@@ -6034,7 +5893,7 @@ sap.ui.define(
         };
       },
 
-      _setOrderCustomData: function(sFieldName, sFieldValue) {
+      _setOrderCustomData: function (sFieldName, sFieldValue) {
         var sUrl = this.getPublicApiRestDataSourceUri() + 'order/v1/orders/customValues';
         var oPayload = {
           plant: this.getPodController().getUserPlant(),
@@ -6047,6 +5906,15 @@ sap.ui.define(
           ]
         };
         this.ajaxPatchRequest(sUrl, oPayload);
+      },
+
+      _getWorkCenterData: function () {
+        var sUrl = this.getPublicApiRestDataSourceUri() + 'workcenter/v2/workcenters';
+        var oParameters = {
+          plant: this.getPodController().getUserPlant(),
+          workCenter: this.getPodController().getPodSelectionModel().selectedPhaseData.workCenter.workcenter
+        };
+        return new Promise((resolve, reject) => this.ajaxGetRequest(sUrl, oParameters, resolve, reject));
       }
     });
   }

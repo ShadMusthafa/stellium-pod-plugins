@@ -1368,7 +1368,7 @@ sap.ui.define(
         
         //Sort the batches based on expiry date and quantity
         oTable.getBinding('items').sort([
-          new sap.ui.model.Sorter('expiry', false),
+          new sap.ui.model.Sorter('expiryDate', false),
           new sap.ui.model.Sorter('qtyFormatted', true)
         ]);
 
@@ -1485,6 +1485,7 @@ sap.ui.define(
             sExpiry = '';
           }
           oData[i].expiry = sExpiry;
+          oData[i].expiryDate = sExpiry ? moment(sExpiry).toDate() : null;
         }
       },
 

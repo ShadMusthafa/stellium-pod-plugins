@@ -13,7 +13,7 @@ modules:
         - X-Frame-Options: deny
         CORS: "[{\"uriPattern\": \"^/podplugins/(.*)$\",\"allowedOrigin\": [
                {\"host\": \"daajan-dmc-test-gpjlw2wc.execution.eu20-quality.web.dmc.cloud.sap\",\"protocol\": \"https\"},
-               {\"host\": \"<DMC_HOST2>\",\"protocol\": \"https\"}],
+               {\"host\": \"daajan-dmc-prod-1cx6wiwv.execution.eu20-prod.web.dmc.cloud.sap\",\"protocol\": \"https\"}],
                \"allowedMethods\": [\"GET\",\"OPTIONS\"],
                \"allowedHeaders\":[\"Origin\", \"Accept\",\"X-Requested-With\",\"Content-Type\",
                      \"Access-Control-Request-Method\",\"Access-Control-Request-Headers\",\"Authorization\",
