@@ -5595,14 +5595,14 @@ sap.ui.define(
         }
 
         //Fetch batch data if model is not set
-        if (
-          !this.batchDetailsModel ||
-          (this.scannedMaterial && this.scannedMaterial.StockID) ||
-          (this.scannedHuItem && this.scannedHuItem.batch)
-        ) {
+        // if (
+        //   !this.batchDetailsModel ||
+        //   (this.scannedMaterial && this.scannedMaterial.StockID) ||
+        //   (this.scannedHuItem && this.scannedHuItem.batch)
+        // ) {
           var { sUrl, oParameters } = this._createBatchDetailsServiceCall();
           await this.getBatchDetails(sUrl, oParameters);
-        }
+        // }
 
         var aBatchDetails = this.batchDetailsModel.getData(),
           oSelectedBatch = aBatchDetails.find(
