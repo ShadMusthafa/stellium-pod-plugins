@@ -989,6 +989,10 @@ sap.ui.define(
           }
           return 0;
         });
+        
+        //Remove charachteristic LOBM_VFDAT from the table
+        this.characteristicsColumns = this.characteristicsColumns.filter(oItem=>oItem.name !== 'LOBM_VFDAT');
+
         //Filter only first 5 characteristics to be shown in the table.
         this.characteristicsColumns = this.characteristicsColumns.slice(0, 5);
         this._enhanceCharacteristicsValues(oData);
