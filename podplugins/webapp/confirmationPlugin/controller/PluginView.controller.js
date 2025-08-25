@@ -1168,10 +1168,21 @@ sap.ui.define(
         );
       },
 
-      onOpenReportQuantityDialog: function (oEvent) {
+      onOpenReportQuantityDialog: async function (oEvent) {
         var oView = this.getView(),
           oPostModel = oView.getModel('qtyPostModel'),
           oData = oEvent.getSource().getBindingContext('quantitiesModel').getObject();
+
+        var sResource = this.selectedOrderData.resource.resource;
+        var bResourceSchedulingRelevant = await this._getResourceWorkcenterData(sResource).then((oResponse) => {
+          let oResource = oResponse[0].members.find((oMember) => oMember.resource.resource === sResource);
+          return oResource.schedulingRelevant;
+        });
+
+        if (!bResourceSchedulingRelevant) {
+          MessageBox.error(this.getI18nText('workcenterResourceIsNotOEERelevant'));
+          return;
+        }
 
         this.callServiceForTimeElementDesc();
 
@@ -2399,6 +2410,16 @@ sap.ui.define(
 
       _endsWith: function (str, suffix) {
         return str.indexOf(suffix, str.length - suffix.length) !== -1;
+      },
+      
+      _getResourceWorkcenterData: function (sResource) {
+        var sUrl = this.getPublicApiRestDataSourceUri() + 'workcenter/v2/workcenters';
+        var oParamters = {
+          plant: this.getPodController().getUserPlant(),
+          resourceMembers: sResource
+        };
+
+        return new Promise((resolve, reject) => this.ajaxGetRequest(sUrl, oParamters, resolve, reject));
       }
     });
 
