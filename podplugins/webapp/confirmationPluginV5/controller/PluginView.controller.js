@@ -147,6 +147,7 @@ sap.ui.define(
         this.getView().setModel(new JSONModel({ value: [] }), 'quantitiesModel');
 
         this.prepareBusyDialog();
+        this.handleOnDialogConfirmBtnThrottled = this._throttle(this.handleOnDialogConfirmBtn, 1000);
       },
 
       /**
@@ -2532,7 +2533,37 @@ sap.ui.define(
         return bAnyValuePresent;
       },
 
-      onConfirm: async function () {
+      onConfirm: function () {
+        var oReportDialog = this.getView().byId('reportQuantityDialog');
+        if (!oReportDialog) {
+          return;
+        }
+        oReportDialog.setBusyIndicatorDelay(100);
+        oReportDialog.setBusy(true);
+
+        try {
+          this.handleOnDialogConfirmBtnThrottled();
+        } catch (e) {
+          oReportDialog.setBusy(false);
+        } finally {
+          oReportDialog.setBusy(false);
+        }
+      },
+
+      _throttle: function (func, limit) {
+        let inThrottle;
+        return function () {
+          const args = arguments;
+          const context = this;
+          if (!inThrottle) {
+            func.apply(context, args);
+            inThrottle = true;
+            setTimeout(() => (inThrottle = false), limit);
+          }
+        }.bind(this);
+      },
+
+      handleOnDialogConfirmBtn: async function () {
         if (ErrorHandler.hasErrors()) {
           return;
         }
