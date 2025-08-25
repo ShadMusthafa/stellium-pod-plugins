@@ -3550,7 +3550,7 @@ sap.ui.define(
         this.isAddDialogOpen = false;
         var oFormLength = this.byId('addMaterialForm').getContent().length;
         // Fix to handle cancel dialog Add
-        for (var i = oFormLength; i > 19; i--) {
+        for (var i = oFormLength; i > 21; i--) {
           this.byId('addMaterialForm').getContent()[i - 1].destroy();
         }
         this.byId('storageLocationAdd').setEnabled(false);
@@ -3631,6 +3631,7 @@ sap.ui.define(
           this.byId('scanDialog').open();
           this.byId('inputPostingDateScan').setValue(this.getCurrentDateInPlantTimeZone());
           this.buildCustomFieldFormContent();
+          // this.getCurrentInputMaterialControl().setEnabled(true);
           setTimeout(
             function () {
               this.byId('inputMatNumScan').focus();
@@ -3747,7 +3748,7 @@ sap.ui.define(
         return isValidInput;
       },
 
-      handleHUScanChange: async function (oEvent) {
+      handleHUScanChange: async function (oEvent, sDialog) {
         var oScanControl = oEvent.getSource(),
           sScannedValue = oScanControl.getValue(),
           oScannedValue;
@@ -3768,9 +3769,21 @@ sap.ui.define(
           return;
         }
 
-        var sMaterial = this.getCurrentModel().getProperty('/material');
+        var sMaterial, oHuItem;
 
+        // if (sDialog) {
+        //   oHuItem = await this._getScannerConsumptionItem(oScannedValue.handlingUnit);
+        //   sMaterial = oHuItem.material;
+        //   this.getCurrentModel().setProperty('/material', sMaterial);
+        //   this.getCurrentInputMaterialControl().setEnabled(false);
+        // } else {
+        //   sMaterial = this.getCurrentModel().getProperty('/material');
+        //   oHuItem = await this._getConsumptionItemFromHu(oScannedValue.handlingUnit, sMaterial);
+        // }
+
+        var sMaterial = this.getCurrentModel().getProperty('/material');
         var oHuItem = await this._getConsumptionItemFromHu(oScannedValue.handlingUnit, sMaterial);
+
         if (!oHuItem) {
           MessageBox.error('Hu items are not relevant for current SFC');
           // this.resetModel(this.getCurrentModel());
@@ -3864,6 +3877,29 @@ sap.ui.define(
         // }
 
         // return null;
+      },
+
+      _getScannerConsumptionItem: async function (sHandlingUnit) {
+        var oHuItem = await this._getHandlingUnitDataFromS4(sHandlingUnit).then((oResponse) => {
+          if (!oResponse || !oResponse.content || oResponse.content.length !== 1) {
+            return null;
+          }
+
+          return oResponse.content[0];
+        });
+
+        if (!oHuItem) {
+          return null;
+        }
+
+        var aBomComponents = this.byId('consumptionList').getModel().getProperty('/lineItems');
+        var oComponent = aBomComponents.find((oItem) => oItem.materialId.material === oHuItem.material);
+
+        if (!oComponent) {
+          return null;
+        }
+
+        return oHuItem;
       },
 
       handleLiveChangeScan: async function (oEvent) {
@@ -4261,7 +4297,7 @@ sap.ui.define(
         this.isScanDialogOpen = false;
         var oFormLength = this.byId('scanMaterialForm').getContent().length;
         // Fix to handle cancel dialog scan
-        for (var i = oFormLength; i > 19; i--) {
+        for (var i = oFormLength; i > 21; i--) {
           this.byId('scanMaterialForm').getContent()[i - 1].destroy();
         }
         this.byId('storageLocationScan').setEnabled(false);

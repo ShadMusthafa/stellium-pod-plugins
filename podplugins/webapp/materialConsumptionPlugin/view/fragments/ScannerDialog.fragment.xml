@@ -11,7 +11,7 @@
                                 <!-- Handling unit scan begin   -->
                                 <Label text="{i18n>handlingUnitScanLabel}"/>
                                 <Input id="idHandlingUnitScanInput2"
-                                        change=".handleHUScanChange"
+                                        change=".handleHUScanChange($event, 'scannerDialog')"
                                         value="{scanModel>/scannedHu}"
                                         required="false">
                                         <layoutData>
