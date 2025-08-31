@@ -5780,9 +5780,9 @@ sap.ui.define(
       },
 
       _raiseAlert: function(oItem) {
-        //DJN_ALERT_BATCH_CORECTION - DJN_ALERT
-        var sUrl =
-          this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_e59863c1-35d9-46df-b7c6-47a09dd80790';
+        //1. DJN_ALERT_BATCH_CORECTION - DJN_ALERT ->REG_e59863c1-35d9-46df-b7c6-47a09dd80790
+        //2. DJN_ALERT_BATCH_CORECTION_1 - DJN_ALERT -> REG_713ecd8d-2cf0-4c66-ac63-e776113dfea6
+        var sUrl = this.getPublicApiRestDataSourceUri() + '/pe/api/v1/process/processDefinitions/start?key=REG_713ecd8d-2cf0-4c66-ac63-e776113dfea6';
         var oPayload = {
           plant: this.getPodController().getUserPlant(),
           order: this.selectedDataInList.selectedShopOrder,

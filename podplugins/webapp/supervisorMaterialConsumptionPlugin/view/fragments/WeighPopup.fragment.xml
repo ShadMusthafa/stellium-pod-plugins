@@ -19,25 +19,7 @@
                         </Input>
                         <!-- Handling unit scan end     -->
 
-                        <!-- Scale selection start -->
-                         <Label text="{i18n>LabelScale}" />
-                        <!-- <Select id="cmbScaleList" items="{ path: 'weighingModel>/scaleList' }" change="onSelectScale"
-                            forceSelection="false">
-                            <core:Item key="{weighingModel>resource}" text="{weighingModel>description}" />
-                            <layoutData>
-                                <f:ColumnElementData cellsSmall="10" cellsLarge="6" />
-                            </layoutData>
-                        </Select> -->
-                        <Input id="cmbScaleList"
-                            showSuggestion="true"
-                            suggestionItems="{weighingModel>/scaleList}"
-                            change="onSelectScale">
-                            <suggestionItems>
-                                <core:Item text="{weighingModel>resource}" />
-                            </suggestionItems>
-                        </Input>
-                         <!-- Scale selection end -->
-
+                        <!-- Batch input start -->
                         <Label text="{i18n>batchid} / {i18n>storageLoc}" />
                         <Input id="inBatchIDWeighing" value="{weighingModel>/batchNumber}"
                             showValueHelp="{weighingModel>/batchManaged}" enabled="{weighingModel>/batchManaged}"
@@ -56,6 +38,20 @@
                             <f:ColumnElementData cellsSmall="5" cellsLarge="3" />
                         </layoutData>
                         </Input>
+                        <!-- Batch input end -->
+
+                        <!-- Scale selection start -->
+                        <Label text="{i18n>LabelScale}" />
+                        <Input id="cmbScaleList"
+                            showSuggestion="true"
+                            suggestionItems="{weighingModel>/scaleList}"
+                            change="onSelectScale">
+                            <suggestionItems>
+                                <core:Item text="{weighingModel>resource}" />
+                            </suggestionItems>
+                        </Input>
+                        <!-- Scale selection end -->
+
                         <Label text="{i18n>LabelOrderNumber}" />
                         <Text text="{weighingModel>/shopOrder}" />
                         <Label text="{i18n>LabelPhase}" />

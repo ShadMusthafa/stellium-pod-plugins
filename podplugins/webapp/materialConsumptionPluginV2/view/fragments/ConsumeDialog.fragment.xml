@@ -16,6 +16,7 @@
                 </Input>
                 <!-- Handling unit scan end     -->
 
+                <!-- Batch input start -->
                 <Label text="{i18n>batchid}" required="{consumeModel>/batchManaged}" />
                 <Input id="inputBatchId" value="{consumeModel>/batchNumber}"
                     showValueHelp="{consumeModel>/batchManaged}"
@@ -23,7 +24,8 @@
                     valueHelpRequest="showBatchDetails"
                     valueHelpOnly="{parts: ['configModel>/allowFreeTextForBatch', 'consumeModel>/material'], formatter: '.oFormatter.getValueHelpOnly'}"
                     change="onBatchChange" liveChange="onBatchLiveChange"> </Input>
-                    
+                <!-- Batch input end -->
+                 
                 <Label text="{i18n>matNum}" />
                 <Text id="inputMatNum" text="{consumeModel>/material}" class="boldText" />
                 <Label text="{i18n>materialDescription}" />

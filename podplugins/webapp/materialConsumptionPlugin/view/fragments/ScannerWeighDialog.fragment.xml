@@ -20,36 +20,8 @@
                             </layoutData>
                         </Input>
                         <!-- Handling unit scan end     -->
-                         
-                        <Label text="{i18n>matNum}" />
-                        <Input id="inScanWeighMatNum" change="handleLiveChangeScan"
-                            value="{scanWeighingModel>/material}" editable="true" required="true" class="boldText">
-                        <layoutData>
-                            <f:ColumnElementData cellsSmall="10" cellsLarge="6" />
-                        </layoutData>
-                        </Input>
 
-                        <!-- Scale selection start -->
-                         <Label text="{i18n>LabelScale}" />
-                        <!-- <Select id="cmbScanWeighScaleList" items="{ path: 'scanWeighingModel>/scaleList' }"
-                            change="onSelectScale" forceSelection="false">
-                            <core:Item key="{scanWeighingModel>resource}" text="{scanWeighingModel>description}" />
-                            <layoutData>
-                                <f:ColumnElementData cellsSmall="10" cellsLarge="6" />
-                            </layoutData>
-                        </Select> -->
-                        <Input id="cmbScanWeighScaleList"
-                            showSuggestion="true"
-                            suggestionItems="{scanWeighingModel>/scaleList}"
-                            change="onSelectScale">
-                            <suggestionItems>
-                                <core:Item text="{scanWeighingModel>resource}" />
-                            </suggestionItems>
-                        </Input>
-                        <!-- Scale selection end -->
-                         
-                        <Label text="{i18n>materialDescription}" />
-                        <Text id="inputAddMatDesc" text="{scanWeighingModel>/materialDescription}" />
+                        <!-- Batch input start -->
                         <Label text="{i18n>batchid} / {i18n>storageLoc}" required="{scanWeighingModel>/batchManaged}" />
                         <Input id="inScanWeighBatchID" value="{scanWeighingModel>/batchNumber}"
                             showValueHelp="{scanWeighingModel>/batchManaged}"
@@ -68,7 +40,30 @@
                             <f:ColumnElementData cellsSmall="5" cellsLarge="3" />
                         </layoutData>
                         </Input>
-                        
+                        <!-- Batch input end -->
+
+                        <!-- Scale selection start -->
+                        <Label text="{i18n>LabelScale}" />
+                        <Input id="cmbScanWeighScaleList"
+                            showSuggestion="true"
+                            suggestionItems="{scanWeighingModel>/scaleList}"
+                            change="onSelectScale">
+                            <suggestionItems>
+                                <core:Item text="{scanWeighingModel>resource}" />
+                            </suggestionItems>
+                        </Input>
+                        <!-- Scale selection end -->
+
+                        <Label text="{i18n>matNum}" />
+                        <Input id="inScanWeighMatNum" change="handleLiveChangeScan"
+                            value="{scanWeighingModel>/material}" editable="true" required="true" class="boldText">
+                        <layoutData>
+                            <f:ColumnElementData cellsSmall="10" cellsLarge="6" />
+                        </layoutData>
+                        </Input>
+                         
+                        <Label text="{i18n>materialDescription}" />
+                        <Text id="inputAddMatDesc" text="{scanWeighingModel>/materialDescription}" />
                         <Label text="{i18n>LabelOrderNumber}" />
                         <Text id="inputScanOrderNum" text="{scanWeighingModel>/shopOrder}" />
                         <Label text="{i18n>LabelPhase}" />

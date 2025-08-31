@@ -19,18 +19,22 @@
                                         </layoutData>
                                 </Input>
                                 <!-- Handling unit scan end     -->
-                                <Label text="{i18n>matNum}" />
-                                <Input id="inputMatNumScan" change="handleLiveChangeScan" value="{scanModel>/material}"
-                                        class="boldText" editable="true" required="true" />
-                                <Label text="{i18n>materialDescription}" />
-                                <Text id="inputMatDescScan" text="{scanModel>/materialDescription}" />
-                                <Label text="{i18n>batchid}" required="{scanModel>/batchManaged}" />
+                                <!-- Batch input -->
+                                 <Label text="{i18n>batchid}" required="{scanModel>/batchManaged}" />
                                 <Input id="inputBatchIdScan" value="{scanModel>/batchNumber}"
                                         showValueHelp="{scanModel>/batchManaged}"
                                         enabled="{parts: ['scanModel>/batchManaged', 'scanModel>/material', 'scanModel>/storageLocation', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getBatchInputEnable'}"
                                         valueHelpRequest="showBatchDetails"
                                         valueHelpOnly="{parts: ['configModel>/allowFreeTextForBatch', 'scanModel>/material'], formatter: '.oFormatter.getValueHelpOnly'}"
                                         change="onBatchChange" liveChange="onBatchLiveChange"> </Input>
+                                <!-- Batch input end -->
+
+                                <Label text="{i18n>matNum}" />
+                                <Input id="inputMatNumScan" change="handleLiveChangeScan" value="{scanModel>/material}"
+                                        class="boldText" editable="true" required="true" />
+                                <Label text="{i18n>materialDescription}" />
+                                <Text id="inputMatDescScan" text="{scanModel>/materialDescription}" />
+                                
 
                                 <!-- <Label text="{i18n>storageLocation}" required="{parts: ['scanModel>/batchManaged', 'scanModel>/material', 'scanModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}"/>
 <Input id="storageLocationScan" textAlign="Right" value="{scanModel>/storageLocation}" enabled="{parts: ['scanModel>/batchManaged', 'scanModel>/material', 'scanModel>/materialType', 'invManagedModel>/isInventoryManaged'], formatter: '.oFormatter.getEnabledStorageLoc'}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="showStorageLocationDetails"> </Input> -->

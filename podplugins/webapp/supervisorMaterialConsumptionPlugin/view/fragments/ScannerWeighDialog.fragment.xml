@@ -21,6 +21,7 @@
                         </Input>
                         <!-- Handling unit scan end     -->
 
+                        <!-- Batch input start -->
                         <Label text="{i18n>batchid} / {i18n>storageLoc}" required="{scanWeighingModel>/batchManaged}" />
                         <Input id="inScanWeighBatchID" value="{scanWeighingModel>/batchNumber}"
                             showValueHelp="{scanWeighingModel>/batchManaged}"
@@ -39,6 +40,7 @@
                             <f:ColumnElementData cellsSmall="5" cellsLarge="3" />
                         </layoutData>
                         </Input>
+                        <!-- Batch input end -->
 
                         <!-- Scale selection start -->
                          <Label text="{i18n>LabelScale}" />
