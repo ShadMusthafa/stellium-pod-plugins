@@ -257,10 +257,16 @@ sap.ui.define(
             this.batchCorrection = aValues[0].value;
           }
 
+          var oSelectedOrder = this.getPodSelectionModel().selectedOrderData,
+            fSfcQuantity = parseFloat(oSelectedOrder.sfcQty).toFixed(3),
+            sUOM = oSelectedOrder.productionCommercialUom;
           if (this.batchCorrection.content && this.batchCorrection.content.length > 0) {
             this.byId('idApprovedQtyTitle').setText(this.getI18nText('approvedGRQtyTitle', [this.batchCorrection.content[0].grQty]));
+            this.byId('idSfcQtyTitle').setText(this.getI18nText('sfcQtyTitle', [fSfcQuantity, sUOM]));
           } else {
-            this.byId('idApprovedQtyTitle').setText('');
+            var fPlannedQty = oSelectedOrder.plannedQty;
+            this.byId('idApprovedQtyTitle').setText(this.getI18nText('GRQtyTitle', [parseFloat(fPlannedQty).toFixed(3), sUOM]));
+            this.byId('idSfcQtyTitle').setText(this.getI18nText('sfcQtyTitle', [fSfcQuantity, sUOM]));
           }
 
           var oBatchCorrection = this.batchCorrection;

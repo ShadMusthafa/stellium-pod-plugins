@@ -43,7 +43,8 @@
                 </items>
             </Table> -->
             <Toolbar>
-                <Title id="idApprovedQtyTitle" />
+                <Title id="idApprovedQtyTitle" class="sapUiMediumMarginEnd"/>
+                <Title id="idSfcQtyTitle" />
                 <ToolbarSpacer />
                 <Button tooltip="{i18n>report.quantity}"  id="Report" text="Report" press="onOpenReportQuantityDialog"
                     type="Emphasized" />
