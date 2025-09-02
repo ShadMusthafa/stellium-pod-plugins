@@ -5604,7 +5604,7 @@ sap.ui.define(
           await this.getBatchDetails(sUrl, oParameters);
         // }
 
-        var aBatchDetails = this.batchDetailsModel.getData(),
+        var aBatchDetails = this.fitlerRecordsWithQualityInspection(this.batchDetailsModel.getData()),
           oSelectedBatch = aBatchDetails.find(
             oBatch => oBatch.batchNumber === sSelectedBatchId && oBatch.storageLocation.storageLocation === sDefaultSloc
           );

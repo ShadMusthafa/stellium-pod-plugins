@@ -5520,7 +5520,7 @@ sap.ui.define(
         await this.getBatchDetails(sUrl, oParameters);
         // }
 
-        var aBatchDetails = this.batchDetailsModel.getData(),
+        var aBatchDetails = this.fitlerRecordsWithQualityInspection(this.batchDetailsModel.getData()),
           oSelectedBatch = aBatchDetails.find((oBatch) => oBatch.batchNumber === sSelectedBatchId && oBatch.storageLocation.storageLocation === sDefaultSloc);
         // && oBatch.inventoryId === sSelectedInventoryId
 
@@ -5657,6 +5657,7 @@ sap.ui.define(
 
           //If consumed qty is less than lower threshold, then mark as parked
           var lowerThreshold = aLineItems[i].lowerThresholdValue || 0;
+          // var lowerThreshold = aLineItems[i].lowerThresholdValue || aLineItems[i].targetQuantity.value;
           if (aLineItems[i].consumedQuantity.value < lowerThreshold) {
             aParkedItems.push(aLineItems[i]);
             continue;
@@ -5664,6 +5665,7 @@ sap.ui.define(
 
           //If consumed qty is greater than upper threshold, then mark as batch correction item
           var upperThreshold = aLineItems[i].upperThresholdValue || 0;
+          // var upperThreshold = aLineItems[i].upperThresholdValue || aLineItems[i].targetQuantity.value;
           if (aLineItems[i].consumedQuantity.value > upperThreshold) {
             bBatchCorrectionFlag = true;
             oBatchCorrectionItem = aLineItems[i];
