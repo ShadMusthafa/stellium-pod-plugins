@@ -95,10 +95,10 @@
                                 unit="{giData>targetQuantity/unitOfMeasure/uom}"/>
                             <ObjectNumber
                                 number="{
-                                    parts:['giData>consumedQuantity/value','giData>consumedQuantity/unitOfMeasure/uom'],
+                                    parts:['giData>consumedQtyEntryUom/value','giData>consumedQtyEntryUom/unitOfMeasure/uom'],
                                     formatter: '.oFormatter.formatQtyWithDecimals'
                                 }"
-                                unit="{giData>consumedQuantity/unitOfMeasure/uom}"/>
+                                unit="{giData>consumedQtyEntryUom/unitOfMeasure/uom}"/>
                             <ObjectStatus
                                 text="{giData>statusText}"
                                 inverted="true"
@@ -187,10 +187,10 @@
                                 unit="{giData>targetQuantity/unitOfMeasure/uom}"/>
                             <ObjectNumber
                                 number="{
-                                    parts:['giData>consumedQuantity/value','giData>consumedQuantity/unitOfMeasure/uom'],
+                                    parts:['giData>consumedQtyEntryUom/value','giData>consumedQtyEntryUom/unitOfMeasure/uom'],
                                     formatter: '.oFormatter.formatQtyWithDecimals'
                                 }"
-                                unit="{giData>consumedQuantity/unitOfMeasure/uom}"/>
+                                unit="{giData>consumedQtyEntryUom/unitOfMeasure/uom}"/>
                             <ObjectStatus
                                 text="{giData>statusText}"
                                 inverted="true"

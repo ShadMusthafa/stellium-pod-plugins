@@ -167,11 +167,11 @@ sap.ui.define(
             fLowerThreshold =
               oItem.targetQuantity.value * (1 - fToleranceLower);
 
-            if (oItem.consumedQuantity.value) {
-              if (oItem.consumedQuantity.value < fLowerThreshold) {
+            if (oItem.consumedQtyEntryUom.value) {
+              if (oItem.consumedQtyEntryUom.value < fLowerThreshold) {
                 oItem.status = "PARKED";
                 oItem.statusText = "Parked";
-              } else if (oItem.consumedQuantity.value > fUpperThreshold) {
+              } else if (oItem.consumedQtyEntryUom.value > fUpperThreshold) {
                 oItem.status = "BATCH_CORRECTION";
                 oItem.statusText = "Batch Correction";
               } else {
@@ -270,7 +270,7 @@ sap.ui.define(
 
                 oLineItem.issueWeight = {
                   value:
-                    oItem.calcComponenetQty - oLineItem.consumedQuantity.value,
+                    oItem.calcComponenetQty - oLineItem.consumedQtyEntryUom.value,
                   unitOfMeasure: {
                     uom: oItem.componentUom,
                   },
@@ -307,10 +307,10 @@ sap.ui.define(
 
           var sComponent = oBatchCorrectionItem.materialId.material,
             fConsumedQty = parseFloat(
-              oBatchCorrectionItem.consumedQuantity.value
+              oBatchCorrectionItem.consumedQtyEntryUom.value
             ),
             sConsumedQtyUom =
-              oBatchCorrectionItem.consumedQuantity.unitOfMeasure.uom;
+              oBatchCorrectionItem.consumedQtyEntryUom.unitOfMeasure.uom;
 
           var oRequestBody = {
             payload: {
@@ -353,7 +353,7 @@ sap.ui.define(
 
                 oLineItem.issueWeight = {
                   value:
-                    oItem.calcComponenetQty - oLineItem.consumedQuantity.value,
+                    oItem.calcComponenetQty - oLineItem.consumedQtyEntryUom.value,
                   unitOfMeasure: {
                     uom: oItem.componentUom,
                   },
@@ -400,13 +400,13 @@ sap.ui.define(
           // aLineItems.forEach(oItem => {
           //   oItem.batchCorrectionWeight.value = oFloatInstance.format(oItem.targetQuantity.value / fTotalGRQty * newValue);
           //   oItem.batchCorrectionWeightCalc.value = oFloatInstance.format(oItem.targetQuantity.value / fTotalGRQty * newValue);
-          //   oItem.issueWeight.value = oFloatInstance.format(oItem.batchCorrectionWeight.value - oItem.consumedQuantity.value);
+          //   oItem.issueWeight.value = oFloatInstance.format(oItem.batchCorrectionWeight.value - oItem.consumedQtyEntryUom.value);
           // });
 
           // // aLineItems.forEach(oItem => {
           // //   oItem.batchCorrectionWeight.value = oItem.batchCorrectionWeight.value / this.currentScaleFactor * newValue;
           // //   oItem.batchCorrectionWeightCalc.value = oItem.batchCorrectionWeightCalc.value / this.currentScaleFactor * newValue;
-          // //   oItem.issueWeight.value = oItem.batchCorrectionWeight.value - oItem.consumedQuantity.value;
+          // //   oItem.issueWeight.value = oItem.batchCorrectionWeight.value - oItem.consumedQtyEntryUom.value;
           // // });
 
           // oGiModel.setProperty('/lineItems', aLineItems);
@@ -423,16 +423,16 @@ sap.ui.define(
             oItem = oContext.getObject();
 
           if (
-            oItem.batchCorrectionWeight.value < oItem.consumedQuantity.value
+            oItem.batchCorrectionWeight.value < oItem.consumedQtyEntryUom.value
           ) {
             MessageToast.show(
               "Correction value cannot be less than measured quantity"
             );
-            oEvent.getSource().setValue(oItem.consumedQuantity.value);
+            oEvent.getSource().setValue(oItem.consumedQtyEntryUom.value);
           }
 
           oItem.issueWeight.value =
-            oItem.batchCorrectionWeight.value - oItem.consumedQuantity.value;
+            oItem.batchCorrectionWeight.value - oItem.consumedQtyEntryUom.value;
         },
 
         onReject: function () {
@@ -896,7 +896,7 @@ sap.ui.define(
               bomTarget: oItem.targetQuantity.value,
               bomTUpper: oItem.toleranceOver || 0,
               bomTLower: oItem.toleranceUnder || 0,
-              measure: oItem.consumedQuantity.value,
+              measure: oItem.consumedQtyEntryUom.value,
               approvedQuantity: oItem.batchCorrectionWeight
                 ? oItem.batchCorrectionWeight.value
                 : oItem.targetQuantity.value,

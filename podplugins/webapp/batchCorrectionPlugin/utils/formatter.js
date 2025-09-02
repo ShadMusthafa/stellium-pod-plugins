@@ -54,8 +54,8 @@ sap.ui.define(['sap/dm/dme/constants/DMCConstants', 'sap/dm/dme/formatter/Number
 
     getActualValue: function(consumedQuantity, consumedQtyEntryUom) {
       var consumedQuantity = this.oFormatter.getValidConsumedQty(consumedQuantity, consumedQtyEntryUom);
-      var actualValue = this.oFormatter.formatQtyWithDecimals(consumedQuantity.value, consumedQuantity.unitOfMeasure.uom);
-      return actualValue + ' ' + consumedQuantity.unitOfMeasure.uom;
+      var actualValue = this.oFormatter.formatQtyWithDecimals(consumedQtyEntryUom.value, consumedQtyEntryUom.unitOfMeasure.uom);
+      return actualValue + ' ' + consumedQtyEntryUom.unitOfMeasure.uom;
     },
 
     stateFormatter: function(sStatus) {
