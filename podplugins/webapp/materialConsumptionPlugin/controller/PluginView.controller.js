@@ -5646,19 +5646,19 @@ sap.ui.define(
 
         for (var i = 0; i < aLineItems.length; i++) {
           //If there is no consumed qty or if consumed qty is 0 then continue
-          if (!aLineItems[i].consumedQuantity.value || aLineItems[i].consumedQuantity.value <= 0) {
+          if (!aLineItems[i].consumedQtyEntryUom.value || aLineItems[i].consumedQtyEntryUom.value <= 0) {
             continue;
           }
 
           //If the consumed quantity is equal to target quantity, then no validation requirement
-          if (aLineItems[i].consumedQuantity.value === aLineItems[i].targetQuantity.value) {
+          if (aLineItems[i].consumedQtyEntryUom.value === aLineItems[i].targetQuantity.value) {
             continue;
           }
 
           //If consumed qty is less than lower threshold, then mark as parked
           var lowerThreshold = aLineItems[i].lowerThresholdValue || 0;
           // var lowerThreshold = aLineItems[i].lowerThresholdValue || aLineItems[i].targetQuantity.value;
-          if (aLineItems[i].consumedQuantity.value < lowerThreshold) {
+          if (aLineItems[i].consumedQtyEntryUom.value < lowerThreshold) {
             aParkedItems.push(aLineItems[i]);
             continue;
           }
@@ -5666,7 +5666,7 @@ sap.ui.define(
           //If consumed qty is greater than upper threshold, then mark as batch correction item
           var upperThreshold = aLineItems[i].upperThresholdValue || 0;
           // var upperThreshold = aLineItems[i].upperThresholdValue || aLineItems[i].targetQuantity.value;
-          if (aLineItems[i].consumedQuantity.value > upperThreshold) {
+          if (aLineItems[i].consumedQtyEntryUom.value > upperThreshold) {
             bBatchCorrectionFlag = true;
             oBatchCorrectionItem = aLineItems[i];
             break;
