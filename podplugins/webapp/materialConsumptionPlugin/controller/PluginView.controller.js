@@ -3775,22 +3775,26 @@ sap.ui.define(
 
         var sMaterial, oHuItem;
 
-        // if (sDialog) {
-        //   oHuItem = await this._getScannerConsumptionItem(oScannedValue.handlingUnit);
-        //   sMaterial = oHuItem.material;
-        //   this.getCurrentModel().setProperty('/material', sMaterial);
-        //   this.getCurrentInputMaterialControl().setEnabled(false);
-        // } else {
-        //   sMaterial = this.getCurrentModel().getProperty('/material');
-        //   oHuItem = await this._getConsumptionItemFromHu(oScannedValue.handlingUnit, sMaterial);
-        // }
+        if (sDialog) {
+          oHuItem = await this._getScannerConsumptionItem(oScannedValue.handlingUnit);
+          if (!oHuItem) {
+            MessageBox.error(this.getI18nText('HuItemsNotRelevantForSfcError'));
+            this.getCurrentInputHuControl().setValue('');
+            return;
+          }
+          sMaterial = oHuItem.material;
+          this.getCurrentModel().setProperty('/material', sMaterial);
+          this.getCurrentInputMaterialControl().setEnabled(false);
+        } else {
+          sMaterial = this.getCurrentModel().getProperty('/material');
+          oHuItem = await this._getConsumptionItemFromHu(oScannedValue.handlingUnit, sMaterial);
+        }
 
-        var sMaterial = this.getCurrentModel().getProperty('/material');
-        var oHuItem = await this._getConsumptionItemFromHu(oScannedValue.handlingUnit, sMaterial);
+        // var sMaterial = this.getCurrentModel().getProperty('/material');
+        // var oHuItem = await this._getConsumptionItemFromHu(oScannedValue.handlingUnit, sMaterial);
 
         if (!oHuItem) {
-          MessageBox.error('Hu items are not relevant for current SFC');
-          // this.resetModel(this.getCurrentModel());
+          MessageBox.error(this.getI18nText('HuItemsNotRelevantForSfcError'));
           this.getCurrentInputHuControl().setValue('');
           return;
         }
@@ -3804,6 +3808,15 @@ sap.ui.define(
         if (oMaterialInput) {
           oMaterialInput.setValue(oHuItem.material);
         }
+
+        var aLineItems = this.getView().byId('consumptionList').getModel().getProperty('/lineItems'),
+          oComponentInfo = aLineItems.find((oComponent) => oComponent.materialId.material === oHuItem.material);
+        if (!oComponentInfo.lowerThresholdValue || !oComponentInfo.upperThresholdValue) {
+          MessageBox.error('Material does not have tolerance. Weighing is not possible');
+          this.getView().byId(this.getCurrentDialogId()).close();
+          return;
+        }
+
         this._getMaterialDetails(oHuItem.material);
         this.focusHandlingUnitInput();
       },
@@ -4885,7 +4898,6 @@ sap.ui.define(
       },
       // C5278086 Adding changes for W&D Start
       showWeighingPopup: async function (oEvent) {
-        this.isWeighingDialogOpen = true;
         var oBindingObject = oEvent.getSource().getBindingContext().getObject();
         this._initWeighingHeaderModel(oBindingObject);
 
@@ -4907,6 +4919,16 @@ sap.ui.define(
           return;
         }
 
+        var oLineContext = oEvent.getSource().getBindingContext(),
+          oLineData = oLineContext.getObject(),
+          fLowerThreshold = oLineData.lowerThresholdValue,
+          fUpperThreshold = oLineData.upperThresholdValue;
+
+        if (!fLowerThreshold || !fUpperThreshold) {
+          MessageBox.error(this.getI18nText('toleranceNotAvailableErrMsg'));
+          return;
+        }
+
         this.scannedHU = null;
         this.scannedHuItem = null;
 
@@ -4922,7 +4944,7 @@ sap.ui.define(
 
         // Init Functions
         this.getWorkCenters();
-
+        this.isWeighingDialogOpen = true;
         //Laden View
         this.openWeighingDialog();
       },

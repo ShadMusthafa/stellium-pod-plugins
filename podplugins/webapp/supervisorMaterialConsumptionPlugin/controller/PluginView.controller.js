@@ -3809,9 +3809,24 @@ sap.ui.define(
           return;
         }
 
-        var sMaterial = this.getCurrentModel().getProperty('/material');
+        // var sMaterial = this.getCurrentModel().getProperty('/material');
+        // var oHuItem = await this._getConsumptionItemFromHu(oScannedValue.handlingUnit, sMaterial);
 
-        var oHuItem = await this._getConsumptionItemFromHu(oScannedValue.handlingUnit, sMaterial);
+        if (sDialog) {
+          oHuItem = await this._getScannerConsumptionItem(oScannedValue.handlingUnit);
+          if (!oHuItem) {
+            MessageBox.error(this.getI18nText('HuItemsNotRelevantForSfcError'));
+            this.getCurrentInputHuControl().setValue('');
+            return;
+          }
+          sMaterial = oHuItem.material;
+          this.getCurrentModel().setProperty('/material', sMaterial);
+          this.getCurrentInputMaterialControl().setEnabled(false);
+        } else {
+          sMaterial = this.getCurrentModel().getProperty('/material');
+          oHuItem = await this._getConsumptionItemFromHu(oScannedValue.handlingUnit, sMaterial);
+        }
+
         if (!oHuItem) {
           MessageBox.error('Hu items are not relevant for current SFC');
           this.resetModel(this.getCurrentModel());
@@ -3827,6 +3842,15 @@ sap.ui.define(
         if (oMaterialInput) {
           oMaterialInput.setValue(oHuItem.material);
         }
+
+        var aLineItems = this.getView().byId('consumptionList').getModel().getProperty('/lineItems'),
+          oComponentInfo = aLineItems.find((oComponent) => oComponent.materialId.material === oHuItem.material);
+        if (!oComponentInfo.lowerThresholdValue || !oComponentInfo.upperThresholdValue) {
+          MessageBox.error('Material does not have tolerance. Weighing is not possible');
+          this.getView().byId(this.getCurrentDialogId()).close();
+          return;
+        }
+
         this._getMaterialDetails(oHuItem.material);
         this.focusHandlingUnitInput();
       },
@@ -5557,7 +5581,7 @@ sap.ui.define(
           await this.getBatchDetails(sUrl, oParameters);
         // }
 
-        var aBatchDetails = this.batchDetailsModel.getData(),
+        var aBatchDetails = this.fitlerRecordsWithQualityInspection(this.batchDetailsModel.getData()),
           oSelectedBatch = aBatchDetails.find(
             oBatch => oBatch.batchNumber === sSelectedBatchId && oBatch.storageLocation.storageLocation === sDefaultSloc
           );
