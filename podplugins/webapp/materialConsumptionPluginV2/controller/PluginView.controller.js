@@ -128,6 +128,8 @@ sap.ui.define(
         this.multiStorLocs = [];
         this.workinstructionsLoaded = 0;
         this.alternateBomComponentsLoaded = 0;
+
+        this.getView().setModel(new JSONModel(), 'scaleModel');
       },
       isSubscribingToNotifications: function() {
         return true;
@@ -3833,6 +3835,29 @@ sap.ui.define(
         return isValidInput;
       },
 
+       _getScannerConsumptionItem: async function (sHandlingUnit) {
+        var oHuItem = await this._getHandlingUnitDataFromS4(sHandlingUnit).then((oResponse) => {
+          if (!oResponse || !oResponse.content || oResponse.content.length !== 1) {
+            return null;
+          }
+
+          return oResponse.content[0];
+        });
+
+        if (!oHuItem) {
+          return null;
+        }
+
+        var aBomComponents = this.byId('consumptionList').getModel().getProperty('/lineItems');
+        var oComponent = aBomComponents.find((oItem) => oItem.materialId.material === oHuItem.material);
+
+        if (!oComponent) {
+          return null;
+        }
+
+        return oHuItem;
+      },
+
       handleHUScanChange: async function(oEvent, sDialog) {
         var oScanControl = oEvent.getSource(),
           sScannedValue = oScanControl.getValue(),
@@ -5103,7 +5128,8 @@ sap.ui.define(
 
         //Validate resource
         var oModel = this.getCurrentModel(),
-          aScaleList = oModel.getProperty('/scaleList');
+          // aScaleList = oModel.getProperty('/scaleList'),
+          aScaleList = this.getView().getModel('scaleModel').getProperty('/scaleList');
         var oResource = aScaleList.find(oScale => oScale.resource === sSelectedScale);
 
         if (!oResource) {
@@ -5116,27 +5142,8 @@ sap.ui.define(
         }
 
         this._assignOperator(sSelectedScale);
+        this.oWeighDispenseHandler.getCurrentModel()?.setProperty('/scaleList', aScaleList);
         this.oWeighDispenseHandler.onSelectScale(oEvent);
-
-        // //Validate asset
-        // if (!sSelectedAsset) {
-        //   this.oWeighDispenseHandler.onSelectScale(oEvent);
-        //   return;
-        // }
-
-        // this._validateAsset(selectedScale, sSelectedAsset)
-        //   .then(
-        //     function(bIsAssetValid) {
-        //       if (!bIsAssetValid) return;
-
-        //       this.oWeighDispenseHandler.onSelectScale(oEvent);
-        //     }.bind(this)
-        //   )
-        //   .catch(
-        //     function(oError) {
-        //       this.showErrorMessage('Error occured during asset validation');
-        //     }.bind(this)
-        //   );
       },
       onSetScaleZero: function(oEvent) {
         var oPluginConfiguration = this.oPluginConfiguration,
@@ -5345,6 +5352,7 @@ sap.ui.define(
       readWorkCenters: function(sUrl, oParameters) {
         var that = this;
         var oWeighingModel = this.getCurrentModel();
+        var oScaleModel = this.getView().getModel('scaleModel');
 
         var oPluginConfiguration = this.oPluginConfiguration;
         AjaxUtil.get(
@@ -5356,7 +5364,8 @@ sap.ui.define(
 
             that.getResourceWithScaleEquipmentId(aMemberArray, aResourceArray);
 
-            oWeighingModel.setProperty('/scaleList', aResourceArray);
+            // oWeighingModel.setProperty('/scaleList', aResourceArray);
+            oScaleModel.setProperty('/scaleList', aResourceArray);
 
             var oCMBScale = that.oWeighDispenseHandler.getCurrentWeighScaleList();
             if (oCMBScale !== undefined) {
