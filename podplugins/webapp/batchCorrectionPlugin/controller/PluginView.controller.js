@@ -129,6 +129,9 @@ sap.ui.define(
           fLowerThreshold = oItem.targetQuantity.value * (1 - fToleranceLower);
 
           if (oItem.consumedQtyEntryUom.value) {
+            //Round UP the value to three decimal places
+            oItem.consumedQtyEntryUom.value =  Math.ceil(oItem.consumedQtyEntryUom.value *1000) / 1000;
+            
             if (oItem.consumedQtyEntryUom.value < fLowerThreshold) {
               oItem.status = 'PARKED';
               oItem.statusText = 'Parked';
