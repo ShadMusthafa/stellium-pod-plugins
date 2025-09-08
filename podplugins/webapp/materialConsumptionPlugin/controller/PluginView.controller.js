@@ -3910,9 +3910,7 @@ sap.ui.define(
           return null;
         }
 
-        var aBomComponents = this.byId('consumptionList').getModel().getProperty('/lineItems');
-        var oComponent = aBomComponents.find((oItem) => oItem.materialId.material === oHuItem.material);
-
+        var oComponent = this._findBomComponentForMaterial(oHuItem.material);
         if (!oComponent) {
           return null;
         }
@@ -3967,6 +3965,16 @@ sap.ui.define(
           }
           oMaterialInput.setValue(oMaterial.material);
           scannedMat = oMaterial.material;
+        }
+
+        //Check if the scanned material is part of the BOM
+        var oComponent = this._findBomComponentForMaterial(scannedMat);
+
+        if (!oComponent) {
+          this.showErrorMessage(that.getI18nText('scannedMaterialNotPartOfBomErrMsg'));
+          oMaterialInput.setValue('');
+          oCurrentDialog.setBusy(false);
+          return;
         }
 
         if (!that.validateMaterialInputRegEx(scannedMat)) {
@@ -4401,6 +4409,10 @@ sap.ui.define(
         var flag = true;
         var oController = this;
         MaterialBrowse.open(oMaterialNoField, oMaterialNoField.getValue(), function (oSelectedObject) {
+          if(!oController._findBomComponentForMaterial(oSelectedObject.material)){
+            oController.showErrorMessage(oController.getI18nText('selectedMaterialNotPartOfBomErrMsg'));
+            return;
+          }
           if (oController.coAndByProducts.length > 0) {
             oController.coAndByProducts.forEach(function (e) {
               if (e === oSelectedObject.material) {
@@ -5985,6 +5997,12 @@ sap.ui.define(
           workCenter: this.getPodController().getPodSelectionModel().selectedPhaseData.workCenter.workcenter
         };
         return new Promise((resolve, reject) => this.ajaxGetRequest(sUrl, oParameters, resolve, reject));
+      },
+
+      _findBomComponentForMaterial: function (sMaterial) {
+        var aBomComponents = this.byId('consumptionList').getModel().getProperty('/lineItems');
+        var oComponent = aBomComponents.find((oItem) => oItem.materialId.material === sMaterial);
+        return oComponent;
       }
     });
   }

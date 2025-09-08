@@ -3789,6 +3789,27 @@ sap.ui.define(
         return isValidInput;
       },
 
+      _getScannerConsumptionItem: async function (sHandlingUnit) {
+        var oHuItem = await this._getHandlingUnitDataFromS4(sHandlingUnit).then((oResponse) => {
+          if (!oResponse || !oResponse.content || oResponse.content.length !== 1) {
+            return null;
+          }
+
+          return oResponse.content[0];
+        });
+
+        if (!oHuItem) {
+          return null;
+        }
+
+        var oComponent = this._findBomComponentForMaterial(oHuItem.material);
+        if (!oComponent) {
+          return null;
+        }
+
+        return oHuItem;
+      },
+
       handleHUScanChange: async function(oEvent) {
         var oScanControl = oEvent.getSource(),
           sScannedValue = oScanControl.getValue(),
@@ -3968,6 +3989,16 @@ sap.ui.define(
           }
           oMaterialInput.setValue(oMaterial.material);
           scannedMat = oMaterial.material;
+        }
+                
+        //Check if the scanned material is part of the BOM
+        var oComponent = this._findBomComponentForMaterial(scannedMat);
+
+        if(!oComponent){
+          this.showErrorMessage(that.getI18nText('scannedMaterialNotPartOfBomErrMsg'));
+          oMaterialInput.setValue('');
+          oCurrentDialog.setBusy(false);
+          return;
         }
 
         if (!that.validateMaterialInputRegEx(scannedMat)) {
@@ -4415,6 +4446,10 @@ sap.ui.define(
         var flag = true;
         var oController = this;
         MaterialBrowse.open(oMaterialNoField, oMaterialNoField.getValue(), function(oSelectedObject) {
+          if(!oController._findBomComponentForMaterial(oSelectedObject.material)){
+            oController.showErrorMessage(oController.getI18nText('selectedMaterialNotPartOfBomErrMsg'));
+            return;
+          }
           if (oController.coAndByProducts.length > 0) {
             oController.coAndByProducts.forEach(function(e) {
               if (e === oSelectedObject.material) {
@@ -5987,6 +6022,12 @@ sap.ui.define(
           items: [],
           formattedText: ''
         };
+      },
+      
+      _findBomComponentForMaterial: function(sMaterial){
+        var aBomComponents = this.byId('consumptionList').getModel().getProperty('/lineItems');
+        var oComponent = aBomComponents.find((oItem) => oItem.materialId.material === sMaterial);
+        return oComponent;
       }
     });
   }
