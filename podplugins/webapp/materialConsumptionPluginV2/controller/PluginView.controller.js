@@ -5752,7 +5752,8 @@ sap.ui.define(
        * If any of the table items have bom components meeting the 'Park' or 'Batch Correction' criteria,
        * show error message and navigate user back to order selection screen
        */
-      _checkBatchCorrectionCondition: function() {
+      _checkBatchCorrectionCondition: async function () {
+        //If the GI model is not available, dont do anything
         if (!this.giModel) return;
 
         var sShopOrder = this.giModel.getProperty('/shopOrder'),
@@ -5764,6 +5765,10 @@ sap.ui.define(
           bBatchCorrectionFlag = false,
           oBatchCorrectionItem;
 
+        //Check if the workcenter is a formulation workcenter. If not, then no batch correction logic will apply
+        if (!this._isFormulationWorkcenter()) return;
+
+        //Loop through the items and check if any of the components is consumed above the tolerance
         for (var i = 0; i < aLineItems.length; i++) {
           //If there is no consumed qty or if consumed qty is 0 then continue
           if (!aLineItems[i].consumedQtyEntryUom.value || aLineItems[i].consumedQtyEntryUom.value <= 0) {
@@ -5775,15 +5780,16 @@ sap.ui.define(
             continue;
           }
 
-          //If consumed qty is less than lower threshold, then mark as parked
-          var lowerThreshold = aLineItems[i].lowerThresholdValue || 0;
-          if (aLineItems[i].consumedQtyEntryUom.value < lowerThreshold) {
+          var lowerThreshold = aLineItems[i].lowerThresholdValue || 0,
+            upperThreshold = aLineItems[i].upperThresholdValue || aLineItems[i].targetQuantity.value;
+
+          //If lower threshold is available, then check for 'PARK' condition else skip this check
+          if (lowerThreshold && aLineItems[i].consumedQtyEntryUom.value < lowerThreshold) {
             aParkedItems.push(aLineItems[i]);
             continue;
           }
 
           //If consumed qty is greater than upper threshold, then mark as batch correction item
-          var upperThreshold = aLineItems[i].upperThresholdValue || 0;
           if (aLineItems[i].consumedQtyEntryUom.value > upperThreshold) {
             bBatchCorrectionFlag = true;
             oBatchCorrectionItem = aLineItems[i];
@@ -5793,10 +5799,13 @@ sap.ui.define(
 
         if (bBatchCorrectionFlag) {
           var sErrorMessage = this.getI18nText('batchCorrectionRequiredErrorMessage', [sShopOrder]);
-          this._raiseAlert(oBatchCorrectionItem);
-          this._setSfcHoldStatus();
+          if (this.getPodSelectionModel().selectedOrderData.sfcStatus !== 'Hold') {
+            this._raiseAlert(oBatchCorrectionItem);
+            this._setSfcHoldStatus();
+            this._setOrderCustomData('BATCH_CORRECTION', 'YES');
+          }
           MessageBox.error(sErrorMessage, {
-            onClose: function() {
+            onClose: function () {
               window.history.go(-1);
             }.bind(this)
           });
@@ -6060,6 +6069,13 @@ sap.ui.define(
         var aBomComponents = this.byId('consumptionList').getModel().getProperty('/lineItems');
         var oComponent = aBomComponents.find((oItem) => oItem.materialId.material === sMaterial);
         return oComponent;
+      },
+      
+      _isFormulationWorkcenter: function () {
+        return this._getWorkCenterData().then((aWorkCenters) => {
+          var oWorkCenterType = aWorkCenters[0].customValues.find((oValue) => oValue.attribute === 'WORKCENTER_ TYPE');
+          return oWorkCenterType && oWorkCenterType.value === 'FORMULATION';
+        });
       }
     });
   }

@@ -4409,7 +4409,7 @@ sap.ui.define(
         var flag = true;
         var oController = this;
         MaterialBrowse.open(oMaterialNoField, oMaterialNoField.getValue(), function (oSelectedObject) {
-          if(!oController._findBomComponentForMaterial(oSelectedObject.material)){
+          if (!oController._findBomComponentForMaterial(oSelectedObject.material)) {
             oController.showErrorMessage(oController.getI18nText('selectedMaterialNotPartOfBomErrMsg'));
             return;
           }
@@ -5662,6 +5662,7 @@ sap.ui.define(
        * show error message and navigate user back to order selection screen
        */
       _checkBatchCorrectionCondition: async function () {
+        //If the GI model is not available, dont do anything
         if (!this.giModel) return;
 
         var sShopOrder = this.giModel.getProperty('/shopOrder'),
@@ -5674,15 +5675,9 @@ sap.ui.define(
           oBatchCorrectionItem;
 
         //Check if the workcenter is a formulation workcenter. If not, then no batch correction logic will apply
-        var bIsFormulationWC = await this._getWorkCenterData().then((aWorkCenters) => {
-          var oWorkCenterType = aWorkCenters[0].customValues.find((oValue) => oValue.attribute === 'WORKCENTER_ TYPE');
-          return oWorkCenterType && oWorkCenterType.value === 'FORMULATION';
-        });
+        if (!this._isFormulationWorkcenter()) return;
 
-        if (!bIsFormulationWC) {
-          return;
-        }
-
+        //Loop through the items and check if any of the components is consumed above the tolerance
         for (var i = 0; i < aLineItems.length; i++) {
           //If there is no consumed qty or if consumed qty is 0 then continue
           if (!aLineItems[i].consumedQtyEntryUom.value || aLineItems[i].consumedQtyEntryUom.value <= 0) {
@@ -5694,17 +5689,16 @@ sap.ui.define(
             continue;
           }
 
-          //If consumed qty is less than lower threshold, then mark as parked
-          var lowerThreshold = aLineItems[i].lowerThresholdValue || 0;
-          // var lowerThreshold = aLineItems[i].lowerThresholdValue || aLineItems[i].targetQuantity.value;
-          if (aLineItems[i].consumedQtyEntryUom.value < lowerThreshold) {
+          var lowerThreshold = aLineItems[i].lowerThresholdValue || 0,
+            upperThreshold = aLineItems[i].upperThresholdValue || aLineItems[i].targetQuantity.value;
+
+          //If lower threshold is available, then check for 'PARK' condition else skip this check
+          if (lowerThreshold && aLineItems[i].consumedQtyEntryUom.value < lowerThreshold) {
             aParkedItems.push(aLineItems[i]);
             continue;
           }
 
           //If consumed qty is greater than upper threshold, then mark as batch correction item
-          var upperThreshold = aLineItems[i].upperThresholdValue || 0;
-          // var upperThreshold = aLineItems[i].upperThresholdValue || aLineItems[i].targetQuantity.value;
           if (aLineItems[i].consumedQtyEntryUom.value > upperThreshold) {
             bBatchCorrectionFlag = true;
             oBatchCorrectionItem = aLineItems[i];
@@ -6003,6 +5997,13 @@ sap.ui.define(
         var aBomComponents = this.byId('consumptionList').getModel().getProperty('/lineItems');
         var oComponent = aBomComponents.find((oItem) => oItem.materialId.material === sMaterial);
         return oComponent;
+      },
+
+      _isFormulationWorkcenter: function () {
+        return this._getWorkCenterData().then((aWorkCenters) => {
+          var oWorkCenterType = aWorkCenters[0].customValues.find((oValue) => oValue.attribute === 'WORKCENTER_ TYPE');
+          return oWorkCenterType && oWorkCenterType.value === 'FORMULATION';
+        });
       }
     });
   }
