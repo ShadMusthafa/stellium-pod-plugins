@@ -68,6 +68,7 @@ sap.ui.define(
         var oViewModel = oView.getModel('viewModel');
         oViewModel.setProperty('/calcGRQty', parseFloat(oData.quantityOrdered));
         oViewModel.setProperty('/calcGrUOM', '');
+        oViewModel.setProperty('/selectedOrder', oData);
         oViewModel.setProperty('/scaleFactor', {
           value: 1,
           min: 1,

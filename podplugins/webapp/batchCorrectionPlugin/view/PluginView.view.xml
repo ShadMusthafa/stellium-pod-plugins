@@ -26,6 +26,8 @@
                 columnsL="1"
                 columnsM="1"
                 singleContainerFullSize="false" >
+                <Label text="SFC"/>
+                <Text text="{viewModel>/selectedOrder/sfc}"/>
                 <Label text="Calculated GR Quantity"/>
                 <HBox width="20rem">
                     <StepInput 
