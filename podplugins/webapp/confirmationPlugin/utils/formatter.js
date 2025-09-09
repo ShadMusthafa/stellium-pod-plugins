@@ -36,10 +36,11 @@ sap.ui.define(
           return '0';
         }
 
-        let oIntNumberFormat = NumberFormat.getIntegerInstance({
+        let oIntNumberFormat = NumberFormat.getFloatInstance({
           groupingEnabled: true,
           style: 'standard',
-          parseAsString: true
+          parseAsString: true,
+          decimals: 3
         });
 
         var iFormattedValue = oIntNumberFormat.format(sValue.toString());
