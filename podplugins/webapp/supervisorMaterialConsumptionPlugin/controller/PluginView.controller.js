@@ -1926,6 +1926,11 @@ sap.ui.define(
         var oView = this.getView();
         var oBindingObject = oEvent.getSource().getBindingContext().getObject();
 
+        if (!this._validateOrderStatus()) {
+          MessageBox.error(this.getI18nText('orderNotExecutableErrMsg', [this.getPodSelectionModel().selectedOrderData.order]));
+          return;
+        }
+
         if (!this._validatePhaseStatus()) {
           MessageBox.error(this.getI18nText('phaseNotInActiveStatusErrMsg', [this.selectedDataInList.truncatedPhaseId]));
           return;
@@ -3521,6 +3526,11 @@ sap.ui.define(
         var sWorkcenter = oView.getModel('WorkcenterInfo').getProperty('/workcenter');
         var oWeighweighRelevantFlag = oView.getModel('authModel').getProperty('/weighRelevant');
 
+        if (!this._validateOrderStatus()) {
+          MessageBox.error(this.getI18nText('orderNotExecutableErrMsg', [this.getPodSelectionModel().selectedOrderData.order]));
+          return;
+        }
+
         if (!this._validatePhaseStatus()) {
           MessageBox.error(this.getI18nText('phaseNotInActiveStatusErrMsg', [this.selectedDataInList.truncatedPhaseId]));
           return;
@@ -3605,6 +3615,11 @@ sap.ui.define(
         //  Extend WeighingScreen
         var sWorkcenter = oView.getModel('WorkcenterInfo').getProperty('/workcenter');
         var oWeighweighRelevantFlag = oView.getModel('authModel').getProperty('/weighRelevant');
+
+        if (!this._validateOrderStatus()) {
+          MessageBox.error(this.getI18nText('orderNotExecutableErrMsg', [this.getPodSelectionModel().selectedOrderData.order]));
+          return;
+        }
 
         if (!this._validatePhaseStatus()) {
           MessageBox.error(this.getI18nText('phaseNotInActiveStatusErrMsg', [this.selectedDataInList.truncatedPhaseId]));
@@ -4969,6 +4984,11 @@ sap.ui.define(
         var oBindingObject = oEvent.getSource().getBindingContext().getObject();
         this._initWeighingHeaderModel(oBindingObject);
 
+        if (!this._validateOrderStatus()) {
+          MessageBox.error(this.getI18nText('orderNotExecutableErrMsg', [this.getPodSelectionModel().selectedOrderData.order]));
+          return;
+        }
+        
         if (!this._validatePhaseStatus()) {
           MessageBox.error(this.getI18nText('phaseNotInActiveStatusErrMsg', [this.selectedDataInList.truncatedPhaseId]));
           return;
@@ -5819,6 +5839,18 @@ sap.ui.define(
       _validatePhaseStatus: function() {
         if (this._hasParkedItems() && this.selectedDataInList.status === 'COMPLETED') return true;
         if (this.selectedDataInList.status === 'ACTIVE') return true;
+        return false;
+      },
+
+      /**
+       * Checks the order execution status and returns a boolean value
+       *  - If order is in ACTIVE status, then true
+       *  - Else false
+       * @returns Boolean
+       */
+      _validateOrderStatus: function () {
+        var oPodSelectionModel = this.getPodSelectionModel();
+        if (oPodSelectionModel.selectedOrderData.orderExecutionStatus === 'ACTIVE') return true;
         return false;
       },
 
