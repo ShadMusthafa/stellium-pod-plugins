@@ -3881,7 +3881,7 @@ sap.ui.define(
 
         var aLineItems = this.getView().byId('consumptionList').getModel().getProperty('/lineItems'),
           oComponentInfo = aLineItems.find((oComponent) => oComponent.materialId.material === oHuItem.material);
-        if (!oComponentInfo.lowerThresholdValue || !oComponentInfo.upperThresholdValue) {
+        if (sDialog === 'scannerWeighDialog' && (!oComponentInfo.lowerThresholdValue || !oComponentInfo.upperThresholdValue)) {
           MessageBox.error('Material does not have tolerance. Weighing is not possible');
           this.getView().byId(this.getCurrentDialogId()).close();
           return;
@@ -5764,14 +5764,14 @@ sap.ui.define(
           }
 
           //If consumed qty is less than lower threshold, then mark as parked
-          var lowerThreshold = aLineItems[i].lowerThresholdValue || 0;
+          var lowerThreshold = aLineItems[i].lowerThresholdValue || aLineItems[i].targetQuantity.value;
           if (aLineItems[i].consumedQuantity.value < lowerThreshold) {
             aParkedItems.push(aLineItems[i]);
             continue;
           }
 
           //If consumed qty is greater than upper threshold, then mark as batch correction item
-          var upperThreshold = aLineItems[i].upperThresholdValue || 0;
+          var upperThreshold = aLineItems[i].upperThresholdValue || aLineItems[i].targetQuantity.value;
           if (aLineItems[i].consumedQuantity.value > upperThreshold) {
             bBatchCorrectionFlag = true;
             oBatchCorrectionItem = aLineItems[i];
@@ -5850,7 +5850,7 @@ sap.ui.define(
        */
       _validateOrderStatus: function () {
         var oPodSelectionModel = this.getPodSelectionModel();
-        if (oPodSelectionModel.selectedOrderData.orderExecutionStatus === 'ACTIVE') return true;
+        if (oPodSelectionModel.selectedOrderData.orderExecutionStatus !== 'DISCARDED') return true;
         return false;
       },
 

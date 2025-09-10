@@ -121,10 +121,11 @@ sap.ui.define(
           } else if (oItem.toleranceOver && oItem.toleranceUnder) {
             fToleranceUpper = oItem.toleranceOver / 100;
             fToleranceLower = oItem.toleranceUnder / 100;
-          } else {
-            fToleranceUpper = oItem.targetQuantity.value;
-            fToleranceLower = oItem.targetQuantity.value;
-          }
+          } 
+          // else {
+          //   fToleranceUpper = oItem.targetQuantity.value;
+          //   fToleranceLower = oItem.targetQuantity.value;
+          // }
 
           fUpperThreshold = oItem.targetQuantity.value * (1 + fToleranceUpper);
           fLowerThreshold = oItem.targetQuantity.value * (1 - fToleranceLower);
@@ -558,11 +559,13 @@ sap.ui.define(
 
       _getGoodsIssueItemsForMaterial: function (oItem) {
         var sUrl = this.getPublicApiRestDataSourceUri() + 'inventory/v1/inventory/goodsIssues';
+        //Send only GI data for the selected SFC
         var oParams = {
           plant: this.getPodController().getUserPlant(),
           material: oItem.materialId.material,
           materialVersion: oItem.materialId.version,
-          order: this.selectedOrder.order
+          order: this.selectedOrder.order,
+          sfc: this.selectedOrder.sfc
         };
         return new Promise((resolve, reject) => this.ajaxGetRequest(sUrl, oParams, resolve, reject));
       },

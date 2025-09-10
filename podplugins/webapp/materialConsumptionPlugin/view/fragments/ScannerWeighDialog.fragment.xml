@@ -12,7 +12,7 @@
                         <!-- Handling unit scan begin   -->
                         <Label text="{i18n>handlingUnitScanLabel}"/>
                         <Input id="idHandlingUnitScanInput"
-                            change=".handleHUScanChange($event, 'scannerDialog')"
+                            change=".handleHUScanChange($event, 'scannerWeighDialog')"
                             value="{scanWeighingModel>/scannedHu}"
                             required="false">
                             <layoutData>

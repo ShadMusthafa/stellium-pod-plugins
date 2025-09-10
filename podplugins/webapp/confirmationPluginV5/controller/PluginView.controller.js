@@ -317,7 +317,7 @@ sap.ui.define(
 
             //In case of by product or co porduct, use GR recieved qty as consumed qty
             if (oItem.componentType !== 'N') {
-              oItem.consumedQuantity.value = this._getReceivedGrQtyForMaterial(oItem.materialId.material);
+              oItem.consumedQtyEntryUom.value = this._getReceivedGrQtyForMaterial(oItem.materialId.material);
               //In case of byProducts, use absolute values for comparison as the targets will be in negative
               oItem.targetQuantity.value = Math.abs(oItem.targetQuantity.value);
             }
@@ -350,7 +350,8 @@ sap.ui.define(
             var fUpperThreshold = fTargetValue * (1 + fToleranceUpper / 100),
               fLowerThreshold = fTargetValue * (1 - fToleranceLower / 100);
 
-            return oItem.consumedQuantity.value < fLowerThreshold || oItem.consumedQuantity.value > fUpperThreshold;
+            // return oItem.consumedQuantity.value < fLowerThreshold || oItem.consumedQuantity.value > fUpperThreshold || oItem.consumedQuantity.value === fTargetValue;s
+            return oItem.consumedQtyEntryUom.value < fLowerThreshold || oItem.consumedQtyEntryUom.value > fUpperThreshold ;
           });
 
           //If correction items are present, return true else return false

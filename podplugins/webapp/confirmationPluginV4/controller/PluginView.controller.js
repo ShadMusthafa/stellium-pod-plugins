@@ -273,7 +273,8 @@ sap.ui.define(
           var oBatchCorrection = this.batchCorrection;
           var oGiSummary = aValues[1].value;
 
-          var fToleranceUpper = 0,
+          var fTargetValue = 0,
+            fToleranceUpper = 0,
             fToleranceLower = 0;
 
           var aItems = oGiSummary.lineItems.filter((oItem) => {
@@ -286,20 +287,25 @@ sap.ui.define(
              *   In case no tolerance data is available, the consumed qty will be compared with the target quantity
              */
             if (oCorrItem) {
+              fTargetValue = Math.abs(oCorrItem.approvedQuantity);
               fToleranceUpper = oCorrItem.approvedTUpper;
               fToleranceLower = oCorrItem.approvedTLower;
             } else if (oItem.recipeComponentToleranceOver && oItem.recipeComponentToleranceUnder) {
+              fTargetValue = oItem.targetQuantity.value;
               fToleranceUpper = oItem.recipeComponentToleranceOver;
               fToleranceLower = oItem.recipeComponentToleranceUnder;
             } else if (oItem.toleranceOver && oItem.toleranceUnder) {
+              fTargetValue = oItem.targetQuantity.value;
               fToleranceUpper = oItem.toleranceOver;
               fToleranceLower = oItem.toleranceUnder;
             } else {
+              fTargetValue = oItem.targetQuantity.value;
               fToleranceUpper = oItem.targetQuantity.value;
               fToleranceLower = oItem.targetQuantity.value;
             }
 
-            return oItem.consumedQuantity.value < fToleranceUpper || oItem.consumedQuantity.value > fToleranceLower;
+            // return oItem.consumedQuantity.value < fLowerThreshold || oItem.consumedQuantity.value > fUpperThreshold || oItem.consumedQuantity.value === fTargetValue;
+            return oItem.consumedQtyEntryUom.value < fLowerThreshold || oItem.consumedQtyEntryUom.value > fUpperThreshold;
           });
 
           //If correction items are present, return true else return false
