@@ -145,6 +145,7 @@ sap.ui.define(
         this.getView().setModel(new JSONModel({ value: this.getI18nText('reportQuantities', [0]) }), 'reportQuantitiesTitle');
         this.getView().setModel(new JSONModel({ customFieldVisible: false }), 'data');
         this.getView().setModel(new JSONModel({ value: [] }), 'quantitiesModel');
+        this.getView().setModel(new JSONModel({}), 'orderDataModel');
 
         this.prepareBusyDialog();
         this.handleOnDialogConfirmBtnThrottled = this._throttle(this.handleOnDialogConfirmBtn, 1000);
@@ -258,7 +259,7 @@ sap.ui.define(
           }
 
           var oSelectedOrder = this.getPodSelectionModel().selectedOrderData,
-            fSfcQuantity = parseFloat(oSelectedOrder.sfcPlannedQtyInProductionUom).toFixed(3),
+            fSfcQuantity = parseFloat(oSelectedOrder.sfcQtyInProductionUom).toFixed(3),
             fPlannedQty = oSelectedOrder.plannedQtyInProductionUom,
             sUOM = oSelectedOrder.productionCommercialUom;
 
@@ -2428,7 +2429,7 @@ sap.ui.define(
           var oSfcQuantityInput = this.batchCorrection.content[0].grQty;
         } else {
           //  var oSfcQuantityInput = this.getPodSelectionModel().selectedOrderData.plannedQty
-          var oSfcQuantityInput = this.getPodSelectionModel().selectedOrderData.sfcPlannedQtyInProductionUom;
+          var oSfcQuantityInput = this.getPodSelectionModel().selectedOrderData.sfcQtyInProductionUom;
         }
         var yieldValue = parseFloat(oYieldInput.getValue()) || 0;
         var scrapValue = parseFloat(oScrapInput.getValue()) || 0;

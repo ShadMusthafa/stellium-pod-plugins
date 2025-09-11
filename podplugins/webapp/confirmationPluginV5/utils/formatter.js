@@ -63,7 +63,8 @@ sap.ui.define(
         let oFloatNumberFormat = NumberFormat.getFloatInstance({
           groupingEnabled: true,
           style: 'standard',
-          parseAsString: true
+          parseAsString: true,
+          decimals: 3
         });
 
         var fFormattedValue = oFloatNumberFormat.format(sValue.toString());
@@ -153,7 +154,12 @@ sap.ui.define(
         if(isNaN(fTragetValue)) return 0;
         if(isNaN(fActualValue)) return fTragetValue.toFixed(3);
         return (fTragetValue - fActualValue).toFixed(3);
-      }
+      },
+
+      getDateTimeInPlantTimeZone: function(dateTime) {
+        let sdate = DateTimeUtils.dmcDateToUTCFormat(dateTime,"UTC");
+        return DateTimeUtils.dmcDateTimeFormatterFromUTC(sdate, PlantSettings.getTimeZone(), null);
+      },
     };
   }
 );

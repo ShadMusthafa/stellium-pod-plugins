@@ -63,7 +63,8 @@ sap.ui.define(
         let oFloatNumberFormat = NumberFormat.getFloatInstance({
           groupingEnabled: true,
           style: 'standard',
-          parseAsString: true
+          parseAsString: true,
+          decimals: 3
         });
 
         var fFormattedValue = oFloatNumberFormat.format(sValue.toString());
