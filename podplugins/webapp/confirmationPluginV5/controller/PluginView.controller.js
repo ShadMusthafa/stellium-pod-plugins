@@ -352,7 +352,7 @@ sap.ui.define(
               fLowerThreshold = fTargetValue * (1 - fToleranceLower / 100);
 
             // return oItem.consumedQuantity.value < fLowerThreshold || oItem.consumedQuantity.value > fUpperThreshold || oItem.consumedQuantity.value === fTargetValue;s
-            return oItem.consumedQtyEntryUom.value < fLowerThreshold || oItem.consumedQtyEntryUom.value > fUpperThreshold ;
+            return oItem.consumedQtyEntryUom.value < fLowerThreshold || oItem.consumedQtyEntryUom.value > fUpperThreshold;
           });
 
           //If correction items are present, return true else return false
@@ -2738,13 +2738,20 @@ sap.ui.define(
         try {
           await this._postConsolidatedConsumption();
 
-          Promise.all([this.reportQuantity(), this.reportActivity()]).then((aResponse) => {
-            if (this.phaseControlKey === 'ZM01' && this.qtyPostData.finalConfirmation) {
-              this._postConfirmationNonMilestone().then((oResponse) => {
-                this.publish('refreshPhaseList', {});
-              });
-            }
-          });
+          // Promise.all([this.reportQuantity(), this.reportActivity()]).then((aResponse) => {
+          //   if (this.phaseControlKey === 'ZM01' && this.qtyPostData.finalConfirmation) {
+          //     this._postConfirmationNonMilestone().then((oResponse) => {
+          //       this.publish('refreshPhaseList', {});
+          //     });
+          //   }
+          // });
+          await this.reportQuantity();
+          await this.reportActivity();
+          if (this.phaseControlKey === 'ZM01' && this.qtyPostData.finalConfirmation) {
+            this._postConfirmationNonMilestone().then((oResponse) => {
+              this.publish('refreshPhaseList', {});
+            });
+          }
         } catch (e) {
           console.error('Error posting confirmation', e);
         } finally {
@@ -2805,6 +2812,7 @@ sap.ui.define(
           .catch((oError, oHttpErrorMessage) => {
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
+            throw oError
           });
       },
 

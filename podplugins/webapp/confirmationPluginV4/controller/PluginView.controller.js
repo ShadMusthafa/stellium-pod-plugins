@@ -1199,17 +1199,16 @@ sap.ui.define(
         var activityConfirmationUrl = this.getActivityConfirmationRestDataSourceUri();
         var sUrl = activityConfirmationUrl + 'activityconfirmation/confirm';
         this.onPressConfirmActivityDialog();
-        this.postActivityData(sUrl, this.dataToBeConfirmed);
-        this.onCloseReportQuantityDialog();
+        this.postActivityData(sUrl, this.dataToBeConfirmed).then(() => {
+          this.onCloseReportQuantityDialog();
+        });
       },
 
       postActivityData: function (sUrl, oData) {
         var that = this;
         //that.byId('activityList').setBusy(true);
-        this.ajaxPostRequest(
-          sUrl,
-          oData,
-          function (oResponseData) {
+        return new Promise((resolve, reject) => this.ajaxPostRequest(sUrl, oData, resolve, reject))
+          .then((oResponseData) => {
             MessageToast.show(that.getI18nText('POSTING_SUCCESSFUL'));
             that.activityConfirmationPluginList = oResponseData;
             that.publish('refreshPhaseList', { stepId: that.selectedOrderData.stepId, sendToAllPages: true });
@@ -1231,13 +1230,12 @@ sap.ui.define(
             activityConfirmationPluginOverviewModel.setData(that.activityConfirmationPluginList);
             that.byId('activityList').setModel(activityConfirmationPluginOverviewModel);
             that.byId('activityList').setBusy(false);
-          },
-          function (oError, oHttpErrorMessage) {
+          })
+          .catch((oError, oHttpErrorMessage) => {
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
             that.byId('activityList').setBusy(false);
-          }
-        );
+          });
       },
 
       createWarningPopUp: function (fnProceed, fnCancel) {
@@ -2554,8 +2552,8 @@ sap.ui.define(
 
         // }
 
-        this.reportQuantity();
-        this.reportActivity();
+        await this.reportQuantity();
+        await this.reportActivity();
 
         //this.onPressConfirmActivityDialog();
         // var quantityConfirmationModel = this.byId('quantityConfirmationTable').getModel();
@@ -2568,19 +2566,17 @@ sap.ui.define(
       reportQuantity: function () {
         var productionUrl = this.getProductionDataSourceUri();
         var sUrl = productionUrl + 'quantityConfirmation/confirm';
-        this.postGrData(sUrl, this.qtyPostData);
+        return this.postGrData(sUrl, this.qtyPostData);
       },
 
       /***
        * Post GR data
        */
-      postGrData: function (sUrl, oRequestData) {
+      postGrData: async function (sUrl, oRequestData) {
         var that = this;
         //  that.byId('quantityConfirmationTable').setBusy(true);
-        this.ajaxPostRequest(
-          sUrl,
-          oRequestData,
-          function (oResponseData) {
+        return new Promise((resolve, reject) => this.ajaxPostRequest(sUrl, oRequestData, resolve, reject))
+          .then((oResponseData) => {
             //    MessageToast.show(that.getI18nText('POSTING_SUCCESSFUL'));
             that.getQuantityConfirmationSummary(that.selectedOrderData);
             that.publish('refreshPhaseList', { stepId: that.selectedOrderData.stepId });
@@ -2593,13 +2589,13 @@ sap.ui.define(
             }
             // that.reportActivity();
             // that.byId('quantityConfirmationTable').setBusy(false);
-          },
-          function (oError, oHttpErrorMessage) {
+          })
+          .catch((oError, oHttpErrorMessage) => {
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
             //that.byId('quantityConfirmationTable').setBusy(false);
-          }
-        );
+            throw oError
+          });
       },
 
       onConfPluginSave: function () {
