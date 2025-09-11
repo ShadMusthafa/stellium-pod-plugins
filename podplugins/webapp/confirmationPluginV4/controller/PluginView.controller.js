@@ -2844,9 +2844,13 @@ sap.ui.define(
       },
 
       getDateInPlantTimeZone: function (date) {
-        var sDate = moment(new Date(date)).tz(this.plantTimeZoneId).format('YYYY-MM-DD');
-        var oDateFormatFrom = DateFormat.getDateInstance({ format: 'yMMMd', UTC: true });
-        return oDateFormatFrom.format(new Date(sDate));
+        // var sDate = moment(new Date(date)).tz(this.plantTimeZoneId).format('YYYY-MM-DD');
+        // var oDateFormatFrom = DateFormat.getDateInstance({ format: 'yMMMd', UTC: true });
+        // return oDateFormatFrom.format(new Date(sDate));
+
+        var sDate = DateTimeUtils.dmcDateToUTCFormat(date, 'Etc/GMT'),
+          sDateTime = DateTimeUtils.dmcDateTimeFormatterFromUTC(sDate, this.plantTimeZoneId, null);
+        return moment(sDate).format('MMM DD, yyyy');
       },
 
       getDateTimeInPlantTimeZone: function (dateTime) {

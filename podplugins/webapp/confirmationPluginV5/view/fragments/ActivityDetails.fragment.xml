@@ -32,7 +32,7 @@
                                 textAlign="Right" />
                             <Text text="{viewActivityReportModel>postedBy}" />
                             <Text
-                                text="{path : 'viewActivityReportModel>postingDate',formatter:'.getDateTimeInPlantTimeZone'}" />
+                                text="{path : 'viewActivityReportModel>postingDate',formatter:'.getDateInPlantTimeZone'}" />
                             <Text
                                 text="{path : 'viewActivityReportModel>creationDate',formatter:'.getDateTimeInPlantTimeZone'}" />
                             <Text
