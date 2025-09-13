@@ -9,17 +9,17 @@ sap.ui.define(
     'sap/dm/dme/formatter/NumberFormatter',
     'sap/dm/dme/formatter/DateTimeUtils'
   ],
-  function(GroupHeaderListItem, MessageType, ValueState, DateFormat, NumberFormat, DMCConstants, DMENumberFormatter, DateTimeUtils) {
+  function (GroupHeaderListItem, MessageType, ValueState, DateFormat, NumberFormat, DMCConstants, DMENumberFormatter, DateTimeUtils) {
     'use strict';
 
     var oResourceBundle;
 
     return {
-      init: function(oBundle) {
+      init: function (oBundle) {
         oResourceBundle = oBundle;
       },
 
-      getScaleColor: function(reqd, actual) {
+      getScaleColor: function (reqd, actual) {
         if (reqd === actual) {
           return sap.m.ValueColor.Good;
         } else {
@@ -27,22 +27,20 @@ sap.ui.define(
         }
       },
 
-      getRequiredQuantity: function(reqd, uom, label) {
-        var reqdValue = this.oFormatter
-          ? DMENumberFormatter.dmcLocaleQuantityFormatterDisplay(reqd, uom)
-          : DMENumberFormatter.dmcLocaleQuantityFormatterDisplay(reqd, uom);
+      getRequiredQuantity: function (reqd, uom, label) {
+        var reqdValue = this.oFormatter ? DMENumberFormatter.dmcLocaleQuantityFormatterDisplay(reqd, uom) : DMENumberFormatter.dmcLocaleQuantityFormatterDisplay(reqd, uom);
         return label + ': ' + reqdValue + ' ' + uom;
       },
 
-      getRequiredQuantityLabel: function(reqd, uom, label) {
+      getRequiredQuantityLabel: function (reqd, uom, label) {
         return label + ': ' + DMENumberFormatter.dmcLocaleFloatNumberFormatter(reqd) + ' ' + uom;
       },
 
-      getQuantityUnitLabel: function(quantity, unit) {
+      getQuantityUnitLabel: function (quantity, unit) {
         return quantity + ' / ' + unit;
       },
 
-      formatDate: function(oDate) {
+      formatDate: function (oDate) {
         if (oDate && sap.ui.Device.browser.name === 'sf') {
           oDate = oDate.replace(/ /g, 'T');
         }
@@ -56,7 +54,7 @@ sap.ui.define(
         }
       },
 
-      formatConsumeButton: function(userAuthorizedForWorkCenter, backflushEnabled, isWeighRelevant, isWaterComponent) {
+      formatConsumeButton: function (userAuthorizedForWorkCenter, backflushEnabled, isWeighRelevant, isWaterComponent) {
         //No consumption posting for water components
         if (isWaterComponent) return false;
 
@@ -69,7 +67,7 @@ sap.ui.define(
         return false;
       },
 
-      formatHeaderButtons: function(userAuthorizedForWorkCenter, showButton) {
+      formatHeaderButtons: function (userAuthorizedForWorkCenter, showButton) {
         if (showButton) {
           if (userAuthorizedForWorkCenter) {
             return true;
@@ -79,7 +77,7 @@ sap.ui.define(
         return false;
       },
 
-      showValueWithUom: function(value, uom) {
+      showValueWithUom: function (value, uom) {
         if (value === null) {
           value = 0;
         }
@@ -89,7 +87,7 @@ sap.ui.define(
         return DMENumberFormatter.dmcLocaleQuantityFormatterDisplay(value);
       },
 
-      showValueUptoThreeDecimalWithUom: function(value, uom) {
+      showValueUptoThreeDecimalWithUom: function (value, uom) {
         if (value === null) {
           return 0;
         }
@@ -99,11 +97,11 @@ sap.ui.define(
         return DMENumberFormatter.dmcLocaleQuantityFormatterDisplay(value);
       },
 
-      formatNumber: function(inputNumber) {
+      formatNumber: function (inputNumber) {
         return DMENumberFormatter.dmcLocaleFloatNumberFormatter(inputNumber);
       },
 
-      formatNumberWithThreeDecimals: function(inputNumber) {
+      formatNumberWithThreeDecimals: function (inputNumber) {
         var NumInstance = NumberFormat.getFloatInstance(
           {
             decimals: 3
@@ -121,15 +119,7 @@ sap.ui.define(
         return returnValue;
       },
 
-      getUpperAndLowerThresholdValues: function(
-        compThresholdUpper,
-        compThresholdLower,
-        bomThresholdUpper,
-        bomThresholdLower,
-        totalQtyEntryUom,
-        totalQtyBaseUom,
-        targetQuantity
-      ) {
+      getUpperAndLowerThresholdValues: function (compThresholdUpper, compThresholdLower, bomThresholdUpper, bomThresholdLower, totalQtyEntryUom, totalQtyBaseUom, targetQuantity) {
         var upperValue = 0,
           lowerValue = 0,
           thresholdValues = {};
@@ -154,7 +144,7 @@ sap.ui.define(
         return thresholdValues;
       },
 
-      getValidQty: function(totalQtyEntryUom, totalQtyBaseUom, targetQuantity) {
+      getValidQty: function (totalQtyEntryUom, totalQtyBaseUom, targetQuantity) {
         if (totalQtyEntryUom && totalQtyEntryUom.value) {
           return totalQtyEntryUom;
         } else if (totalQtyBaseUom && totalQtyBaseUom.value) {
@@ -164,18 +154,18 @@ sap.ui.define(
         }
       },
 
-      getValidTargetValues: function(totalQtyEntryUom, totalQtyBaseUom, targetQuantity) {
+      getValidTargetValues: function (totalQtyEntryUom, totalQtyBaseUom, targetQuantity) {
         var validTargetQty = this.oFormatter.getValidQty(totalQtyEntryUom, totalQtyBaseUom, targetQuantity);
         return validTargetQty.value;
       },
 
-      getValidRequiredQuantity: function(totalQtyEntryUom, totalQtyBaseUom, targetQuantity, label) {
+      getValidRequiredQuantity: function (totalQtyEntryUom, totalQtyBaseUom, targetQuantity, label) {
         var validTargetQty = this.oFormatter.getValidQty(totalQtyEntryUom, totalQtyBaseUom, targetQuantity);
         var requiredQuantity = this.oFormatter.formatQtyWithDecimals(validTargetQty.value, validTargetQty.unitOfMeasure.uom);
         return requiredQuantity + ' ' + validTargetQty.unitOfMeasure.uom;
       },
 
-      getValidConsumedQty: function(consumedQuantity, consumedQtyEntryUom) {
+      getValidConsumedQty: function (consumedQuantity, consumedQtyEntryUom) {
         if (consumedQtyEntryUom && ![null, undefined, ''].includes(consumedQtyEntryUom.value)) {
           return consumedQtyEntryUom;
         } else {
@@ -183,28 +173,28 @@ sap.ui.define(
         }
       },
 
-      getValidConsumedQtyValue: function(consumedQuantity, consumedQtyEntryUom) {
+      getValidConsumedQtyValue: function (consumedQuantity, consumedQtyEntryUom) {
         var consumedQuantity = this.oFormatter.getValidConsumedQty(consumedQuantity, consumedQtyEntryUom);
         return consumedQuantity.value ? consumedQuantity.value : 0;
       },
 
-      getColor: function(totalQtyEntryUom, totalQtyBaseUom, targetQuantity, consumedQuantity, consumedQtyEntryUom) {
+      getColor: function (totalQtyEntryUom, totalQtyBaseUom, targetQuantity, consumedQuantity, consumedQtyEntryUom) {
         var reqdQty = this.oFormatter.getValidQty(totalQtyEntryUom, totalQtyBaseUom, targetQuantity);
         var consumedQuantity = this.oFormatter.getValidConsumedQty(consumedQuantity, consumedQtyEntryUom);
 
         return this.oFormatter.getScaleColor(reqdQty.value, consumedQuantity.value);
       },
 
-      getActualValue: function(consumedQuantity, consumedQtyEntryUom) {
+      getActualValue: function (consumedQuantity, consumedQtyEntryUom) {
         var consumedQuantity = this.oFormatter.getValidConsumedQty(consumedQuantity, consumedQtyEntryUom);
         var actualValue = this.oFormatter.formatQtyWithDecimals(consumedQuantity.value, consumedQuantity.unitOfMeasure.uom);
         return actualValue + ' ' + consumedQuantity.unitOfMeasure.uom;
       },
 
-      formatQtyWithDecimals: function(quantity, uom) {
+      formatQtyWithDecimals: function (quantity, uom) {
         var formattedQty;
         // To display decimals for UoM PC
-        if (DMCConstants.uomEach.includes(uom) && (quantity && quantity % 1 != 0)) {
+        if (DMCConstants.uomEach.includes(uom) && quantity && quantity % 1 != 0) {
           var NumInstance = NumberFormat.getFloatInstance(
             {
               decimals: 3
@@ -218,7 +208,7 @@ sap.ui.define(
         return formattedQty;
       },
 
-      getThresholdValues: function(upperValue, lowerValue, totalQtyEntryUom, totalQtyBaseUom, targetQuantity) {
+      getThresholdValues: function (upperValue, lowerValue, totalQtyEntryUom, totalQtyBaseUom, targetQuantity) {
         var validTargetQty = this.oFormatter.getValidQty(totalQtyEntryUom, totalQtyBaseUom, targetQuantity);
         var uom = validTargetQty.unitOfMeasure.uom;
 
@@ -236,23 +226,15 @@ sap.ui.define(
             return NumInstance.format(lowerValue) + ' - ' + NumInstance.format(upperValue) + ' ' + uom;
           } else {
             return (
-              DMENumberFormatter.dmcLocaleQuantityFormatterDisplay(lowerValue, uom) +
-              ' - ' +
-              DMENumberFormatter.dmcLocaleQuantityFormatterDisplay(upperValue, uom) +
-              ' ' +
-              uom
+              DMENumberFormatter.dmcLocaleQuantityFormatterDisplay(lowerValue, uom) + ' - ' + DMENumberFormatter.dmcLocaleQuantityFormatterDisplay(upperValue, uom) + ' ' + uom
             );
           }
         } else {
-          return (
-            DMENumberFormatter.dmcLocaleQuantityFormatterDisplay(lowerValue) +
-            ' - ' +
-            DMENumberFormatter.dmcLocaleQuantityFormatterDisplay(upperValue)
-          );
+          return DMENumberFormatter.dmcLocaleQuantityFormatterDisplay(lowerValue) + ' - ' + DMENumberFormatter.dmcLocaleQuantityFormatterDisplay(upperValue);
         }
       },
 
-      formatBatchQuantityAdv: function(qty, uom) {
+      formatBatchQuantityAdv: function (qty, uom) {
         if (qty === null) {
           qty = 0;
         }
@@ -269,12 +251,12 @@ sap.ui.define(
         return NumInstance.format(qty);
       },
 
-      getValueHelpOnly: function(allowFreeText, sMaterial) {
+      getValueHelpOnly: function (allowFreeText, sMaterial) {
         if (sMaterial !== '') return !allowFreeText;
         return true;
       },
 
-      getGroupHeader: function(sComponentType) {
+      getGroupHeader: function (sComponentType) {
         if (sComponentType.key === 'B') {
           return new GroupHeaderListItem({
             title: this.getI18nText('co-by-byProduct'),
@@ -288,50 +270,50 @@ sap.ui.define(
         }
       },
 
-      getEnabledStorageLoc: function(batchManaged, material, materialType, isInv, isEWM) {
+      getEnabledStorageLoc: function (batchManaged, material, materialType, isInv, isEWM) {
         if ((isInv && isEWM) || materialType === 'PIPELINE') {
           return false;
         }
         return !batchManaged;
       },
 
-      showUpdateBtnStorLoc: function(qty, isInv) {
+      showUpdateBtnStorLoc: function (qty, isInv) {
         if (!isInv && (qty === undefined || qty === null || qty === '')) {
           return true;
         }
         return false;
       },
 
-      showQtyStorLoc: function(qty, isInv) {
+      showQtyStorLoc: function (qty, isInv) {
         if (!isInv && (qty === undefined || qty === null || qty === '')) {
           return false;
         }
         return true;
       },
 
-      showRefreshBtnStorLoc: function(qty, isInv) {
+      showRefreshBtnStorLoc: function (qty, isInv) {
         if (isInv || (!isInv && (qty === undefined || qty === null || qty === ''))) {
           return false;
         }
         return true;
       },
 
-      getBatchInputEnable: function(batchManaged, material, materialType, sloc, isInv, isEWM) {
+      getBatchInputEnable: function (batchManaged, material, materialType, sloc, isInv, isEWM) {
         if ((isInv && isEWM) || !batchManaged || materialType === 'PIPELINE' || (!isInv && material !== '' && sloc === '')) {
           return false;
         }
         return true;
       },
 
-      getQtyEnable: function(bUseFullHU) {
+      getQtyEnable: function (bUseFullHU) {
         return !bUseFullHU;
       },
 
-      parseNumber: function(fNumber) {
+      parseNumber: function (fNumber) {
         return DMENumberFormatter.dmcLocaleNumberParser(fNumber);
       },
 
-      formatWeighButton: function(userAuthorizedForWorkCenter, backflushEnabled, isWeighRelevant, isWaterComponent) {
+      formatWeighButton: function (userAuthorizedForWorkCenter, backflushEnabled, isWeighRelevant, isWaterComponent) {
         //No weighing for water components
         if (isWaterComponent) return false;
 
@@ -343,9 +325,16 @@ sap.ui.define(
         }
         return false;
       },
-      formatUTCDateTimeToPlantTimeZone: function(vDate) {
+
+      formatUTCDateTimeToPlantTimeZone: function (vDate) {
         var parseDate = DateTimeUtils.dmcParseDate(vDate);
         return DateTimeUtils.dmcDateTimeFormatterFromUTC(DateTimeUtils.dmcDateToUTCFormat(parseDate, 'UTC'));
+      },
+
+      getDateInPlantTimeZone: function (date) {
+        var sDate = DateTimeUtils.dmcDateToUTCFormat(date, 'Etc/GMT'),
+          sDateTime = DateTimeUtils.dmcDateTimeFormatterFromUTC(sDate, this.plantTimeZoneId, null);
+        return moment(sDate).format('MMM DD, yyyy');
       }
     };
   }

@@ -73,7 +73,7 @@
                         <Text text="{postingsModel>batchNumber}" />
                         <Text text="{postingsModel>userId}" />
                         <Text
-                            text="{path : 'postingsModel>dateTime',formatter:'.oFormatter.formatUTCDateTimeToPlantTimeZone'}" />
+                            text="{path : 'postingsModel>dateTime',formatter:'.oFormatter.getDateInPlantTimeZone'}" />
                         <Text
                             text="{path : 'postingsModel>createdDateTime',formatter:'.oFormatter.formatUTCDateTimeToPlantTimeZone'}" />
                         <HBox width="100%" alignItems="Start" justifyContent="Start">

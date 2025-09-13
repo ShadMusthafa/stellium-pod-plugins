@@ -346,6 +346,11 @@ sap.ui.define(
       formatUTCDateTimeToPlantTimeZone: function(vDate) {
         var parseDate = DateTimeUtils.dmcParseDate(vDate);
         return DateTimeUtils.dmcDateTimeFormatterFromUTC(DateTimeUtils.dmcDateToUTCFormat(parseDate, 'UTC'));
+      },
+      getDateInPlantTimeZone: function (date) {
+        var sDate = DateTimeUtils.dmcDateToUTCFormat(date, 'Etc/GMT'),
+          sDateTime = DateTimeUtils.dmcDateTimeFormatterFromUTC(sDate, this.plantTimeZoneId, null);
+        return moment(sDate).format('MMM DD, yyyy');
       }
     };
   }

@@ -84,7 +84,7 @@
                         <Text
                             text="{parts: [{path: 'postingsModel>dateTime', type: 'sap.ui.model.odata.type.String'}], formatter: '.GRPostController.oDateTimeUtils.dmcDateTimeFormatterFromUTC'}" />
                         <Text
-                            text="{parts: [{path: 'postingsModel>createdDateTime', type: 'sap.ui.model.odata.type.String'}], formatter: '.GRPostController.oDateTimeUtils.dmcDateFormatterFromUTC'}" />
+                            text="{parts: [{path: 'postingsModel>createdDateTime', type: 'sap.ui.model.odata.type.String'}], formatter: '.GRPostController.oDateTimeUtils.dmcDateTimeFormatterFromUTC'}" />
                         <Text text="{postingsModel>comments}" />
                         <Button icon="sap-icon://print" tooltip="{i18n-goodreceipt>PRINT_BTN_COLUMN.LABEL}"
                             press=".GRPostController.onPrintBtnPressed" />
