@@ -1,0 +1,38 @@
+<core:FragmentDefinition
+    xmlns:core='sap.ui.core'
+    xmlns='sap.m'>
+    <Dialog id="idConsumptionPostingDialog" title="Consumption Posting">
+        <content>
+            <Table id="idConsumptionTable" 
+                items="{
+                    path: '/items', 
+                    templateShareable: false
+                }">
+                <columns>
+                    <Column><Label text="{i18n>consTable-SfcLabel}"/></Column>
+                    <Column><Label text="{i18n>consTable-ComponentLabel}"/></Column>
+                    <Column><Label text="{i18n>consTable-BatchLabel}"/></Column>
+                    <Column><Label text="{i18n>consTable-QuantityLabel}"/></Column>
+                    <Column><Label text="{i18n>consTable-PostingStatusLabel}"/></Column>
+                    <Column><Label text="{i18n>consTable-MessagesLabel}"/></Column>
+                    <!-- <Column width="4rem"><Label text="Actions" /></Column> -->
+                </columns>
+                <items>
+                    <ColumnListItem highlight="{status/status}">
+                        <Text text="{sfc}"/>
+                        <Text text="{component}"/>
+                        <Text text="{batchNo}"/>
+                        <ObjectNumber number="{totalQuantity}" unit="{uom}"/>
+                        <ObjectStatus text="{status/text}" icon="{status/icon}" state="{status/status}" />
+                        <Text text="{message}"/>
+                        <!-- <Button icon="sap-icon://refresh" enabled="{= %{status/status} === 'Error' }" press=".onRetryPosting"/> -->
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <buttons>
+            <Button type="Accept" text="{i18n>consDia-consumeComponentBtnLab}" press=".onConsumeBtnPress"/>
+            <Button type="Reject" text="{i18n>consDia-cancelConsumptionBtnLab}" press=".onCancelBtnPress"/>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

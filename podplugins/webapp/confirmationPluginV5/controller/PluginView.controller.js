@@ -15,7 +15,8 @@ sap.ui.define(
     'sap/ui/model/Sorter',
     './../utils/formatter',
     './../utils/ErrorHandler',
-    './../utils/ReasonCodeDialog'
+    './../utils/ReasonCodeDialog',
+    './ConsumptionPostingUtils'
   ],
   function (
     JSONModel,
@@ -33,7 +34,8 @@ sap.ui.define(
     Sorter,
     Formatter,
     ErrorHandler,
-    ReasonCodeDialogUtil
+    ReasonCodeDialogUtil,
+    ConsumptionPostingUtils
   ) {
     'use strict';
 
@@ -149,6 +151,8 @@ sap.ui.define(
 
         this.prepareBusyDialog();
         this.handleOnDialogConfirmBtnThrottled = this._throttle(this.handleOnDialogConfirmBtn, 1000);
+
+        this.oConsumptionPostingUtils = new ConsumptionPostingUtils(this);
       },
 
       /**
@@ -2548,15 +2552,18 @@ sap.ui.define(
           return;
         }
         oReportDialog.setBusyIndicatorDelay(100);
-        oReportDialog.setBusy(true);
+        // oReportDialog.setBusy(true);
 
-        try {
-          this.handleOnDialogConfirmBtnThrottled();
-        } catch (e) {
-          oReportDialog.setBusy(false);
-        } finally {
-          oReportDialog.setBusy(false);
-        }
+        this.oConsumptionPostingUtils.showDialog();
+
+        //TODO: Move this to success of consumption posting
+        // try {
+        //   this.handleOnDialogConfirmBtnThrottled();
+        // } catch (e) {
+        //   oReportDialog.setBusy(false);
+        // } finally {
+        //   oReportDialog.setBusy(false);
+        // }
       },
 
       _throttle: function (func, limit) {
@@ -2736,7 +2743,7 @@ sap.ui.define(
         this.getView().byId('reportQuantityDialog').setBusy(true);
 
         try {
-          await this._postConsolidatedConsumption();
+          // await this._postConsolidatedConsumption();
 
           // Promise.all([this.reportQuantity(), this.reportActivity()]).then((aResponse) => {
           //   if (this.phaseControlKey === 'ZM01' && this.qtyPostData.finalConfirmation) {
@@ -2757,6 +2764,23 @@ sap.ui.define(
         } finally {
           this.getView().setBusy(false);
           this.getView().byId('reportQuantityDialog').setBusy(false);
+        }
+      },
+
+      postConfirmation: function () {
+        var oReportDialog = this.getView().byId('reportQuantityDialog');
+        if (!oReportDialog) {
+          return;
+        }
+        oReportDialog.setBusyIndicatorDelay(100);
+        oReportDialog.setBusy(true);
+
+        try {
+          this.handleOnDialogConfirmBtnThrottled();
+        } catch (e) {
+          oReportDialog.setBusy(false);
+        } finally {
+          oReportDialog.setBusy(false);
         }
       },
 
@@ -2812,7 +2836,7 @@ sap.ui.define(
           .catch((oError, oHttpErrorMessage) => {
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
-            throw oError
+            throw oError;
           });
       },
 
