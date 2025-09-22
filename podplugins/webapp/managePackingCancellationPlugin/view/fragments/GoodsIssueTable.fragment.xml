@@ -1,19 +1,22 @@
 <core:FragmentDefinition 
     xmlns:core="sap.ui.core" 
     xmlns="sap.m">
-    <Table id="goodsIssueTable" items="{goodsIssueItems>/}">
-    <headerToolbar>
-        <OverflowToolbar>
-            <Title id="idGoodIssueTitleText" text="{= 'Postings (' + ${goodsIssueItems>/}.length + ')'}" />
-            <ToolbarSpacer/>
-            <!-- <Input 
-                placeholder="Search" 
-                liveChange="onGoodsIssueSearch" 
-                width="10rem" /> -->
-            <SearchField placeholder="Search" search=".onSearchGoodsIssue" width="10rem" />
-            <Button icon="sap-icon://action-settings" press="onGoodsIssueSettingsBtnPress" tooltip="Settings" visible="true"/>
-        </OverflowToolbar>
-    </headerToolbar>
+    <Table id="goodsIssueTable" items="{goodsIssueItems>/}" 
+        growing="true" growingScrollToLoad="false" growingThreshold="9999"
+        updateStarted="onBeforeTableUpdate">
+        <headerToolbar>
+            <OverflowToolbar>
+                <!-- <Title id="idGoodIssueTitleText" text="{= 'Postings (' + ${goodsIssueItems>/}.length + ')'}" /> -->
+                <Title id="idGoodIssueTitleText" text="{data>/goodsIssueTitle}" />
+                <ToolbarSpacer/>
+                <!-- <Input 
+                    placeholder="Search" 
+                    liveChange="onGoodsIssueSearch" 
+                    width="10rem" /> -->
+                <SearchField placeholder="Search" search=".onSearchGoodsIssue" width="10rem" />
+                <Button icon="sap-icon://action-settings" press="onGoodsIssueSettingsBtnPress" tooltip="Settings" visible="true"/>
+            </OverflowToolbar>
+        </headerToolbar>
         <columns>
             <Column id="inventoryIdGICol">
                 <Text text="{i18n>inventoryId}" />

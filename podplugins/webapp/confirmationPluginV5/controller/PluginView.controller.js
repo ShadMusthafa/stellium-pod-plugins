@@ -150,7 +150,8 @@ sap.ui.define(
         this.getView().setModel(new JSONModel({}), 'orderDataModel');
 
         this.prepareBusyDialog();
-        this.handleOnDialogConfirmBtnThrottled = this._throttle(this.handleOnDialogConfirmBtn, 1000);
+        // this.handleOnDialogConfirmBtnThrottled = this._throttle(this.handleOnDialogConfirmBtn, 1000);
+        this._isConfirmationInProgress = false;
 
         this.oConsumptionPostingUtils = new ConsumptionPostingUtils(this);
       },
@@ -2235,33 +2236,8 @@ sap.ui.define(
 
         //Reset the fields
         this._resetFields();
-        // var oTable = this.byId("activity");
-        // var aItems = oTable.getItems();
-        // var bAnyValuePresent = false;
 
-        // // Check for any non-empty input field
-        // aItems.forEach(function (oItem) {
-        //   var oInput = oItem.getCells()[1]; // Assuming the second cell contains the Input field
-        //   var sValue = oInput.getValue();
-
-        //   if (sValue) {
-        //     bAnyValuePresent = true;
-        //   }
-        // });
-
-        // // Set value state based on bAnyValuePresent
-        // aItems.forEach(function (oItem) {
-        //   var oInput = oItem.getCells()[1]; // Assuming the second cell contains the Input field
-        //   if (!bAnyValuePresent) {
-        //     oInput.setValueState("Error");
-        //     oInput.setValueStateText("At least one field must be filled.");
-        //   } else {
-        //     oInput.setValueState("None");
-        //   }
-        // });
-
-        // return bAnyValuePresent;
-        var oTable = this.byId('activity'); // Replace with the actual ID
+        var oTable = this.byId('activity');
         var aItems = oTable.getItems();
 
         for (var i = 0; i < aItems.length; i++) {
@@ -2274,6 +2250,8 @@ sap.ui.define(
             }
           });
         }
+
+        this._isConfirmationInProgress = false;
       },
 
       /***
@@ -2546,24 +2524,28 @@ sap.ui.define(
         return bAnyValuePresent;
       },
 
-      onConfirm: function () {
-        var oReportDialog = this.getView().byId('reportQuantityDialog');
-        if (!oReportDialog) {
-          return;
+      onConfirm: async function () {
+        //Prevent confirmation from posting more than once
+        if (this._isConfirmationInProgress) return;
+        this._isConfirmationInProgress = true;
+
+        try {
+          var oReportDialog = this.getView().byId('reportQuantityDialog');
+          if (!oReportDialog) return;
+
+          var bIsFormValid = await this._validateConfirmationForm();
+          if (!bIsFormValid) return;
+
+          oReportDialog.setBusyIndicatorDelay(0);
+          oReportDialog.setBusy(true);
+          // this.handleOnDialogConfirmBtn();
+          this.oConsumptionPostingUtils.showDialog();
+        } catch (e) {
+          oReportDialog.setBusy(false);
+        } finally {
+          oReportDialog.setBusy(false);
+          this._isConfirmationInProgress = false;
         }
-        oReportDialog.setBusyIndicatorDelay(100);
-        // oReportDialog.setBusy(true);
-
-        this.oConsumptionPostingUtils.showDialog();
-
-        //TODO: Move this to success of consumption posting
-        // try {
-        //   this.handleOnDialogConfirmBtnThrottled();
-        // } catch (e) {
-        //   oReportDialog.setBusy(false);
-        // } finally {
-        //   oReportDialog.setBusy(false);
-        // }
       },
 
       _throttle: function (func, limit) {
@@ -2634,6 +2616,7 @@ sap.ui.define(
         if (oOrderData && oOrderData.customData && oOrderData.customData['OVER_DELIVERY_TOLERANCE']) {
           var fTolPercent = parseFloat(oOrderData.customData['OVER_DELIVERY_TOLERANCE']) / 100;
           sfcQuantityValue = sfcQuantityValue * (1 + fTolPercent);
+          sfcQuantityValue = +parseFloat(sfcQuantityValue).toFixed(3);
         }
 
         if (yieldValue + scrapValue > sfcQuantityValue) {
@@ -2678,7 +2661,7 @@ sap.ui.define(
         }
 
         //Check if reason code is provided in case of scrap quantity
-        if (oScrapQtyInput.getValue() && !oReasonCodeInput.getValue()) {
+        if (oScrapQtyInput.getValue() && oScrapQtyInput.getValue() >0 && !oReasonCodeInput.getValue()) {
           ErrorHandler.setErrorState(oReasonCodeInput, this.getI18nText('REASON_CODE_NOT_ASSIGNED'));
           return;
         }
@@ -2764,6 +2747,7 @@ sap.ui.define(
         } finally {
           this.getView().setBusy(false);
           this.getView().byId('reportQuantityDialog').setBusy(false);
+          this._isConfirmationInProgress = false;
         }
       },
 
@@ -2772,15 +2756,17 @@ sap.ui.define(
         if (!oReportDialog) {
           return;
         }
-        oReportDialog.setBusyIndicatorDelay(100);
+        oReportDialog.setBusyIndicatorDelay(0);
         oReportDialog.setBusy(true);
 
         try {
-          this.handleOnDialogConfirmBtnThrottled();
+          // this.handleOnDialogConfirmBtnThrottled();
+          this.handleOnDialogConfirmBtn();
         } catch (e) {
           oReportDialog.setBusy(false);
         } finally {
           oReportDialog.setBusy(false);
+          this._isConfirmationInProgress = false;
         }
       },
 
@@ -3294,6 +3280,102 @@ sap.ui.define(
           order: oSelectedOrder.order
         };
         return new Promise((resolve, reject) => this.ajaxGetRequest(sUrl, oParams, resolve, reject));
+      },
+
+      _validateConfirmationForm: async function () {
+        // if (ErrorHandler.hasErrors()) return;
+
+        //Clear errors and validate items
+        ErrorHandler.clearErrorState(this.byId('yieldQuantity'));
+        ErrorHandler.clearErrorState(this.byId('scrapQuantity'));
+        ErrorHandler.clearErrorState(this.byId('postedBy'));
+        ErrorHandler.clearErrorState(this.byId('postingDate'));
+        ErrorHandler.clearErrorState(this.byId('reasonCode'));
+
+        var oScrapQtyInput = this.byId('scrapQuantity'),
+          oYieldQtyInput = this.byId('yieldQuantity'),
+          oReasonCodeInput = this.byId('reasonCode'),
+          oSfcQuantityInput;
+
+        //If batch correction data exists, use corrected GR quantity else use SFC gr quantity
+        if (this.batchCorrection.content && this.batchCorrection.content.length > 0) {
+          oSfcQuantityInput = this.batchCorrection.content[0].grQty;
+        } else {
+          oSfcQuantityInput = this.getPodSelectionModel().selectedOrderData.sfcQtyInProductionUom;
+        }
+
+        var yieldValue = parseFloat(oYieldQtyInput.getValue()) || 0,
+          scrapValue = parseFloat(oScrapQtyInput.getValue()) || 0,
+          sfcQuantityValue = parseFloat(oSfcQuantityInput) || 0;
+
+        /* Add checks to ensure that overdelivery does not happen
+        1. Get the tolerance for the header quantity from the order custom data
+        2. Check if the current confirmed qty exceeds the order qty tolerance
+    */
+        var oOrderData = await this._getOrderData()
+          .then((oData) => {
+            var oCustomValues = oData.customValues.reduce((acc, oItem) => {
+              acc[oItem.attribute] = oItem.value;
+              return acc;
+            }, {});
+            oData.customData = oCustomValues;
+            this.getView().getModel('orderDataModel').setProperty('/', oData);
+            return oData;
+          })
+          .catch((error) => ({}));
+
+        //If order has over delivery tolerance, use the max delivery quantity for validations
+        if (oOrderData && oOrderData.customData && oOrderData.customData['OVER_DELIVERY_TOLERANCE']) {
+          var fTolPercent = parseFloat(oOrderData.customData['OVER_DELIVERY_TOLERANCE']) / 100;
+          sfcQuantityValue = sfcQuantityValue * (1 + fTolPercent);
+        }
+
+        if (yieldValue + scrapValue > sfcQuantityValue) {
+          MessageBox.error('Quantity (sum of yield and scrap) should not exceed SFC quantity');
+          oYieldQtyInput.setValueState(sap.ui.core.ValueState.Error);
+          oScrapQtyInput.setValueState(sap.ui.core.ValueState.Error);
+          return Promise.resolve(false);
+        } else {
+          oYieldQtyInput.setValueState(sap.ui.core.ValueState.None);
+          oScrapQtyInput.setValueState(sap.ui.core.ValueState.None);
+        }
+
+        var oModelData = this.getView().getModel('quantitiesModel').getData().value,
+          totalYieldQuantity = 0;
+
+        totalYieldQuantity = oModelData.reduce((acc, val) => {
+          acc += parseFloat(val.totalYieldQuantity.value) + parseFloat(val.totalScrapQuantity.value);
+          return acc;
+        }, 0);
+
+        var Remaining = sfcQuantityValue - totalYieldQuantity;
+        if (yieldValue + scrapValue > Remaining) {
+          MessageBox.error('Remaining SFC Quantity : ' + Remaining + '');
+          oYieldQtyInput.setValueState(sap.ui.core.ValueState.Error);
+          oScrapQtyInput.setValueState(sap.ui.core.ValueState.Error);
+          return Promise.resolve(false);
+        } else {
+          oYieldQtyInput.setValueState(sap.ui.core.ValueState.None);
+          oScrapQtyInput.setValueState(sap.ui.core.ValueState.None);
+        }
+
+        if (totalYieldQuantity >= sfcQuantityValue) {
+          MessageBox.error('SFC quantity has already been reported');
+          oYieldQtyInput.setValueState(sap.ui.core.ValueState.Error);
+          oScrapQtyInput.setValueState(sap.ui.core.ValueState.Error);
+          return Promise.resolve(false);
+        } else {
+          oYieldQtyInput.setValueState(sap.ui.core.ValueState.None);
+          oScrapQtyInput.setValueState(sap.ui.core.ValueState.None);
+        }
+
+        //Check if reason code is provided in case of scrap quantity
+        if (oScrapQtyInput.getValue() && oScrapQtyInput.getValue() > 0 && !oReasonCodeInput.getValue()) {
+          ErrorHandler.setErrorState(oReasonCodeInput, this.getI18nText('REASON_CODE_NOT_ASSIGNED'));
+          return Promise.resolve(false);
+        }
+
+        return Promise.resolve(true);
       }
     });
 

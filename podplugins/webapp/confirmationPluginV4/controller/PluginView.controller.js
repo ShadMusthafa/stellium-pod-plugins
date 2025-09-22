@@ -149,6 +149,8 @@ sap.ui.define(
 
         this.prepareBusyDialog();
         this.handleOnDialogConfirmBtnThrottled = this._throttle(this.handleOnDialogConfirmBtn, 1000);
+
+        this._isConfirmationInProgress = false;
       },
 
       /**
@@ -2273,6 +2275,8 @@ sap.ui.define(
             }
           });
         }
+
+        this._isConfirmationInProgress = false;
       },
 
       /***
@@ -2374,6 +2378,9 @@ sap.ui.define(
       },
 
       onConfirm: function () {
+        if (this._isConfirmationInProgress) return;
+        this._isConfirmationInProgress = true;
+
         var oReportDialog = this.getView().byId('reportQuantityDialog');
         if (!oReportDialog) {
           return;
@@ -2382,11 +2389,13 @@ sap.ui.define(
         oReportDialog.setBusy(true);
 
         try {
-          this.handleOnDialogConfirmBtnThrottled();
+          // this.handleOnDialogConfirmBtnThrottled();
+          this.handleOnDialogConfirmBtn();
         } catch (e) {
           oReportDialog.setBusy(false);
         } finally {
           oReportDialog.setBusy(false);
+          this._isConfirmationInProgress = false;
         }
       },
 
@@ -2457,6 +2466,7 @@ sap.ui.define(
         if (oOrderData && oOrderData.customData && oOrderData.customData['OVER_DELIVERY_TOLERANCE']) {
           var fTolPercent = parseFloat(oOrderData.customData['OVER_DELIVERY_TOLERANCE']) / 100;
           sfcQuantityValue = sfcQuantityValue * (1 + fTolPercent);
+          sfcQuantityValue = +parseFloat(sfcQuantityValue).toFixed(3);
         }
 
         // var sfcquantity = this.getPodSelectionModel().selectedOrderData.sfcPlannedQtyInProductionUom
@@ -2503,7 +2513,7 @@ sap.ui.define(
         }
 
         //Check if reason code is provided in case of scrap quantity
-        if (oScrapQtyInput.getValue() && !oReasonCodeInput.getValue()) {
+        if (oScrapQtyInput.getValue() && oScrapQtyInput.getValue() >0 && !oReasonCodeInput.getValue()) {
           ErrorHandler.setErrorState(oReasonCodeInput, this.getI18nText('REASON_CODE_NOT_ASSIGNED'));
           return;
         }
@@ -2594,7 +2604,7 @@ sap.ui.define(
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
             //that.byId('quantityConfirmationTable').setBusy(false);
-            throw oError
+            throw oError;
           });
       },
 

@@ -314,6 +314,22 @@ sap.ui.define(
         }
       },
 
+      onBeforeTableUpdate: function (oEvent) {
+        var sReason = oEvent.getParameter('reason');
+        if (sReason !== 'Growing') return;
+
+        var sTableId = oEvent.getSource().getId();
+        if (sTableId.match(/goodsIssueTable/)) {
+          this.getGoodsIssueItems();
+        } else if (sTableId.match(/goodsReceiptFinishGoodTable/)) {
+          this.getGoodsReceiptItems('FINISH_GOOD', true, this.byId('goodsReceiptSearch').getValue());
+        } else if (sTableId.match(/goodsReceiptCoProductTable/)) {
+          this.getGoodsReceiptItems('CO_PRODUCT', true, this.byId('goodsReceiptByCoProductSearch').getValue());
+        } else if (sTableId.match(/goodsReceiptByProductTable/)) {
+          this.getGoodsReceiptItems('BY_PRODUCT', true, this.byId('goodsReceiptByProductSearch').getValue());
+        }
+      },
+
       cancelActQtyConfirmation: function (oEvent) {
         var oView = this.getView(),
           oConfirmation = oEvent.getSource().getBindingContext('confirmationItems').getObject(),
@@ -1017,7 +1033,8 @@ sap.ui.define(
           let aTableData = (this.getView().getModel(sTableName) && this.getView().getModel(sTableName).getData()) || [];
 
           // Concatenate the new content to the existing data
-          aTableData = bConcatFlag ? aContent : aTableData.concat(aContent);
+          // aTableData = bConcatFlag ? aContent : aTableData.concat(aContent);
+          aTableData = bConcatFlag ? aTableData.concat(aContent) : aContent;
 
           //Collect the packing HU and map it to the
           var aPackingData = await this._getPackingDataFromS4();

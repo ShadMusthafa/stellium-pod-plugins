@@ -1,10 +1,13 @@
 <core:FragmentDefinition 
     xmlns:core="sap.ui.core" 
     xmlns="sap.m">
-    <Table id="goodsReceiptByProductTable" items="{BY_PRODUCT>/}">
+    <Table id="goodsReceiptByProductTable" items="{BY_PRODUCT>/}"
+        growing="true" growingScrollToLoad="false" growingThreshold="20"
+        updateStarted="onBeforeTableUpdate">
     <headerToolbar>
         <OverflowToolbar>
-            <Title id="idByProdTitleText" text="{= 'By-Products (' + ${BY_PRODUCT>/}.length + ')'}" />
+            <!-- <Title id="idByProdTitleText" text="{= 'By-Products (' + ${BY_PRODUCT>/}.length + ')'}" /> -->
+            <Title id="idByProdTitleText" text="{data>/BY_PRODUCT_TITLE}" />
             <ToolbarSpacer/>
             <!-- <Input 
                 placeholder="Search" 

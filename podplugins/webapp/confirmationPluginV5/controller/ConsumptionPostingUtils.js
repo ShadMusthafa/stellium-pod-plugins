@@ -13,6 +13,7 @@ sap.ui.define(['sap/ui/base/Object', 'sap/ui/core/Fragment', 'sap/ui/model/json/
       this.DB_BASE_URL = 'https://dbapicall.cfapps.eu20-001.hana.ondemand.com/';
 
       this.onConsumeBtnThrottled = this._throttle(this._consumeComponent, 1000);
+      this._isConsumptionInProgress = false;
     },
 
     showDialog: async function () {
@@ -64,7 +65,10 @@ sap.ui.define(['sap/ui/base/Object', 'sap/ui/core/Fragment', 'sap/ui/model/json/
     },
 
     onConsumeBtnPress: function (oEvent) {
-      this.onConsumeBtnThrottled(oEvent);
+      if (this._isConsumptionInProgress) return;
+      this._isConsumptionInProgress = true;
+      // this.onConsumeBtnThrottled(oEvent);
+      this._consumeComponent(oEvent);
     },
 
     _consumeComponent: async function (oEvent) {
@@ -72,14 +76,19 @@ sap.ui.define(['sap/ui/base/Object', 'sap/ui/core/Fragment', 'sap/ui/model/json/
         aPayloads = aItems.map((oItem) => this._prepareGoodsIssuePayload(oItem));
 
       let aPromises = aPayloads.map((oPayload, idx) => this._postGoodsIssue(oPayload, `/items/${idx}`));
-      let bPostConfirmation = await Promise.allSettled(aPromises).then((aResults) => {
-        let bIsSuccess = aResults.every((oResult) => oResult.status === 'fulfilled');
-        return bIsSuccess;
-      });
+      let bPostConfirmation = await Promise.allSettled(aPromises)
+        .then((aResults) => {
+          let bIsSuccess = aResults.every((oResult) => oResult.status === 'fulfilled');
+          return bIsSuccess;
+        })
+        .finally(() => {
+          this._isConsumptionInProgress = false;
+        });
 
       //If all the consumption posting is successfull, then close the dialog and post the confirmations
       if (bPostConfirmation) {
         this._oDialog.close();
+        console.log('Posting confirmation');
         this._oController.postConfirmation();
       }
 
@@ -90,6 +99,16 @@ sap.ui.define(['sap/ui/base/Object', 'sap/ui/core/Fragment', 'sap/ui/model/json/
       if (this._oDialog) this._oDialog.close();
       this._oModel.setProperty('/items', []);
       this._oModel.refresh(true);
+
+      this._isConsumptionInProgress = false;
+      this._oController._isConfirmationInProgress = false;
+
+      let oReportQtyDialog = this._oController.getView().byId('reportQuantityDialog');
+      if (oReportQtyDialog) {
+        oReportQtyDialog.setBusy(false);
+      }
+
+      this._isConsumptionInProgress = false;
     },
 
     onRetryPosting: function (oEvent) {
@@ -120,10 +139,10 @@ sap.ui.define(['sap/ui/base/Object', 'sap/ui/core/Fragment', 'sap/ui/model/json/
         order: oSelectedOrder.order,
         sfc: oSelectedOrder.sfc,
         phase: oSelectedPhase.phaseId,
-        workcenter: oSelectedPhase.selectedWorkcenter
+        workcenter: oSelectedPhase.workCenter.workcenter
       };
 
-      return new Promise((resolve, reject) => that.ajaxGetRequest(sUrl, oParams, resolve, reject)).then((aResponse) => {
+      return new Promise((resolve, reject) => that.ajaxGetRequest(sUrl, oParams, resolve, reject)).then(async (aResponse) => {
         let mBatches = aResponse.data.reduce((acc, val) => {
           acc[val.batchNo] = val.batchNo;
           return acc;
@@ -165,7 +184,7 @@ sap.ui.define(['sap/ui/base/Object', 'sap/ui/core/Fragment', 'sap/ui/model/json/
         order: oSelectedOrder.order,
         charge: oSelectedOrder.sfc,
         phase: oSelectedPhase.phaseId,
-        workCenter: oSelectedPhase.selectedWorkcenter,
+        workCenter: oSelectedPhase.workCenter.workcenter,
         component: {
           material: {
             material: oConsumptionItem.component,
@@ -195,8 +214,11 @@ sap.ui.define(['sap/ui/base/Object', 'sap/ui/core/Fragment', 'sap/ui/model/json/
     _postGoodsIssue: async function (oPayload, sPath) {
       let that = this._oController,
         sUrl = that.getPublicApiRestDataSourceUri() + 'processorder/v1/goodsissue';
+
+      console.log('Posting GI ', oPayload);
       return new Promise((resolve, reject) => that.ajaxPostRequest(sUrl, oPayload, resolve, reject))
         .then((oResponse) => {
+          console.log('GI posting successfull ');
           //Update the status for the item
           let oStatus = {
             status: 'Success',
@@ -235,15 +257,24 @@ sap.ui.define(['sap/ui/base/Object', 'sap/ui/core/Fragment', 'sap/ui/model/json/
         order: oSelectedOrder.order,
         material: oSelectedOrder.materialName,
         phase: oSelectedPhase.phaseId,
-        workcenter: oSelectedPhase.selectedWorkcenter,
+        workcenter: oSelectedPhase.workCenter.workcenter,
         component: oConsumptionItem.component,
         erpSequence: oConsumptionItem.erpSequence,
         localSequence: oConsumptionItem.localSequence,
         batchNo: oConsumptionItem.batchNo,
-        sfc: oConsumptionItem.sfc
+        sfc: oConsumptionItem.sfc,
+        maxTimestamp: oConsumptionItem.maxDateTime
       };
 
-      return new Promise((resolve, reject) => that.ajaxPostRequest(sUrl, oPayload, resolve, reject));
+      console.log('Update DB item ', oPayload);
+      return new Promise((resolve, reject) => that.ajaxPostRequest(sUrl, oPayload, resolve, reject))
+        .then((oResponse) => {
+          console.log('Updated DB items ', oResponse);
+        })
+        .catch((oError) => {
+          console.log('Error form db ', oError);
+          throw oError;
+        });
     },
 
     _throttle: function (func, limit) {

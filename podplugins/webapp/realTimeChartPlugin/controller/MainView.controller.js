@@ -72,7 +72,8 @@ sap.ui.define(
                   dataLabel: {
                     formatString: ChartFormatter.DefaultPattern.SHORTFLOAT_MFD2,
                     visible: false
-                  }
+                  },
+                  adjustScale: true
                 },
                 valueAxis: {
                   visible: true,
@@ -129,7 +130,8 @@ sap.ui.define(
                   dataLabel: {
                     formatString: ChartFormatter.DefaultPattern.SHORTFLOAT_MFD2,
                     visible: false
-                  }
+                  },
+                  adjustScale: true
                 },
                 valueAxis: {
                   visible: true,

@@ -560,15 +560,31 @@ sap.ui.define(
         var oPayloads = this.createActQtyCancellationPayloads(sCancelationText),
           aPromises = [];
 
-        if (Object.keys(oPayloads.activityCancellation).length > 0) {
-          await this.cancelActivityConfirmationItem(oPayloads.activityCancellation);
-          // aPromises.push(this.cancelActivityConfirmationItem(oPayloads.activityCancellation));
-        }
+        this.getView().setBusy(true);
 
-        if (Object.keys(oPayloads.quantityCancellation).length > 0) {
-          await this.wait(1000);
-          await this.cancelQuantityConfirmationItem(oPayloads.quantityCancellation);
-          // aPromises.push(this.cancelQuantityConfirmationItem(oPayloads.quantityCancellation));
+        try {
+          this._getBusyDialog().open();
+          if (Object.keys(oPayloads.activityCancellation).length > 0) {
+            await this.cancelActivityConfirmationItem(oPayloads.activityCancellation).catch((oError) => {
+              MessageBox.error('Activity confirmation could not be cancelled', {
+                details: JSON.stringify(oError)
+              });
+            });
+            // aPromises.push(this.cancelActivityConfirmationItem(oPayloads.activityCancellation));
+          }
+
+          if (Object.keys(oPayloads.quantityCancellation).length > 0) {
+            await this.wait(1000);
+            await this.cancelQuantityConfirmationItem(oPayloads.quantityCancellation).catch((oError) => {
+              MessageBox.error('Quantity confirmation could not be cancelled', {
+                details: JSON.stringify(oError)
+              });
+            });
+            // aPromises.push(this.cancelQuantityConfirmationItem(oPayloads.quantityCancellation));
+          }
+        } finally {
+          this.getView().setBusy(false);
+          this._getBusyDialog().close();
         }
 
         this.getActQtyConfirmationData();
@@ -1151,7 +1167,7 @@ sap.ui.define(
           this.byId('goodsIssueTable').setBusy(false);
         }
 
-        this.setGoodsReceiptTableBusy(false);
+        // this.setGoodsReceiptTableBusy(false);
 
         if (this.byId('activityConfirmation')) {
           this.byId('activityConfirmation').setBusy(false);
@@ -1349,6 +1365,15 @@ sap.ui.define(
         }
         const iItemCount = oListBinding.getLength();
         this.byId('idCoProdTitleText').setText(this.getI18nText('CO_PRODUCT', [iItemCount]));
+      },
+
+      _getBusyDialog: function () {
+        if (this._oBusyDialog) return this._oBusyDialog;
+
+        this._oBusyDialog = new sap.m.BusyDialog({
+          title: 'Posting Cancellation'
+        });
+        return this._oBusyDialog;
       }
     });
 

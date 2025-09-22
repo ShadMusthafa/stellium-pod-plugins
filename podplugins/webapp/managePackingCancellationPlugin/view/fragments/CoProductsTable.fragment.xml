@@ -1,19 +1,22 @@
 <core:FragmentDefinition 
     xmlns:core="sap.ui.core" 
     xmlns="sap.m">
-    <Table id="goodsReceiptCoProductTable" items="{CO_PRODUCT>/}">
-     <headerToolbar>
-        <OverflowToolbar>
-            <Title id="idCoProdTitleText" text="{= 'Co-Products (' + ${CO_PRODUCT>/}.length + ')'}" />
-            <ToolbarSpacer/>
-            <!-- <Input 
-                placeholder="Search" 
-                liveChange="onCR_BP_Search" 
-                width="10rem" /> -->
-            <SearchField id="goodsReceiptByCoProductSearch" placeholder="Search" search=".onSearchCoProducts" width="10rem" />
-            <Button icon="sap-icon://action-settings" press="onGoodsReceiptCPSettingsBtnPress" tooltip="Settings" visible="true"/>
-        </OverflowToolbar>
-    </headerToolbar>
+    <Table id="goodsReceiptCoProductTable" items="{CO_PRODUCT>/}"
+        growing="true" growingScrollToLoad="false" growingThreshold="20"
+        updateStarted="onBeforeTableUpdate">
+        <headerToolbar>
+            <OverflowToolbar>
+                <!-- <Title id="idCoProdTitleText" text="{= 'Co-Products (' + ${CO_PRODUCT>/}.length + ')'}" /> -->
+                <Title id="idCoProdTitleText" text="{data>/CO_PRODUCT_TITLE}" />
+                <ToolbarSpacer/>
+                <!-- <Input 
+                    placeholder="Search" 
+                    liveChange="onCR_BP_Search" 
+                    width="10rem" /> -->
+                <SearchField id="goodsReceiptByCoProductSearch" placeholder="Search" search=".onSearchCoProducts" width="10rem" />
+                <Button icon="sap-icon://action-settings" press="onGoodsReceiptCPSettingsBtnPress" tooltip="Settings" visible="true"/>
+            </OverflowToolbar>
+        </headerToolbar>
         <columns>
             <Column id="inventoryId_GR_CP_Col">
                 <Text text="{i18n>inventoryId}" />

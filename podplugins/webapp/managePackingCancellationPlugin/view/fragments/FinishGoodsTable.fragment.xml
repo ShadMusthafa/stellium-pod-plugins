@@ -1,19 +1,22 @@
 <core:FragmentDefinition 
     xmlns:core="sap.ui.core" 
     xmlns="sap.m">
-    <Table id="goodsReceiptFinishGoodTable" items="{FINISH_GOOD>/}">
-    <headerToolbar>
-        <OverflowToolbar>
-            <Title id="idFinGoodsTitleText" text="{= 'Finished Goods (' + ${FINISH_GOOD>/}.length + ')'}" />
-            <ToolbarSpacer/>
-            <!-- <Input 
-                placeholder="Search" 
-                liveChange="onGR_FG_Search" 
-                width="10rem" /> -->
-            <SearchField id="goodsReceiptSearch" placeholder="Search" search=".onSearchFinishedGoods" width="10rem" />
-            <Button icon="sap-icon://action-settings" press="onGoodsReceiptFGSettingsBtnPress" tooltip="Settings" visible="true"/>
-        </OverflowToolbar>
-    </headerToolbar>
+    <Table id="goodsReceiptFinishGoodTable" items="{FINISH_GOOD>/}"
+        growing="true" growingScrollToLoad="false" growingThreshold="20"
+        updateStarted="onBeforeTableUpdate">
+        <headerToolbar>
+            <OverflowToolbar>
+                <!-- <Title id="idFinGoodsTitleText" text="{= 'Finished Goods (' + ${FINISH_GOOD>/}.length + ')'}" /> -->
+                <Title id="idFinGoodsTitleText" text="{data>/FINISH_GOOD_TITLE}" />
+                <ToolbarSpacer/>
+                <!-- <Input 
+                    placeholder="Search" 
+                    liveChange="onGR_FG_Search" 
+                    width="10rem" /> -->
+                <SearchField id="goodsReceiptSearch" placeholder="Search" search=".onSearchFinishedGoods" width="10rem" />
+                <Button icon="sap-icon://action-settings" press="onGoodsReceiptFGSettingsBtnPress" tooltip="Settings" visible="true"/>
+            </OverflowToolbar>
+        </headerToolbar>
         <columns>
             <Column id="inventoryId_GR_FG_Col">
                 <Text text="{i18n>inventoryId}" />
