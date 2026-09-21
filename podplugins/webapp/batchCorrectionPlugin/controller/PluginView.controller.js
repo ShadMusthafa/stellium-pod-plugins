@@ -121,7 +121,7 @@ sap.ui.define(
           } else if (oItem.toleranceOver && oItem.toleranceUnder) {
             fToleranceUpper = oItem.toleranceOver / 100;
             fToleranceLower = oItem.toleranceUnder / 100;
-          } 
+          }
           // else {
           //   fToleranceUpper = oItem.targetQuantity.value;
           //   fToleranceLower = oItem.targetQuantity.value;
@@ -132,8 +132,8 @@ sap.ui.define(
 
           if (oItem.consumedQtyEntryUom.value) {
             //Round UP the value to three decimal places
-            oItem.consumedQtyEntryUom.value =  Math.ceil(oItem.consumedQtyEntryUom.value *1000) / 1000;
-            
+            oItem.consumedQtyEntryUom.value = Math.ceil(oItem.consumedQtyEntryUom.value * 1000) / 1000;
+
             if (oItem.consumedQtyEntryUom.value < fLowerThreshold) {
               oItem.status = 'PARKED';
               oItem.statusText = 'Parked';
@@ -173,6 +173,15 @@ sap.ui.define(
               this.getView().getModel('viewModel').setProperty('/scaleFactor/precision', 0);
           }
         });
+
+        this._getOrderDetails().then((oData) => {
+          var oCustomData = oData.customValues.reduce((acc, val) => {
+            acc[val.attribute] = val.value;
+            return acc;
+          }, {});
+          this.selectedOrder.customData = oCustomData;
+          oViewModel.setProperty('/orderCustomData', oCustomData);
+        });
       },
 
       onCalculateNewBomQty: function (oEvent) {
@@ -184,7 +193,9 @@ sap.ui.define(
             plant: this.getPodController().getUserPlant(),
             hdrmat: this.selectedOrder.materialName,
             grUom: this.selectedOrder.baseInternalUom,
-            grQty: fGrQty
+            grQty: fGrQty,
+            bomAltId: this.selectedOrder.customData.BOM_ALT_ID,
+            erpBom: this.selectedOrder.customData.ERP_BOM
           }
         };
 
@@ -536,7 +547,7 @@ sap.ui.define(
       },
 
       _getOrderDetails: function () {
-        var sUrl = this.getPublicApiRestDataSourceUri() + '/order/v1/orders/';
+        var sUrl = this.getPublicApiRestDataSourceUri() + 'order/v1/orders';
         var oParams = {
           plant: this.getPodController().getUserPlant(),
           order: this.selectedOrder.order

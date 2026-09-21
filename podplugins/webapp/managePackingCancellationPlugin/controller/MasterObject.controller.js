@@ -14,7 +14,8 @@ sap.ui.define(
     'sap/m/Button',
     'sap/m/ButtonType',
     'sap/ui/core/Fragment',
-    '../util/formatter'
+    '../util/formatter',
+    'sap/dm/dme/formatter/DateTimeUtils'
   ],
   function (
     JSONModel,
@@ -31,7 +32,8 @@ sap.ui.define(
     Button,
     ButtonType,
     Fragment,
-    Formatter
+    Formatter,
+    DateTimeUtils
   ) {
     'use strict';
 
@@ -43,6 +45,7 @@ sap.ui.define(
       },
 
       formatter: Formatter,
+      oDateTimeUtils: DateTimeUtils,
 
       onInit: function () {
         var oView = this.getView();
@@ -668,7 +671,9 @@ sap.ui.define(
               type: ButtonType.Emphasized,
               text: this.getI18nText('ok'),
               press: function () {
-                const sCancelationText = this.getView().getModel('cancelReason').getProperty('/value');
+                let sCancelationText = this.getView().getModel('cancelReason').getProperty('/value');
+                //Add custom cancellation tag to the cancellation message
+                sCancelationText = `Cancellation done by the custom App ${Date.now() } ${sCancelationText}`;
 
                 switch (sCancelType) {
                   case 'ActQtyCombined':
@@ -1293,7 +1298,12 @@ sap.ui.define(
             this.onRefreshBtnPress();
             MessageToast.show(this.getI18nText('orderConformationSucess'));
           }.bind(this), // Bind the success callback to the current context
-          this._requestFailure.bind(this) // Bind the failure callback to the current context
+          function (oError){
+            // this._requestFailure.bind(this) // Bind the failure callback to the current context
+            this._requestFailure(...arguments);
+            // MessageBox.error(oError.error.causeMessage);
+            MessageBox.error("The stock is insufficient, respective inventory has been used, relocated or scrapped");
+          }.bind(this)
         );
       },
 

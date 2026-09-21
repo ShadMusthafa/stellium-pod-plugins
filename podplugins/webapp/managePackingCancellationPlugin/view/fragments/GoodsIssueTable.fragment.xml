@@ -97,7 +97,8 @@
                 <!-- <Text text="{goodsIssueItems>postingDateTime}"/> -->
                 <Text text="{ path: 'goodsIssueItems>postingDateTime', formatter: '.formatter.formatSingleDate' }" />
                 <!-- <Text text="{goodsIssueItems>createdDateTime}"/> -->
-                <Text text="{ path: 'goodsIssueItems>createdDateTime', formatter: '.formatter.formatDateAndTime' }" />
+                <!-- <Text text="{ path: 'goodsIssueItems>createdDateTime', formatter: '.formatter.formatDateAndTime' }" /> -->
+                <Text text="{ path: 'goodsIssueItems>createdDateTime', formatter: '.oDateTimeUtils.dmcDateTimeFormatterFromUTC' }" />
                 <Text text="{goodsIssueItems>storageLocation}"/>
                 <Text text="{goodsIssueItems>comments}"/>
                 <Text text="{goodsIssueItems>cancellationComments}"/>

@@ -189,7 +189,12 @@ sap.ui.define(
 
         this._getParkedOrBatchCorrectionItems();
 
-        //  this._setShowFooterToolbar();
+        /* Check to see if the user is a supervisor */
+        this._getSupervisedUsers().then((oResponse) => {
+          if (oResponse.supervisedUserIds.length > 0) {
+            this.getView().getModel('confV3Model').setProperty('/isSupervisorUser', true);
+          }
+        });
       },
       // ResourceStatus: function () {
       //   if (!this._validateResourceStatus(this.selectedOrderData.resource.resource)) {
@@ -2299,92 +2304,49 @@ sap.ui.define(
       onYieldQuantityLiveChange: function (oEvent) {
         var oView = this.getView(),
           oPostModel = oView.getModel('qtyPostModel'),
-          value = oEvent.getSource().getValue();
-        var oInput = oEvent.getSource();
-        var oItem = oInput.getParent();
-        var oTable = this.byId('activity');
-        var aItems = oTable.getItems();
-        var oYieldInput = this.byId('yieldQuantity');
-        var oScrapInput = this.byId('scrapQuantity');
+          oYieldQtyInput = oEvent.getSource(),
+          fYieldQty = parseFloat(oYieldQtyInput.getValue()) || 0,
+          oScrapInput = oView.byId('scrapQuantity'),
+          fScrapQty = oPostModel.getProperty('/scrapQuantity/value') || 0;
 
-        oYieldInput.setValueState(sap.ui.core.ValueState.None);
-        oScrapInput.setValueState(sap.ui.core.ValueState.None);
+        //Clear error states from yield and scrap qty inputs
+        ErrorHandler.clearErrorState(oYieldQtyInput);
+        ErrorHandler.clearErrorState(oScrapInput);
 
-        var oData = oTable.getModel().getData().activitySummary;
-
-        var that = this,
-          sUrl = this.getPublicApiRestDataSourceUri() + 'user/v1/supervisors';
-
-        var oParameters = {
-          plant: this.getPodController().getUserPlant(),
-          userId: this.getGlobalProperty('loggedInUserDetails').userId
-        };
-        this.ajaxGetRequest(
-          sUrl,
-          oParameters,
-          function (oResponseData) {
-            if (oResponseData.supervisedUserIds.length === 0) {
-              for (var i = 0; i < aItems.length; i++) {
-                var oRow = aItems[i];
-                var aCells = oRow.getCells();
-                var oUpdateInput = aCells[1];
-                oUpdateInput.setEditable(false);
-              }
-            } else {
-              for (var i = 0; i < aItems.length; i++) {
-                var oRow = aItems[i];
-                var aCells = oRow.getCells();
-                var oUpdateInput = aCells[1];
-                oUpdateInput.setEditable(true);
-              }
-            }
-          },
-          function (oError, sHttpErrorMessage) {
-            console.error('Error fetching data:', error);
-            //that.handleErrorMessage(oError, sHttpErrorMessage);
-          }
-        );
-
-        // Get the index of the current item
-        var iIndex = oTable.indexOfItem(oItem);
-
-        // Loop through table items
-        for (var i = 0; i < aItems.length; i++) {
-          var oRow = aItems[i];
-          var aCells = oRow.getCells();
-          var oYieldInput = aCells[0];
-          var oUpdateInput = aCells[1];
-          oUpdateInput.setEditable(true); // Assuming the 3rd column has the input for result
-          var totalqty = this.getPodSelectionModel().selectedOrderData.sfcPlannedQtyInProductionUom;
-          var oScrap = this.byId('scrapQuantity');
-          var fscrapValue = parseFloat(oScrap.getValue()) || 0;
-          var fYieldValue = parseFloat(oInput.getValue()) || 0;
-          var fStandardValue = oData[i].targetQuantity.value;
-
-          if (!isNaN(fStandardValue)) {
-            var oconvertstvalue = fStandardValue * 60;
-            var fResult = (oconvertstvalue / totalqty) * (fYieldValue + fscrapValue);
-            var converttounit = fResult / 60;
-            oUpdateInput.setValue(converttounit.toFixed(2)); // Display result with 2 decimal places
-            //oUpdateInput.setEditable(false); // Make it non-editable after update
-          } else {
-            // Handle invalid or zero yield value
-            oUpdateInput.setValue(''); // Clear the result if yield is not valid
-            oUpdateInput.setEditable(true);
-          }
-        }
-
-        if (Number.isNaN(value) || (value && !this._validatePositiveNumber(value)) || parseFloat(value) === 0) {
-          ErrorHandler.setErrorState(oEvent.getSource(), this.getI18nText('POSITIVE_INPUT'));
+        // Validate user input for yield qty
+        if (Number.isNaN(fYieldQty) || (fYieldQty && !this._validatePositiveNumber(fYieldQty)) || parseFloat(fYieldQty) === 0) {
+          ErrorHandler.setErrorState(oYieldQtyInput, this.getI18nText('POSITIVE_INPUT'));
         } else {
-          ErrorHandler.clearErrorState(oEvent.getSource());
+          ErrorHandler.clearErrorState(oYieldQtyInput);
 
-          //!Move below logic to _enableConfirmButton
           var yieldQuantityValue = oPostModel.getProperty('/yieldQuantity/value');
           var scrapQuantityValue = oPostModel.getProperty('/scrapQuantity/value');
           if (yieldQuantityValue > 0 || scrapQuantityValue > 0) {
             this._enableConfirmButton();
           }
+        }
+
+        // Calculate the activity times
+        var oActivityConfTable = oView.byId('activity'),
+          aActivityItems = oActivityConfTable.getItems(),
+          fTotalSfcQty = this.getPodSelectionModel().selectedOrderData.sfcPlannedQtyInProductionUom,
+          oActivityData = oActivityConfTable.getModel().getData();
+        for (var i = 0; i < aActivityItems.length; i++) {
+          var oActivity = aActivityItems[i];
+          var fTargetValue = oActivityData.activitySummary[i].targetQuantity.value;
+          var oReportInput = oActivity.getCells()[1];
+
+          //If the target value is not available, no reported value
+          if (isNaN(fTargetValue)) {
+            oReportInput.setValue(0);
+            continue;
+          }
+
+          // If the target value is available, calculate activity time
+          var fTargetValueInSecs = fTargetValue * 60;
+          var fResult = (fTargetValueInSecs / fTotalSfcQty) * (fYieldQty + fScrapQty);
+          var fResultInMins = fResult / 60;
+          oReportInput.setValue(fResultInMins.toFixed(2));
         }
       },
 
@@ -2412,89 +2374,52 @@ sap.ui.define(
       onScrapQuantityLiveChange: function (oEvent) {
         var oView = this.getView(),
           oPostModel = oView.getModel('qtyPostModel'),
-          value = oEvent.getSource().getValue();
-        var oInput = this.byId('yieldQuantity');
-        var oItem = oInput.getParent();
-        var oTable = this.byId('activity');
-        var aItems = oTable.getItems();
-        var oYieldInput = this.byId('yieldQuantity');
-        var oScrapInput = this.byId('scrapQuantity');
+          oYieldQtyInput = this.byId('yieldQuantity'),
+          fYieldQty = parseFloat(oYieldQtyInput.getValue()) || 0,
+          oScrapQtyInput = this.byId('scrapQuantity'),
+          fScrapQty = parseFloat(oScrapQtyInput.getValue()) || 0;
 
-        oYieldInput.setValueState(sap.ui.core.ValueState.None);
-        oScrapInput.setValueState(sap.ui.core.ValueState.None);
-        // Get the index of the current item
-        var iIndex = oTable.indexOfItem(oItem);
-        var oData = oTable.getModel().getData().activitySummary;
-        var that = this,
-          sUrl = this.getPublicApiRestDataSourceUri() + 'user/v1/supervisors';
+        //Clear error states from yield and scrap qty inputs
+        ErrorHandler.clearErrorState(oYieldQtyInput);
+        ErrorHandler.clearErrorState(oScrapQtyInput);
 
-        var oParameters = {
-          plant: this.getPodController().getUserPlant(),
-          userId: this.getGlobalProperty('loggedInUserDetails').userId
-        };
-        this.ajaxGetRequest(
-          sUrl,
-          oParameters,
-          function (oResponseData) {
-            if (oResponseData.supervisedUserIds.length === 0) {
-              for (var i = 0; i < aItems.length; i++) {
-                var oRow = aItems[i];
-                var aCells = oRow.getCells();
-                var oUpdateInput = aCells[1];
-                oUpdateInput.setEditable(false);
-              }
-            } else {
-              for (var i = 0; i < aItems.length; i++) {
-                var oRow = aItems[i];
-                var aCells = oRow.getCells();
-                var oUpdateInput = aCells[1];
-                oUpdateInput.setEditable(true);
-              }
-            }
-          },
-          function (oError, sHttpErrorMessage) {
-            console.error('Error fetching data:', error);
-            //that.handleErrorMessage(oError, sHttpErrorMessage);
-          }
-        );
-        // Loop through table items
-        for (var i = 0; i < aItems.length; i++) {
-          var oRow = aItems[i];
-          var aCells = oRow.getCells();
-          var oYieldInput = aCells[0];
-          var oUpdateInput = aCells[1];
-          oUpdateInput.setEditable(true); // Assuming the 3rd column has the input for result
-          var totalqty = this.getPodSelectionModel().selectedOrderData.sfcQtyInProductionUom;
-          var oScrap = this.byId('scrapQuantity');
-          var fscrapValue = parseFloat(oScrap.getValue()) || 0;
-          var fYieldValue = parseFloat(oInput.getValue()) || 0;
-          var fStandardValue = oData[i].targetQuantity.value;
-
-          if (!isNaN(fStandardValue)) {
-            var oconvertstvalue = fStandardValue * 60;
-            var fResult = (oconvertstvalue / totalqty) * (fYieldValue + fscrapValue);
-            var converttounit = fResult / 60;
-            oUpdateInput.setValue(converttounit.toFixed(2)); // Display result with 2 decimal places
-            //oUpdateInput.setEditable(false); // Make it non-editable after update
-          } else {
-            // Handle invalid or zero yield value
-            oUpdateInput.setValue(''); // Clear the result if yield is not valid
-            oUpdateInput.setEditable(true);
-          }
-        }
-        if (Number.isNaN(value) || (value && !this._validatePositiveNumber(value)) || parseFloat(value) === 0) {
-          ErrorHandler.setErrorState(oEvent.getSource(), this.getI18nText('POSITIVE_INPUT'));
+        // Validate user input for yield qty
+        if (Number.isNaN(fScrapQty) || (fScrapQty && !this._validatePositiveNumber(fScrapQty)) || parseFloat(fScrapQty) === 0) {
+          ErrorHandler.setErrorState(oScrapQtyInput, this.getI18nText('POSITIVE_INPUT'));
         } else {
-          ErrorHandler.clearErrorState(oEvent.getSource());
+          ErrorHandler.clearErrorState(oScrapQtyInput);
 
-          //!Move below logic to _enableConfirmButton
           var yieldQuantityValue = oPostModel.getProperty('/yieldQuantity/value');
           var scrapQuantityValue = oPostModel.getProperty('/scrapQuantity/value');
           if (yieldQuantityValue > 0 || scrapQuantityValue > 0) {
             this._enableConfirmButton();
           }
         }
+
+        // Calculate the activity times
+        var oActivityConfTable = oView.byId('activity'),
+          aActivityItems = oActivityConfTable.getItems(),
+          fTotalSfcQty = this.getPodSelectionModel().selectedOrderData.sfcPlannedQtyInProductionUom,
+          oActivityData = oActivityConfTable.getModel().getData();
+        for (var i = 0; i < aActivityItems.length; i++) {
+          var oActivity = aActivityItems[i];
+          var fTargetValue = oActivityData.activitySummary[i].targetQuantity.value;
+          var oReportInput = oActivity.getCells()[1];
+
+          //If the target value is not available, no reported value
+          if (isNaN(fTargetValue)) {
+            oReportInput.setValue(0);
+            continue;
+          }
+
+          // If the target value is available, calculate activity time
+          var fTargetValueInSecs = fTargetValue * 60;
+          var fResult = (fTargetValueInSecs / fTotalSfcQty) * (fYieldQty + fScrapQty);
+          var fResultInMins = fResult / 60;
+          oReportInput.setValue(fResultInMins.toFixed(2));
+        }
       },
+
       onValidate: function () {
         var oTable = this.byId('activity');
         var aItems = oTable.getItems();
@@ -2524,8 +2449,10 @@ sap.ui.define(
         return bAnyValuePresent;
       },
 
-      onConfirm: async function () {
-        //Prevent confirmation from posting more than once
+      onConfirm: async function (oEvent) {
+        if (!oEvent.getSource().getEnabled()) return;
+        oEvent.getSource().setEnabled(false);
+
         if (this._isConfirmationInProgress) return;
         this._isConfirmationInProgress = true;
 
@@ -2539,12 +2466,13 @@ sap.ui.define(
           oReportDialog.setBusyIndicatorDelay(0);
           oReportDialog.setBusy(true);
           // this.handleOnDialogConfirmBtn();
-          this.oConsumptionPostingUtils.showDialog();
+          await this.oConsumptionPostingUtils.showDialog();
         } catch (e) {
           oReportDialog.setBusy(false);
         } finally {
           oReportDialog.setBusy(false);
           this._isConfirmationInProgress = false;
+          oEvent.getSource().setEnabled(true);
         }
       },
 
@@ -2640,6 +2568,7 @@ sap.ui.define(
           totalYieldQuantity += yieldQuantity + ScrapQuantity;
         });
         var Remaining = sfcQuantityValue - totalYieldQuantity;
+        Remaining = parseFloat(Remaining.toFixed(3));
         if (yieldValue + scrapValue > Remaining) {
           MessageBox.error('Remaining SFC Quantity : ' + Remaining + '');
           oYieldInput.setValueState(sap.ui.core.ValueState.Error);
@@ -2661,7 +2590,7 @@ sap.ui.define(
         }
 
         //Check if reason code is provided in case of scrap quantity
-        if (oScrapQtyInput.getValue() && oScrapQtyInput.getValue() >0 && !oReasonCodeInput.getValue()) {
+        if (oScrapQtyInput.getValue() && oScrapQtyInput.getValue() > 0 && !oReasonCodeInput.getValue()) {
           ErrorHandler.setErrorState(oReasonCodeInput, this.getI18nText('REASON_CODE_NOT_ASSIGNED'));
           return;
         }
@@ -2744,14 +2673,16 @@ sap.ui.define(
           }
         } catch (e) {
           console.error('Error posting confirmation', e);
+          return Promise.reject('Error posting confirmation');
         } finally {
           this.getView().setBusy(false);
           this.getView().byId('reportQuantityDialog').setBusy(false);
           this._isConfirmationInProgress = false;
+          return Promise.resolve();
         }
       },
 
-      postConfirmation: function () {
+      postConfirmation:async function () {
         var oReportDialog = this.getView().byId('reportQuantityDialog');
         if (!oReportDialog) {
           return;
@@ -2761,7 +2692,7 @@ sap.ui.define(
 
         try {
           // this.handleOnDialogConfirmBtnThrottled();
-          this.handleOnDialogConfirmBtn();
+          await this.handleOnDialogConfirmBtn();
         } catch (e) {
           oReportDialog.setBusy(false);
         } finally {
@@ -2873,7 +2804,7 @@ sap.ui.define(
         }
 
         var sUrl = 'https://djn-int-prod-dmc-d42lnn2u.it-cpi023-rt.cfapps.eu20-001.hana.ondemand.com/http/Confirmations';
-        this.ajaxPostRequest(
+        (this.ajaxPostRequest(
           sUrl,
           oPayload,
           function (oResponse) {
@@ -2883,7 +2814,7 @@ sap.ui.define(
           function (oError, oHttpErrorMessage) {
             var err = oError ? oError : oHttpErrorMessage;
             that.showErrorMessage(err, true, true);
-          };
+          });
       },
 
       onReasonCodePress: function (oEvent) {
@@ -3376,6 +3307,15 @@ sap.ui.define(
         }
 
         return Promise.resolve(true);
+      },
+
+      _getSupervisedUsers: function () {
+        var sUrl = this.getPublicApiRestDataSourceUri() + 'user/v1/supervisors';
+        var oParameters = {
+          plant: this.getPodController().getUserPlant(),
+          userId: this.getGlobalProperty('loggedInUserDetails').userId
+        };
+        return new Promise((resolve, reject) => this.ajaxGetRequest(sUrl, oParameters, resolve, reject));
       }
     });
 

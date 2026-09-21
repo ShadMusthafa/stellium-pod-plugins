@@ -97,7 +97,8 @@
                 <!-- <Text text="{FINISH_GOOD>postingDateTime}"/> -->
                 <Text text="{ path: 'FINISH_GOOD>postingDateTime', formatter: '.formatter.formatSingleDate' }" />
                 <!-- <Text text="{FINISH_GOOD>createdDateTime}"/> -->
-                <Text text="{ path: 'FINISH_GOOD>createdDateTime', formatter: '.formatter.formatDateAndTime' }" />
+                <!-- <Text text="{ path: 'FINISH_GOOD>createdDateTime', formatter: '.formatter.formatDateAndTime' }" /> -->
+                <Text text="{ path: 'FINISH_GOOD>createdDateTime', formatter: '.oDateTimeUtils.dmcDateTimeFormatterFromUTC' }" />
                 <Text text="{FINISH_GOOD>storageLocation}"/>
                 <Text text="{FINISH_GOOD>comments}"/>
                 <Text text="{FINISH_GOOD>cancellationComments}"/>

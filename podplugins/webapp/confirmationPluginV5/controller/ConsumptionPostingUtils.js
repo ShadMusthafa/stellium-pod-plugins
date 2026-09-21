@@ -1,4 +1,4 @@
-sap.ui.define(['sap/ui/base/Object', 'sap/ui/core/Fragment', 'sap/ui/model/json/JSONModel'], function (UI5Object, Fragment, JSONModel) {
+sap.ui.define(['sap/ui/base/Object', 'sap/ui/core/Fragment', 'sap/ui/model/json/JSONModel', 'sap/m/MessageBox'], function (UI5Object, Fragment, JSONModel, MessageBox) {
   return UI5Object.extend('stellium.ext.podplugins.confirmationPluginV5.controller.ConsumptionPostingUtils', {
     mStatusText: {
       DEFAULT: 'Posting Pending',
@@ -23,7 +23,7 @@ sap.ui.define(['sap/ui/base/Object', 'sap/ui/core/Fragment', 'sap/ui/model/json/
 
       this._oDialog.setBusy(true);
 
-      this._getConsumptionListForSfc()
+      return this._getConsumptionListForSfc()
         .then((oResponse) => {
           let oStatus = {
             status: 'None',
@@ -66,6 +66,18 @@ sap.ui.define(['sap/ui/base/Object', 'sap/ui/core/Fragment', 'sap/ui/model/json/
 
     onConsumeBtnPress: function (oEvent) {
       if (this._isConsumptionInProgress) return;
+
+      var aItems = this._oModel.getProperty('/items').filter((oItem) => oItem.status.status !== 'Success');
+      var aItemsWithoutInventory = aItems.filter((oItem) => !oItem.inventory || !oItem.inventory.inventoryId)
+      if (aItemsWithoutInventory.length) {
+        var sMsg = '';
+        aItemsWithoutInventory.forEach(oItem=>{
+          sMsg += `Batch ${oItem.batchNo} does not have stock in storage location ${oItem.storageLocation}\n`;
+        })
+        MessageBox.error(sMsg);
+        return;
+      }
+
       this._isConsumptionInProgress = true;
       // this.onConsumeBtnThrottled(oEvent);
       this._consumeComponent(oEvent);
@@ -142,33 +154,72 @@ sap.ui.define(['sap/ui/base/Object', 'sap/ui/core/Fragment', 'sap/ui/model/json/
         workcenter: oSelectedPhase.workCenter.workcenter
       };
 
+      // return new Promise((resolve, reject) => that.ajaxGetRequest(sUrl, oParams, resolve, reject)).then(async (aResponse) => {
+      //   let mBatches = aResponse.data.reduce((acc, val) => {
+      //     acc[val.batchNo] = val.batchNo;
+      //     return acc;
+      //   }, {});
+
+      //   let aUniqueBatches = Object.keys(mBatches);
+      //   let aInventoryPromise = aUniqueBatches.map((sBatch) => this._getInventoryData(sBatch));
+      //   return Promise.all(aInventoryPromise).then((aInventories) => {
+      //     aInventories.forEach((oInventory) => (mBatches[oInventory.content[0]?.batchNumber] = oInventory.content[0]));
+      //     return aResponse.data.map((oItem) => {
+      //       oItem.inventory = mBatches[oItem.batchNo];
+      //       return oItem;
+      //     });
+      //   });
+      // });
+
       return new Promise((resolve, reject) => that.ajaxGetRequest(sUrl, oParams, resolve, reject)).then(async (aResponse) => {
-        let mBatches = aResponse.data.reduce((acc, val) => {
-          acc[val.batchNo] = val.batchNo;
+        // Create unique storageLocation + batch combinations
+        let mBatchSloc = aResponse.data.reduce((acc, val) => {
+          const key = `${val.storageLocation}-${val.batchNo}`;
+
+          if (!acc[key]) {
+            acc[key] = {
+              batchNo: val.batchNo,
+              storageLocation: val.storageLocation
+            };
+          }
+
           return acc;
         }, {});
 
-        let aUniqueBatches = Object.keys(mBatches);
-        let aInventoryPromise = aUniqueBatches.map((sBatch) => this._getInventoryData(sBatch));
-        return Promise.all(aInventoryPromise).then((aInventories) => {
-          aInventories.forEach((oInventory) => (mBatches[oInventory.content[0]?.batchNumber] = oInventory.content[0]));
-          return aResponse.data.map((oItem) => {
-            oItem.inventory = mBatches[oItem.batchNo];
-            return oItem;
-          });
+        const aUniquePairs = Object.values(mBatchSloc);
+
+        // Call inventory service for each unique pair
+        const aInventoryPromise = aUniquePairs.map((oItem) => this._getInventoryData(oItem.batchNo, oItem.storageLocation));
+
+        const aInventories = await Promise.all(aInventoryPromise);
+
+        // Map results back using same key
+        aInventories.forEach((oInventory, index) => {
+          const { batchNo, storageLocation } = aUniquePairs[index];
+          const key = `${storageLocation}-${batchNo}`;
+
+          mBatchSloc[key] = oInventory.content?.[0];
+        });
+
+        // Attach inventory back to original response
+        return aResponse.data.map((oItem) => {
+          const key = `${oItem.storageLocation}-${oItem.batchNo}`;
+          oItem.inventory = mBatchSloc[key];
+          return oItem;
         });
       });
 
       // return new Promise((resolve, reject) => that.ajaxGetRequest(sUrl, oParams, resolve, reject));
     },
 
-    _getInventoryData: function (sBatchNo) {
+    _getInventoryData: function (sBatchNo, sStorageLocation) {
       let that = this._oController,
         sUrl = that.getPublicApiRestDataSourceUri() + 'inventory/v1/inventories';
 
       let oParams = {
         plant: that.getPodController().getUserPlant(),
-        batchNumber: sBatchNo
+        batchNumber: sBatchNo,
+        storageLocation: sStorageLocation
       };
 
       return new Promise((resolve, reject) => that.ajaxGetRequest(sUrl, oParams, resolve, reject));
@@ -202,7 +253,7 @@ sap.ui.define(['sap/ui/base/Object', 'sap/ui/core/Fragment', 'sap/ui/model/json/
         // quantity: oConsumptionItem.quantity,
         unitOfMeasure: oConsumptionItem.uom,
         postedBy: that.getPodController().getUserId(),
-        postingDateTime: moment().subtract(1, 'seconds').format('YYYY-MM-DD HH:mm:ss'),
+        postingDateTime: moment().tz('Asia/Riyadh').subtract(3, 'seconds').format('YYYY-MM-DD HH:mm:ss'),
         comments: 'Portioning consumption posting'
       };
 

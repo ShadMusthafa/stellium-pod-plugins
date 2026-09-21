@@ -5,14 +5,15 @@
         title="{i18n>cancelConfirmationsTitle}"
         afterClose=".onCancelConfirmationDialogAfterClose">
         <content>
-            <Table id="idCancellationTable" items="{cancellationItems>/}">
+            <Table id="idCancellationTable" items="{cancellationItems>/}" mode="MultiSelect">
                 <columns>
-                    <Column><Text text="{i18n>operationDescription}"/></Column>
-                    <Column><Text text="{i18n>confirmationGroup}"/></Column>
-                    <Column><Text text="{i18n>confirmationCounter}"/></Column>
-                    <Column><Text text="{i18n>postedBy}"/></Column>
-                    <Column><Text text="{i18n>createdOn}"/></Column>
-                    <Column><Text text="{i18n>type}"/></Column>
+                    <Column width="12rem"><Text text="{i18n>operationDescription}"/></Column>
+                    <Column width="6rem"><Text text="{i18n>confirmationGroup}"/></Column>
+                    <Column width="6rem"><Text text="{i18n>confirmationCounter}"/></Column>
+                    <Column width="15rem"><Text text="{i18n>postedBy}"/></Column>
+                    <Column width="6rem"><Text text="{i18n>createdOn}"/></Column>
+                    <Column width="10rem"><Text text="{i18n>type}"/></Column>
+                    <Column><Text text="{i18n>message}"/></Column>
                 </columns>
                 <items>
                     <ColumnListItem>
@@ -28,6 +29,7 @@
                                 formatter: '.formatter.formatSingleDate'
                             }" />
                             <Text text="{= ${cancellationItems>isActivityConfirmation} ? 'Activity Confirmation' : 'Quantity Confirmation' }"/>
+                            <Text text="{cancellationItems>message}"/>
                         </cells>
                     </ColumnListItem>
                 </items>

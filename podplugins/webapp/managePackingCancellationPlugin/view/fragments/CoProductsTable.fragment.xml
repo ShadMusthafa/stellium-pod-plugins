@@ -97,7 +97,8 @@
                 <!-- <Text text="{CO_PRODUCT>postingDateTime}"/> -->
                 <Text text="{ path: 'CO_PRODUCT>postingDateTime', formatter: '.formatter.formatSingleDate' }" />
                 <!-- <Text text="{CO_PRODUCT>createdDateTime}"/> -->
-                <Text text="{ path: 'CO_PRODUCT>createdDateTime', formatter: '.formatter.formatDateAndTime' }" />
+                <!-- <Text text="{ path: 'CO_PRODUCT>createdDateTime', formatter: '.formatter.formatDateAndTime' }" /> -->
+                <Text text="{ path: 'CO_PRODUCT>createdDateTime', formatter: '.oDateTimeUtils.dmcDateTimeFormatterFromUTC' }" />
                 <Text text="{CO_PRODUCT>storageLocation}"/>
                 <Text text="{CO_PRODUCT>comments}"/>
                 <Text text="{CO_PRODUCT>cancellationComments}"/>  

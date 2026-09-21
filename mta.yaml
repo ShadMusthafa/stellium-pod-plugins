@@ -7,7 +7,7 @@ modules:
    path: podplugins
    parameters:
       disk-quota: 512M
-      memory: 256M
+      memory: 100M
    properties:
         httpHeaders:
         - X-Frame-Options: deny

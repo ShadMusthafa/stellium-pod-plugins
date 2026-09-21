@@ -148,7 +148,7 @@ sap.ui.define(
         this.getView().setModel(new JSONModel({}), 'orderDataModel');
 
         this.prepareBusyDialog();
-        this.handleOnDialogConfirmBtnThrottled = this._throttle(this.handleOnDialogConfirmBtn, 1000);
+        this.handleOnDialogConfirmBtnThrottled = this._throttle(this.handleOnDialogConfirmBtn, 2000);
 
         this._isConfirmationInProgress = false;
       },
@@ -2377,25 +2377,30 @@ sap.ui.define(
         }
       },
 
-      onConfirm: function () {
+      onConfirm:async function (oEvent) {
+        if (!oEvent.getSource().getEnabled()) return;
+        oEvent.getSource().setEnabled(false);
+
         if (this._isConfirmationInProgress) return;
         this._isConfirmationInProgress = true;
 
         var oReportDialog = this.getView().byId('reportQuantityDialog');
         if (!oReportDialog) {
+          this._isConfirmationInProgress = false;
           return;
         }
-        oReportDialog.setBusyIndicatorDelay(100);
+        oReportDialog.setBusyIndicatorDelay(0);
         oReportDialog.setBusy(true);
 
         try {
-          // this.handleOnDialogConfirmBtnThrottled();
-          this.handleOnDialogConfirmBtn();
+          await this.handleOnDialogConfirmBtnThrottled();
+          // this.handleOnDialogConfirmBtn();
         } catch (e) {
           oReportDialog.setBusy(false);
         } finally {
           oReportDialog.setBusy(false);
           this._isConfirmationInProgress = false;
+          oEvent.getSource().setEnabled(true);
         }
       },
 
@@ -2405,10 +2410,11 @@ sap.ui.define(
           const args = arguments;
           const context = this;
           if (!inThrottle) {
-            func.apply(context, args);
             inThrottle = true;
             setTimeout(() => (inThrottle = false), limit);
+            return func.apply(context, args);
           }
+          return Promise.resolve();
         }.bind(this);
       },
 
@@ -2492,6 +2498,7 @@ sap.ui.define(
           totalYieldQuantity += yieldQuantity + ScrapQuantity;
         });
         var Remaining = sfcQuantityValue - totalYieldQuantity;
+        Remaining = parseFloat(Remaining.toFixed(3));
         if (yieldValue + scrapValue > Remaining) {
           MessageBox.error('Remaining SFC Quantity : ' + Remaining + '');
           oYieldInput.setValueState(sap.ui.core.ValueState.Error);
@@ -2513,7 +2520,7 @@ sap.ui.define(
         }
 
         //Check if reason code is provided in case of scrap quantity
-        if (oScrapQtyInput.getValue() && oScrapQtyInput.getValue() >0 && !oReasonCodeInput.getValue()) {
+        if (oScrapQtyInput.getValue() && oScrapQtyInput.getValue() > 0 && !oReasonCodeInput.getValue()) {
           ErrorHandler.setErrorState(oReasonCodeInput, this.getI18nText('REASON_CODE_NOT_ASSIGNED'));
           return;
         }
@@ -2571,6 +2578,7 @@ sap.ui.define(
         // this.postGrData(sUrl, this.qtyPostData);
 
         //  this.onCloseReportQuantityDialog();
+        return Promise.resolve();
       },
 
       reportQuantity: function () {

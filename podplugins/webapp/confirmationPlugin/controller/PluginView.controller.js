@@ -1957,7 +1957,10 @@ sap.ui.define(
         }
       },
 
-      onConfirm: function () {
+      onConfirm: function (oEvent) {
+        let oCnfBtn = oEvent.getSource();
+        oCnfBtn.setEnabled(false);
+
         if (ErrorHandler.hasErrors()) {
           return;
         }
@@ -2020,6 +2023,8 @@ sap.ui.define(
         this.qtyPostData.finalConfirmation = this.byId('finalConfirmation').getSelected();
         // this.postGrData(sUrl, this.qtyPostData);
         this.onCloseReportQuantityDialog();
+
+        oCnfBtn.setEnabled(true);
       },
 
       reportQuantity: function () {
